@@ -59,6 +59,7 @@ export interface DeliberationSession {
   academic_year?: {
     id: string;
     name: string;
+    is_current?: boolean;
   };
   president?: {
     id: string;
@@ -73,6 +74,9 @@ export interface DeliberationSession {
   stats?: {
     total_students: number;
     results_count: number;
+    passed_students?: number;
+    failed_students?: number;
+    pending_students?: number;
   };
 }
 

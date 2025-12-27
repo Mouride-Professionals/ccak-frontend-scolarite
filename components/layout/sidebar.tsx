@@ -44,6 +44,12 @@ const menuItems: MenuItem[] = [
     ),
     children: [
       {
+        id: "programmes",
+        label: "Programmes",
+        href: "/programmes",
+        icon: null as any,
+      },
+      {
         id: "students",
         label: "Étudiants",
         href: "/students",
