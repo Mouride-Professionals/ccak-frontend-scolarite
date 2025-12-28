@@ -10,6 +10,9 @@ import type {
   DeliberationSessionFilters,
   CreateDeliberationSessionInput,
   UpdateDeliberationSessionInput,
+  DeliberationResult,
+  CreateDeliberationResultInput,
+  UpdateDeliberationResultInput,
 } from "@/types/deliberation";
 import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import * as deliberationsApi from "@/lib/api/deliberations";
@@ -159,5 +162,82 @@ export function useFacultyMembers() {
     queryKey: ["faculty-members"],
     queryFn: () => deliberationsApi.getFacultyMembers(),
     staleTime: 300000,
+  });
+}
+
+// =====================
+// DELIBERATION RESULTS
+// =====================
+
+export const deliberationResultKeys = {
+  all: ["deliberation-results"] as const,
+  lists: () => [...deliberationResultKeys.all, "list"] as const,
+  list: (sessionId: string, filters?: any) =>
+    [...deliberationResultKeys.lists(), sessionId, filters] as const,
+  details: () => [...deliberationResultKeys.all, "detail"] as const,
+  detail: (id: string) => [...deliberationResultKeys.details(), id] as const,
+};
+
+/**
+ * Get deliberation results for a session
+ */
+export function useDeliberationResults(
+  sessionId: string,
+  filters?: any
+) {
+  return useQuery({
+    queryKey: deliberationResultKeys.list(sessionId, filters),
+    queryFn: () => deliberationsApi.getDeliberationResults(sessionId, filters),
+    enabled: !!sessionId,
+    staleTime: 10000, // 10 seconds (shorter for active editing)
+  });
+}
+
+/**
+ * Create a deliberation result
+ */
+export function useCreateDeliberationResult() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deliberationsApi.createDeliberationResult,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
+  });
+}
+
+/**
+ * Update a deliberation result
+ */
+export function useUpdateDeliberationResult() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: any }) =>
+      deliberationsApi.updateDeliberationResult(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
+  });
+}
+
+/**
+ * Batch update deliberation results
+ */
+export function useBatchUpdateDeliberationResults() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deliberationsApi.batchUpdateDeliberationResults,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
   });
 }

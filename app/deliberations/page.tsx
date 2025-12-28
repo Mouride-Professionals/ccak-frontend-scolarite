@@ -172,7 +172,7 @@ export default function DeliberationsPage() {
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Rechercher une session..."
-                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                className="block w-96 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               />
             </div>
             <button
@@ -325,9 +325,28 @@ export default function DeliberationsPage() {
 
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
-              <p className="text-sm text-zinc-500">
-                Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} sessions
-              </p>
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-zinc-500">
+                  Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} sessions
+                </p>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="perPage" className="text-sm text-zinc-600">
+                    Éléments par page:
+                  </label>
+                  <select
+                    id="perPage"
+                    value={filters.limit ?? 10}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
+                    className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 transition-colors focus:border-[#008D36] focus:outline-none focus:ring-2 focus:ring-[#008D36]/20"
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
