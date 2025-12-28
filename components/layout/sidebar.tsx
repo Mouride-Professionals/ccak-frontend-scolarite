@@ -44,6 +44,18 @@ const menuItems: MenuItem[] = [
     ),
     children: [
       {
+        id: "programmes",
+        label: "Programmes",
+        href: "/programmes",
+        icon: null as any,
+      },
+      {
+        id: "course-units",
+        label: "Unités d'Enseignement",
+        href: "/course-units",
+        icon: null as any,
+      },
+>>>>>>> Stashed changes
         id: "students",
         label: "Étudiants",
         href: "/students",
