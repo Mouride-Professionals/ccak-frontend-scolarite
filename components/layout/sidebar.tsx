@@ -44,6 +44,36 @@ const menuItems: MenuItem[] = [
     ),
     children: [
       {
+        id: "faculties",
+        label: "Facultés",
+        href: "/faculties",
+        icon: null as any,
+      },
+      {
+        id: "departments",
+        label: "Départements",
+        href: "/departments",
+        icon: null as any,
+      },
+      {
+        id: "programmes",
+        label: "Programmes",
+        href: "/programmes",
+        icon: null as any,
+      },
+      {
+        id: "course-units",
+        label: "Unités d'Enseignement",
+        href: "/course-units",
+        icon: null as any,
+      },
+      {
+        id: "courses",
+        label: "Cours",
+        href: "/courses",
+        icon: null as any,
+      },
+      {
         id: "students",
         label: "Étudiants",
         href: "/students",
@@ -53,6 +83,12 @@ const menuItems: MenuItem[] = [
         id: "deliberations",
         label: "Délibérations",
         href: "/deliberations",
+        icon: null as any,
+      },
+      {
+        id: "documents",
+        label: "Documents",
+        href: "/documents",
         icon: null as any,
       },
       {
@@ -66,7 +102,7 @@ const menuItems: MenuItem[] = [
   {
     id: "notes",
     label: "Notes",
-    href: "/notes",
+    href: "/grades",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -107,6 +143,40 @@ const menuItems: MenuItem[] = [
         />
       </svg>
     ),
+  },
+  {
+    id: "communication",
+    label: "Communication",
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+    children: [
+      {
+        id: "notifications-admin",
+        label: "Notifications",
+        href: "/dashboard/notifications",
+        icon: null as any,
+      },
+      {
+        id: "announcements-admin",
+        label: "Annonces",
+        href: "/dashboard/announcements",
+        icon: null as any,
+      },
+      {
+        id: "templates",
+        label: "Templates",
+        href: "/dashboard/templates",
+        icon: null as any,
+      },
+    ],
   },
 ];
 
