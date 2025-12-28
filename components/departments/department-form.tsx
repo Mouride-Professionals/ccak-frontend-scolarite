@@ -17,6 +17,7 @@ interface DepartmentFormProps {
   onCancel?: () => void;
 }
 
+//
 const DepartmentSchema = z.object({
   faculty_id: z.string().min(1, "Faculty is required"),
   name: z.string().min(1, "Name is required"),
