@@ -891,6 +891,166 @@ export const mockDocuments: Document[] = [
 ];
 
 // =====================
+// ADMINS
+// =====================
+
+export const mockAdmins: Admin[] = [
+  {
+    id: "admin-1",
+    full_name: "Dr. Marie Diop",
+  },
+  {
+    id: "admin-2",
+    full_name: "M. Jean-Pierre Niang",
+  },
+];
+
+// =====================
+// GUARDIANS
+// =====================
+
+export const mockGuardians: Guardian[] = [
+  {
+    id: "guardian-1",
+    student_id: "stud-1",
+    full_name: "Mamadou Diallo Sr.",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221771234560",
+    email: "mamadou.diallo.sr@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Ingénieur",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-2",
+    student_id: "stud-1",
+    full_name: "Fatou Diallo",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221772345671",
+    email: "fatou.diallo@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Enseignante",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-3",
+    student_id: "stud-2",
+    full_name: "Moussa Sow",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221773456782",
+    email: "moussa.sow@email.com",
+    address: "456 Avenue Léopold Sédar Senghor, Saint-Louis, Sénégal",
+    occupation: "Commerçant",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-4",
+    student_id: "stud-3",
+    full_name: "Marie Ndiaye",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221774567893",
+    email: "marie.ndiaye@email.com",
+    address: "789 Boulevard Général de Gaulle, Thiès, Sénégal",
+    occupation: "Médecin",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DOCUMENTS
+// =====================
+
+export const mockDocuments: Document[] = [
+  {
+    id: "doc-1",
+    student_id: "stud-1",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-1/cni.pdf",
+    file_name: "cni_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Document valide",
+    uploaded_at: "2024-09-01T10:00:00Z",
+    reviewed_at: "2024-09-02T14:30:00Z",
+    created_at: "2024-09-01T10:00:00Z",
+    updated_at: "2024-09-02T14:30:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-2",
+    student_id: "stud-1",
+    type: DocumentType.BIRTH_CERT,
+    file_path: "/uploads/students/stud-1/birth_cert.pdf",
+    file_name: "acte_naissance_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Certificat de naissance authentique",
+    uploaded_at: "2024-09-01T10:15:00Z",
+    reviewed_at: "2024-09-02T14:35:00Z",
+    created_at: "2024-09-01T10:15:00Z",
+    updated_at: "2024-09-02T14:35:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-3",
+    student_id: "stud-1",
+    type: DocumentType.PHOTO,
+    file_path: "/uploads/students/stud-1/photo.jpg",
+    file_name: "photo_mamadou_diallo.jpg",
+    status: DocumentStatus.PENDING,
+    uploaded_at: "2024-09-01T10:30:00Z",
+    created_at: "2024-09-01T10:30:00Z",
+    updated_at: "2024-09-01T10:30:00Z",
+  },
+  {
+    id: "doc-4",
+    student_id: "stud-2",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-2/cni.pdf",
+    file_name: "cni_amidata_sow.pdf",
+    status: DocumentStatus.REJECTED,
+    reviewed_by: "admin-2",
+    notes: "Document expiré - Veuillez fournir une CNI valide",
+    uploaded_at: "2024-09-01T11:00:00Z",
+    reviewed_at: "2024-09-03T09:15:00Z",
+    created_at: "2024-09-01T11:00:00Z",
+    updated_at: "2024-09-03T09:15:00Z",
+    reviewer: {
+      id: "admin-2",
+      full_name: "M. Jean-Pierre Niang",
+    },
+  },
+  {
+    id: "doc-5",
+    student_id: "stud-2",
+    type: DocumentType.BAC_DIPLOMA,
+    file_path: "/uploads/students/stud-2/bac.pdf",
+    file_name: "bac_amidata_sow.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Diplôme du BAC validé",
+    uploaded_at: "2024-09-01T11:15:00Z",
+    reviewed_at: "2024-09-02T16:00:00Z",
+    created_at: "2024-09-01T11:15:00Z",
+    updated_at: "2024-09-02T16:00:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+];
+
+// =====================
 // STUDENTS
 // =====================
 
