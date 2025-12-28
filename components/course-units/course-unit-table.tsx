@@ -52,15 +52,15 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200">
+          <tbody className="divide-y divide-zinc-100">
             {courseUnits.map((courseUnit) => (
-              <tr key={courseUnit.id} className="hover:bg-zinc-50">
-                <td className="px-6 py-4">
+              <tr key={courseUnit.id} className="bg-white transition-colors hover:bg-zinc-50/50">
+                <td className="px-6 py-5">
                   <div className="text-sm font-medium text-zinc-900">
                     {courseUnit.code}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <div className="text-sm font-medium text-zinc-900">
                     {courseUnit.name}
                   </div>
@@ -102,12 +102,28 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                     {courseUnit.isActive ? "Actif" : "Inactif"}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
+                <td className="px-6 py-5">
+                  <div className="flex items-center justify-end gap-2">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(courseUnit.id)}
+                        className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
+                        title="Éditer"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    )}
                     <Link
                       href={`/course-units/${courseUnit.id}`}
-                      className="text-zinc-500 hover:text-[#00365F] transition-colors"
-                      title="Voir les détails"
+                      className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
+                      title="Voir"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -124,26 +140,10 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                         />
                       </svg>
                     </Link>
-                    {onEdit && (
-                      <button
-                        onClick={() => onEdit(courseUnit.id)}
-                        className="text-[#008D36] hover:text-[#007A2E] transition-colors"
-                        title="Modifier"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
-                    )}
                     {onDelete && (
                       <button
                         onClick={() => onDelete(courseUnit.id)}
-                        className="text-red-600 hover:text-red-800 transition-colors"
+                        className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

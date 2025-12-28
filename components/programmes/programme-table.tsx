@@ -63,20 +63,20 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-200">
+          <tbody className="divide-y divide-zinc-100">
             {programmes.map((programme) => (
-              <tr key={programme.id} className="hover:bg-zinc-50">
-                <td className="px-6 py-4">
+              <tr key={programme.id} className="bg-white transition-colors hover:bg-zinc-50/50">
+                <td className="px-6 py-5">
                   <div className="text-sm font-medium text-zinc-900">
                     {programme.name}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
                     {getLevelLabel(programme.level)}
                   </span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <div className="text-sm text-zinc-900">
                     {programme.department?.name || "N/A"}
                   </div>
@@ -84,17 +84,17 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                     {programme.department?.code}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <div className="text-sm text-zinc-900">
                     {programme.duration_semesters} semestres
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <div className="text-sm text-zinc-900">
                     {programme.total_credits_required}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-5">
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
                       programme.is_active
@@ -105,12 +105,28 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                     {programme.is_active ? "Actif" : "Inactif"}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
+                <td className="px-6 py-5">
+                  <div className="flex items-center justify-end gap-2">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(programme.id)}
+                        className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
+                        title="Éditer"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                    )}
                     <Link
                       href={`/programmes/${programme.id}`}
-                      className="text-zinc-500 hover:text-[#00365F] transition-colors"
-                      title="Voir les détails"
+                      className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
+                      title="Voir"
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -127,26 +143,10 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                         />
                       </svg>
                     </Link>
-                    {onEdit && (
-                      <button
-                        onClick={() => onEdit(programme.id)}
-                        className="text-[#008D36] hover:text-[#007A2E] transition-colors"
-                        title="Modifier"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
-                    )}
                     {onDelete && (
                       <button
                         onClick={() => onDelete(programme.id)}
-                        className="text-red-600 hover:text-red-800 transition-colors"
+                        className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
