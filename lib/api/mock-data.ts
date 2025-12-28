@@ -8,7 +8,7 @@ import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
 
-import type { Student, Guardian, Document, Admin } from "@/types/student";
+import type { Student, Guardian, Document, Admin, SemesterResult } from "@/types/student";
 import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
 
 // =====================
@@ -548,6 +548,150 @@ export const mockStudents: Student[] = [
     status: StudentStatus.ACTIVE,
     created_at: "2024-09-01T00:00:00Z",
     updated_at: "2024-09-01T00:00:00Z",
+  },
+];
+
+// =====================
+// GUARDIANS
+// =====================
+
+export const mockGuardians: Guardian[] = [
+  {
+    id: "guardian-1",
+    student_id: "stu-1",
+    full_name: "Fatou Diop",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221771111112",
+    email: "fatou.diop@example.com",
+    address: "Parcelles Assainies, Dakar",
+    occupation: "Commercante",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-2",
+    student_id: "stu-2",
+    full_name: "Mamadou Kane",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221772222223",
+    email: "mamadou.kane@example.com",
+    address: "Liberte 6, Dakar",
+    occupation: "Enseignant",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-3",
+    student_id: "stu-3",
+    full_name: "Khady Sarr",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221773333334",
+    email: "khady.sarr@example.com",
+    address: "Plateau, Dakar",
+    occupation: "Infirmiere",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-4",
+    student_id: "stu-4",
+    full_name: "Ousmane Sow",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221774444445",
+    email: "ousmane.sow@example.com",
+    address: "Mermoz, Dakar",
+    occupation: "Comptable",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DOCUMENTS
+// =====================
+
+export const mockDocuments: Document[] = [
+  {
+    id: "doc-1",
+    student_id: "stu-1",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stu-1/cni.pdf",
+    file_name: "cni-moussa-diop.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Verifie",
+    uploaded_at: "2024-09-03T10:15:00Z",
+    reviewed_at: "2024-09-04T08:20:00Z",
+    created_at: "2024-09-03T10:15:00Z",
+    updated_at: "2024-09-04T08:20:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Admin CCAK",
+    },
+  },
+  {
+    id: "doc-2",
+    student_id: "stu-1",
+    type: DocumentType.BIRTH_CERT,
+    file_path: "/uploads/students/stu-1/birth-cert.pdf",
+    file_name: "birth-cert-moussa-diop.pdf",
+    status: DocumentStatus.PENDING,
+    uploaded_at: "2024-09-03T10:20:00Z",
+    created_at: "2024-09-03T10:20:00Z",
+    updated_at: "2024-09-03T10:20:00Z",
+  },
+  {
+    id: "doc-3",
+    student_id: "stu-2",
+    type: DocumentType.BAC_DIPLOMA,
+    file_path: "/uploads/students/stu-2/bac.pdf",
+    file_name: "bac-aissatou-kane.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-2",
+    notes: "Conforme",
+    uploaded_at: "2024-09-03T11:10:00Z",
+    reviewed_at: "2024-09-04T09:30:00Z",
+    created_at: "2024-09-03T11:10:00Z",
+    updated_at: "2024-09-04T09:30:00Z",
+    reviewer: {
+      id: "admin-2",
+      full_name: "Aminata Admin",
+    },
+  },
+  {
+    id: "doc-4",
+    student_id: "stu-3",
+    type: DocumentType.TRANSCRIPT,
+    file_path: "/uploads/students/stu-3/transcript.pdf",
+    file_name: "transcript-ibrahima-sarr.pdf",
+    status: DocumentStatus.REJECTED,
+    reviewed_by: "admin-1",
+    notes: "Document illisible",
+    uploaded_at: "2024-09-05T14:00:00Z",
+    reviewed_at: "2024-09-06T08:45:00Z",
+    created_at: "2024-09-05T14:00:00Z",
+    updated_at: "2024-09-06T08:45:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Admin CCAK",
+    },
+  },
+  {
+    id: "doc-5",
+    student_id: "stu-4",
+    type: DocumentType.PHOTO,
+    file_path: "/uploads/students/stu-4/photo.jpg",
+    file_name: "photo-mariama-sow.jpg",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-2",
+    uploaded_at: "2024-09-05T15:00:00Z",
+    reviewed_at: "2024-09-06T10:20:00Z",
+    created_at: "2024-09-05T15:00:00Z",
+    updated_at: "2024-09-06T10:20:00Z",
+    reviewer: {
+      id: "admin-2",
+      full_name: "Aminata Admin",
+    },
   },
 ];
 
