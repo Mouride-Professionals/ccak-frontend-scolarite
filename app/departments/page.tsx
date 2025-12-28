@@ -29,7 +29,6 @@ export default function DepartmentsPage() {
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editDepartmentId, setEditDepartmentId] = useState<string | null>(null);
-  const [viewDepartmentId, setViewDepartmentId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [facultyFilter, setFacultyFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -60,10 +59,6 @@ export default function DepartmentsPage() {
   const { data: departmentToEdit } = useDepartment(
     editDepartmentId || "",
     !!editDepartmentId
-  );
-  const { data: departmentToView } = useDepartment(
-    viewDepartmentId || "",
-    !!viewDepartmentId
   );
   const { data: facultiesData } = useFaculties();
   const deleteMutation = useDeleteDepartment();
@@ -255,11 +250,13 @@ export default function DepartmentsPage() {
             ) : (
               <DepartmentsTable
                 departments={departments}
-                onEdit={(id) => setEditDepartmentId(id)}
+                onEdit={(id) => {
+                  setIsCreateModalOpen(false);
+                  setEditDepartmentId(id);
+                }}
                 onDelete={(id) =>
                   setDeleteConfirm({ isOpen: true, departmentId: id })
                 }
-                onView={(id) => setViewDepartmentId(id)}
               />
             )}
           </div>
@@ -287,55 +284,6 @@ export default function DepartmentsPage() {
                 onSuccess={() => setEditDepartmentId(null)}
                 department={departmentToEdit}
               />
-            ) : (
-              <p>Chargement...</p>
-            )}
-          </Modal>
-
-          {/* View Modal */}
-          <Modal
-            isOpen={!!viewDepartmentId}
-            onClose={() => setViewDepartmentId(null)}
-            title="Détails du Département"
-            subtitle="Informations du département sélectionné"
-            size="md"
-          >
-            {departmentToView ? (
-              <div className="space-y-6 text-sm">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-zinc-500">Nom</p>
-                    <p className="font-medium text-zinc-900">{departmentToView.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-500">Code</p>
-                    <p className="font-medium text-zinc-900">{departmentToView.code}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-500">Faculté</p>
-                    <p className="font-medium text-zinc-900">{departmentToView.faculty?.name || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-500">Chef de département</p>
-                    <p className="font-medium text-zinc-900">{departmentToView.head?.name || "Non assigné"}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-500">Statut</p>
-                    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${departmentToView.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                      {departmentToView.is_active ? "Actif" : "Inactif"}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex justify-end border-t border-zinc-200 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setViewDepartmentId(null)}
-                    className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-                  >
-                    Fermer
-                  </button>
-                </div>
-              </div>
             ) : (
               <p>Chargement...</p>
             )}

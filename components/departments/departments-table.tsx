@@ -1,19 +1,18 @@
 "use client";
 
 import type { Department } from "@/types/department";
+import Link from "next/link";
 
 interface DepartmentsTableProps {
   departments: Department[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onView?: (id: string) => void;
 }
 
 export default function DepartmentsTable({
   departments,
   onEdit,
   onDelete,
-  onView,
 }: DepartmentsTableProps) {
   if (departments.length === 0) {
     return (
@@ -112,8 +111,8 @@ export default function DepartmentsTable({
                       </button>
                     )}
                     {/* View (center) */}
-                    <button
-                      onClick={() => onView?.(department.id)}
+                    <Link
+                      href={`/departments/${department.id}`}
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
@@ -131,7 +130,7 @@ export default function DepartmentsTable({
                         />
                         <circle cx="12" cy="12" r="3" strokeWidth={2} />
                       </svg>
-                    </button>
+                    </Link>
                     {onDelete && (
                       <button
                         onClick={() => onDelete(department.id)}

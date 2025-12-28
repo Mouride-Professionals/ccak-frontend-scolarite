@@ -4,10 +4,8 @@
  */
 
 import { api } from "@/lib/api-client";
-import type {
-  AcademicProgram,
-  Department,
-} from "@/types/academic";
+import type { AcademicProgram } from "@/types/academic";
+import type { Department } from "@/types/department";
 import type {
   AcademicProgramFilters,
   CreateProgrammeInput,

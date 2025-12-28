@@ -212,9 +212,9 @@ export default function ProgrammeDetailPage() {
                     <dd className="mt-1 text-sm text-zinc-900">{programme.department.code}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-zinc-500">Description</dt>
+                    <dt className="text-sm font-medium text-zinc-500">Faculté</dt>
                     <dd className="mt-1 text-sm text-zinc-900">
-                      {programme.department?.faculty?.description || "Aucune description"}
+                      {programme.department?.faculty?.name || "Aucune faculté"}
                     </dd>
                   </div>
                 </dl>

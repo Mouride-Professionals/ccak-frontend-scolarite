@@ -7,14 +7,12 @@ interface FacultiesTableProps {
   faculties: Faculty[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onView?: (id: string) => void;
 }
 
 export default function FacultiesTable({
   faculties,
   onEdit,
   onDelete,
-  onView,
 }: FacultiesTableProps) {
   if (faculties.length === 0) {
     return (
@@ -105,8 +103,8 @@ export default function FacultiesTable({
                       </button>
                     )}
                     {/* View (center) */}
-                    <button
-                      onClick={() => onView?.(faculty.id)}
+                    <Link
+                      href={`/faculties/${faculty.id}`}
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
@@ -124,7 +122,7 @@ export default function FacultiesTable({
                         />
                         <circle cx="12" cy="12" r="3" strokeWidth={2} />
                       </svg>
-                    </button>
+                    </Link>
                     {onDelete && (
                       <button
                         onClick={() => onDelete(faculty.id)}

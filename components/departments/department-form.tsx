@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Department, CreateDepartmentInput } from "@/types/department";
@@ -22,10 +22,10 @@ const DepartmentSchema = z.object({
   name: z.string().min(1, "Name is required"),
   code: z.string().min(1, "Code is required"),
   head_id: z.string().optional().nullable(),
-  is_active: z.boolean().optional().default(true),
+  is_active: z.boolean(),
 });
 
-type DepartmentFormData = z.infer<typeof DepartmentSchema>;
+type DepartmentFormData = z.input<typeof DepartmentSchema>;
 
 export function DepartmentForm({
   department,
@@ -56,13 +56,13 @@ export function DepartmentForm({
       : { is_active: true },
   });
 
-  const onSubmit = async (data: DepartmentFormData) => {
+  const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
     const input: CreateDepartmentInput = {
       faculty_id: data.faculty_id,
       name: data.name,
       code: data.code,
       head_id: data.head_id || null,
-      is_active: data.is_active,
+      is_active: data.is_active ?? true,
     };
 
     if (department) {

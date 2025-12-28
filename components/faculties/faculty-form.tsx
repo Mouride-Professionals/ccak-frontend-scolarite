@@ -21,10 +21,10 @@ const FacultySchema = z.object({
   name: z.string().min(1, "Name is required"),
   code: z.string().min(1, "Code is required"),
   dean_id: z.string().optional().nullable(),
-  is_active: z.boolean().optional().default(true),
+  is_active: z.boolean().default(true),
 });
 
-type FacultyFormData = z.infer<typeof FacultySchema>;
+type FacultyFormData = z.input<typeof FacultySchema>;
 
 export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) {
   const { mutate: createFaculty, isPending: isCreating } = useCreateFaculty();
@@ -55,7 +55,7 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
       name: data.name,
       code: data.code,
       dean_id: data.dean_id || null,
-      is_active: data.is_active,
+      is_active: data.is_active ?? true,
     };
 
     if (faculty) {
