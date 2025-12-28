@@ -55,7 +55,7 @@ const menuItems: MenuItem[] = [
         href: "/course-units",
         icon: null as any,
       },
->>>>>>> Stashed changes
+      {
         id: "students",
         label: "Étudiants",
         href: "/students",

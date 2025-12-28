@@ -3,7 +3,7 @@
  * This file contains static data for testing while backend is being developed
  */
 
-import type { AcademicYear, AcademicProgram, FacultyMember } from "@/types/academic";
+import type { AcademicYear, AcademicProgram, FacultyMember, Department } from "@/types/academic";
 import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
@@ -100,6 +100,43 @@ export const mockAcademicPrograms: AcademicProgram[] = [
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
+  },
+];
+
+// =====================
+// DEPARTMENTS
+// =====================
+
+export const mockDepartments: Department[] = [
+  {
+    id: "dept-1",
+    faculty_id: "fac-1",
+    name: "Informatique",
+    code: "INFO",
+    head_id: "fac-mem-1",
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-2",
+    faculty_id: "fac-1",
+    name: "Mathématiques",
+    code: "MATH",
+    head_id: "fac-mem-4",
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-3",
+    faculty_id: "fac-2",
+    name: "Physique",
+    code: "PHYS",
+    head_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
 ];
 
@@ -381,3 +418,12 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     },
   },
 ];
+
+// Debug log for mock data loading
+console.log("Mock data loaded:", {
+  mockAcademicPrograms: mockAcademicPrograms.length,
+  mockDepartments: mockDepartments.length,
+  mockAcademicYears: mockAcademicYears.length,
+  mockFacultyMembers: mockFacultyMembers.length,
+  mockDeliberationSessions: mockDeliberationSessions.length
+});

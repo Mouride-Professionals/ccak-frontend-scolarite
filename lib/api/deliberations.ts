@@ -4,6 +4,7 @@
  */
 
 import { api } from "@/lib/api-client";
+import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import type {
   DeliberationSession,
   DeliberationSessionsResponse,
@@ -11,6 +12,7 @@ import type {
   CreateDeliberationSessionInput,
   UpdateDeliberationSessionInput,
 } from "@/types/deliberation";
+import { DeliberationStatus } from "@/types/deliberation";
 import {
   mockDeliberationSessions,
   mockAcademicPrograms,
@@ -122,7 +124,7 @@ export async function createDeliberationSession(
     const newSession: DeliberationSession = {
       id: `delib-${Date.now()}`,
       ...input,
-      status: "SCHEDULED" as const,
+      status: DeliberationStatus.SCHEDULED,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       academic_program: program
@@ -162,7 +164,7 @@ export async function createDeliberationSession(
     return newSession;
   }
 
-  return api.post<DeliberationSession>("/deliberations", input);
+  return api.post<DeliberationSession>("/deliberations", input as unknown as Record<string, unknown>);
 }
 
 /**
@@ -190,7 +192,7 @@ export async function updateDeliberationSession(
     return updated;
   }
 
-  return api.put<DeliberationSession>(`/deliberations/${id}`, input);
+  return api.put<DeliberationSession>(`/deliberations/${id}`, input as unknown as Record<string, unknown>);
 }
 
 /**
@@ -234,7 +236,7 @@ export async function getAcademicPrograms() {
     await delay(200);
     return mockAcademicPrograms;
   }
-  return api.get("/academic-programs");
+  return api.get<AcademicProgram[]>("/academic-programs");
 }
 
 /**
@@ -245,7 +247,7 @@ export async function getAcademicYears() {
     await delay(200);
     return mockAcademicYears;
   }
-  return api.get("/academic-years");
+  return api.get<AcademicYear[]>("/academic-years");
 }
 
 /**
@@ -256,5 +258,5 @@ export async function getFacultyMembers() {
     await delay(200);
     return mockFacultyMembers;
   }
-  return api.get("/faculty-members");
+  return api.get<FacultyMember[]>("/faculty-members");
 }
