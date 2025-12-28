@@ -104,3 +104,170 @@ export interface SemesterResult {
   // Relations
   student?: Student;
 }
+
+// =====================
+// FORM TYPES
+// =====================
+
+export interface CreateStudentInput {
+  full_name: string;
+  gender: Gender;
+  date_of_birth: string;
+  place_of_birth: string;
+  nationality: string;
+  phone: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  address: string;
+  documents?: File[];
+  [key: string]: unknown;
+}
+
+export interface UpdateStudentInput extends Partial<CreateStudentInput> {
+  status?: StudentStatus;
+  [key: string]: unknown;
+}
+
+// =====================
+// FILTERS & QUERIES
+// =====================
+
+export interface StudentFilters {
+ status?: StudentStatus;
+ gender?: Gender;
+ search?: string;
+ page?: number;
+ limit?: number;
+}
+
+// =====================
+// GUARDIAN TYPES
+// =====================
+
+export enum GuardianRelationship {
+  FATHER = "FATHER",
+  MOTHER = "MOTHER",
+  GUARDIAN = "GUARDIAN",
+}
+
+export interface Guardian {
+  id: string;
+  student_id: string;
+  full_name: string;
+  relationship: GuardianRelationship;
+  phone: string;
+  email: string;
+  address: string;
+  occupation: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateGuardianInput {
+  student_id: string;
+  full_name: string;
+  relationship: GuardianRelationship;
+  phone: string;
+  email: string;
+  address: string;
+  occupation: string;
+  [key: string]: unknown;
+}
+
+export interface UpdateGuardianInput extends Partial<CreateGuardianInput> {
+  [key: string]: unknown;
+}
+
+export interface GuardiansResponse {
+  data: Guardian[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+// =====================
+// DOCUMENT TYPES
+// =====================
+
+export enum DocumentType {
+  CNI = "CNI",
+  BIRTH_CERT = "BIRTH_CERT",
+  BAC_DIPLOMA = "BAC_DIPLOMA",
+  TRANSCRIPT = "TRANSCRIPT",
+  PHOTO = "PHOTO",
+  MEDICAL = "MEDICAL",
+  OTHER = "OTHER",
+}
+
+export enum DocumentStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+export interface Document {
+  id: string;
+  student_id: string;
+  type: DocumentType;
+  file_path: string;
+  file_name: string;
+  status: DocumentStatus;
+  reviewed_by?: string;
+  notes?: string;
+  uploaded_at: string;
+  reviewed_at?: string;
+  created_at: string;
+  updated_at: string;
+
+  // Relations
+  reviewer?: {
+    id: string;
+    full_name: string;
+  };
+}
+
+export interface CreateDocumentInput {
+  student_id: string;
+  type: DocumentType;
+  file_path: string;
+  file_name: string;
+  [key: string]: unknown;
+}
+
+export interface UpdateDocumentInput extends Partial<CreateDocumentInput> {
+  status?: DocumentStatus;
+  reviewed_by?: string;
+  notes?: string;
+  reviewed_at?: string;
+  [key: string]: unknown;
+}
+
+export interface DocumentsResponse {
+  data: Document[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+// =====================
+// ADMIN TYPES
+// =====================
+
+export interface Admin {
+  id: string;
+  full_name: string;
+}
+
+// =====================
+// API RESPONSES
+// =====================
+
+export interface StudentsResponse {
+  data: Student[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}

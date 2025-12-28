@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DeliberationStatusBadge from "@/components/deliberations/deliberation-status-badge";
@@ -11,7 +12,9 @@ import Toast from "@/components/ui/toast";
 import {
   useDeliberationSession,
   useDeleteDeliberationSession,
+  useUpdateDeliberationStatus,
 } from "@/hooks/use-deliberations";
+import { DeliberationStatus } from "@/types/deliberation";
 
 export default function DeliberationDetailPage() {
   const router = useRouter();
@@ -19,28 +22,37 @@ export default function DeliberationDetailPage() {
   const sessionId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
     isOpen: false,
     message: "",
     type: "success",
   });
 
+  const statusMenuRef = useRef<HTMLDivElement>(null);
+
   const { data: session, isLoading, error } = useDeliberationSession(sessionId);
   const deleteMutation = useDeleteDeliberationSession();
+  const updateStatusMutation = useUpdateDeliberationStatus();
 
-  // Redirect if error
+  // Show 404 if error
   useEffect(() => {
     if (error) {
-      setToast({
-        isOpen: true,
-        message: "Session de délibération introuvable",
-        type: "error",
-      });
-      setTimeout(() => {
-        router.push("/deliberations");
-      }, 2000);
+      notFound();
     }
-  }, [error, router]);
+  }, [error]);
+
+  // Close status menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target as Node)) {
+        setShowStatusMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleDelete = async () => {
     try {
@@ -64,6 +76,38 @@ export default function DeliberationDetailPage() {
     }
   };
 
+  const handleStatusChange = async (newStatus: DeliberationStatus) => {
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: sessionId,
+        status: newStatus,
+      });
+      setShowStatusMenu(false);
+      setToast({
+        isOpen: true,
+        message: "Statut mis à jour avec succès",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la mise à jour du statut",
+        type: "error",
+      });
+    }
+  };
+
+  const getStatusLabel = (status: DeliberationStatus) => {
+    const labels = {
+      [DeliberationStatus.SCHEDULED]: "Programmée",
+      [DeliberationStatus.IN_PROGRESS]: "En cours",
+      [DeliberationStatus.COMPLETED]: "Terminée",
+      [DeliberationStatus.CLOSED]: "Clôturée",
+    };
+    return labels[status];
+  };
+
   if (isLoading) {
     return (
       <ProtectedRoute>
@@ -81,6 +125,10 @@ export default function DeliberationDetailPage() {
     );
   }
 
+  if (!session && !isLoading) {
+    notFound();
+  }
+
   if (!session) {
     return null;
   }
@@ -88,6 +136,24 @@ export default function DeliberationDetailPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Détails de la Session">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <Link
+            href="/deliberations"
+            className="flex items-center gap-2 text-sm font-medium text-[#00365F] transition-colors hover:text-[#008D36]"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Retour à la liste
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -99,20 +165,80 @@ export default function DeliberationDetailPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Results Button */}
             <Link
-              href={`/deliberations/${sessionId}/edit`}
-              className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              href={`/deliberations/${sessionId}/results`}
+              className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              Modifier
+              Saisir les résultats
             </Link>
+
+            {/* Change Status Button */}
+            <div className="relative" ref={statusMenuRef}>
+              <button
+                onClick={() => setShowStatusMenu(!showStatusMenu)}
+                className="flex items-center gap-2 rounded-lg border border-[#008D36] bg-white px-4 py-2 text-sm font-medium text-[#008D36] transition-colors hover:bg-[#008D36]/5"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Changer le statut
+              </button>
+
+              {/* Status Dropdown */}
+              {showStatusMenu && (
+                <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-zinc-200 bg-white shadow-lg">
+                  <div className="border-b border-zinc-200 px-4 py-3">
+                    <p className="text-sm font-medium text-zinc-900">Changer le statut</p>
+                    <p className="mt-1 text-xs text-zinc-500">Statut actuel : {getStatusLabel(session.status)}</p>
+                  </div>
+                  <div className="py-2">
+                    {Object.values(DeliberationStatus).map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => handleStatusChange(status)}
+                        disabled={status === session.status || updateStatusMutation.isPending}
+                        className={`flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                          status === session.status
+                            ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
+                            : "text-zinc-700 hover:bg-zinc-50"
+                        }`}
+                      >
+                        <span className={`h-2 w-2 rounded-full ${
+                          status === DeliberationStatus.SCHEDULED
+                            ? "bg-blue-500"
+                            : status === DeliberationStatus.IN_PROGRESS
+                            ? "bg-amber-500"
+                            : status === DeliberationStatus.COMPLETED
+                            ? "bg-green-500"
+                            : "bg-zinc-500"
+                        }`}></span>
+                        {getStatusLabel(status)}
+                        {status === session.status && (
+                          <svg className="ml-auto h-4 w-4 text-zinc-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               onClick={() => setDeleteConfirm(true)}
               className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100"
@@ -231,59 +357,6 @@ export default function DeliberationDetailPage() {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Stats */}
-          {session.stats && (
-            <div className="rounded-lg border border-zinc-200 bg-white p-6">
-              <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-                Statistiques
-              </h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-                <div>
-                  <p className="text-sm font-medium text-zinc-500">Étudiants inscrits</p>
-                  <p className="mt-1 text-2xl font-bold text-zinc-900">
-                    {session.stats.total_students}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-zinc-500">Admis</p>
-                  <p className="mt-1 text-2xl font-bold text-[#008D36]">
-                    {session.stats.passed_students}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-zinc-500">Ajournés</p>
-                  <p className="mt-1 text-2xl font-bold text-red-600">
-                    {session.stats.failed_students}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-zinc-500">En attente</p>
-                  <p className="mt-1 text-2xl font-bold text-amber-600">
-                    {session.stats.pending_students}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Back Button */}
-          <div className="flex justify-start">
-            <Link
-              href="/deliberations"
-              className="flex items-center gap-2 text-sm font-medium text-[#00365F] transition-colors hover:text-[#008D36]"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Retour à la liste
-            </Link>
           </div>
         </div>
 
