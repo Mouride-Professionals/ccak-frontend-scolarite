@@ -124,7 +124,7 @@ export default function DeliberationForm({
               value={formData.session_name}
               onChange={(e) => handleChange("session_name", e.target.value)}
               placeholder="| Saisir"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             />
             {errors.session_name && (
@@ -142,7 +142,7 @@ export default function DeliberationForm({
               id="session_date"
               value={formData.session_date}
               onChange={(e) => handleChange("session_date", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             />
             {errors.session_date && (
@@ -167,7 +167,7 @@ export default function DeliberationForm({
               id="academic_program_id"
               value={formData.academic_program_id}
               onChange={(e) => handleChange("academic_program_id", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             >
               <option value="">Sélectionner un programme</option>
@@ -191,7 +191,7 @@ export default function DeliberationForm({
               id="academic_year_id"
               value={formData.academic_year_id}
               onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             >
               <option value="">Sélectionner une année</option>
@@ -215,7 +215,7 @@ export default function DeliberationForm({
               id="semester"
               value={formData.semester}
               onChange={(e) => handleChange("semester", parseInt(e.target.value, 10))}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((sem) => (
@@ -246,7 +246,7 @@ export default function DeliberationForm({
               id="presided_by"
               value={formData.presided_by}
               onChange={(e) => handleChange("presided_by", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               disabled={isLoading}
             >
               <option value="">Sélectionner un président</option>

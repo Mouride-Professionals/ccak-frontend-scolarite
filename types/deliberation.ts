@@ -59,6 +59,7 @@ export interface DeliberationSession {
   academic_year?: {
     id: string;
     name: string;
+    is_current?: boolean;
   };
   president?: {
     id: string;
@@ -73,6 +74,9 @@ export interface DeliberationSession {
   stats?: {
     total_students: number;
     results_count: number;
+    passed_students?: number;
+    failed_students?: number;
+    pending_students?: number;
   };
 }
 
@@ -84,7 +88,7 @@ export interface DeliberationResult {
   id: string;
   deliberation_session_id: string;
   student_id: string;
-  decision: DeliberationDecision;
+  decision: DeliberationDecision | null;
   jury_remarks: string | null;
   is_with_honors: boolean;
   honor_level: HonorLevel | null;
@@ -99,6 +103,12 @@ export interface DeliberationResult {
     photo_url: string | null;
   };
   deliberation_session?: DeliberationSession;
+  semester_result?: {
+    semester_average: number;
+    semester_gpa: number;
+    total_credits_earned: number;
+    total_credits_enrolled: number;
+  };
 }
 
 // =====================

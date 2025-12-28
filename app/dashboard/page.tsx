@@ -2,6 +2,13 @@
 
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
+import StatCard from "@/components/cards/StatCard";
+import NiveauBarChart from '@/components/charts/NiveauBarChart';
+import QuickActions from '@/components/cards/QuickActions';
+import InscriptionsLineChart from '@/components/charts/InscriptionsLineChart';
+import ValidationGauge from '@/components/charts/ValidationGauge';
+import RecentActivitiesTable from '@/components/tables/RecentActivitiesTable';
+import Card from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
 
@@ -78,9 +85,43 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Modules Grid */}
+        
+
+        <div className="mt-8 grid grid-cols-12 gap-6">
+          
+
+          {/* Ligne 1 */}
+          <div className="col-span-8">
+            <Card title="Répartition par Niveau">
+              <NiveauBarChart />
+            </Card>
+          </div>
+
+          <div className="col-span-4">
+            <QuickActions />
+          </div>
+
+          {/* Ligne 2 */}
+          <div className="col-span-6">
+            <Card title="Évolution des inscriptions" rightSlot={
+              <select className="text-xs border border-slate-400 rounded-md px-2 py-1">
+                <option className="text-slate-800" selected>6 derniers mois</option>
+              </select>
+            }>
+              <InscriptionsLineChart />
+            </Card>
+          </div>
+
+          <div className="col-span-6">
+            <ValidationGauge />
+          </div>
+
         </div>
+          
+        <div className="mt-8">
+          <RecentActivitiesTable />
+        </div>
+
       </DashboardLayout>
     </ProtectedRoute>
   );
