@@ -1,21 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import type { DeliberationSession } from "@/types/deliberation";
-import DeliberationStatusBadge from "./deliberation-status-badge";
+import type { Student } from "@/types/student";
+import StudentStatusBadge from "./student-status-badge";
 
-interface DeliberationTableProps {
-  sessions: DeliberationSession[];
+interface StudentTableProps {
+  students: Student[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export default function DeliberationTable({ sessions, onEdit, onDelete }: DeliberationTableProps) {
-  if (sessions.length === 0) {
+export default function StudentTable({ students, onEdit, onDelete }: StudentTableProps) {
+  if (students.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
         <p className="text-sm text-zinc-500">
-          Aucune session de délibération trouvée.
+          Aucun étudiant trouvé.
         </p>
       </div>
     );
@@ -28,28 +28,22 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
           <thead>
             <tr className="border-b border-zinc-200 bg-[#00365F]/10">
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Session
+                Numéro étudiant
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Programme
+                Nom complet
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Année
+                Genre
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Semestre
+                Date de naissance
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Date
+                Téléphone
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Statut
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Président
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Étudiants
               </th>
               <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Actions
@@ -57,57 +51,47 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {sessions.map((session) => (
+            {students.map((student) => (
               <tr
-                key={session.id}
+                key={student.id}
                 className="bg-white transition-colors hover:bg-zinc-50/50"
               >
                 <td className="px-6 py-5">
                   <Link
-                    href={`/deliberations/${session.id}`}
+                    href={`/students/${student.id}`}
                     className="text-sm font-medium text-[#00365F] hover:text-[#008D36] transition-colors"
                   >
-                    {session.session_name}
+                    {student.student_number}
                   </Link>
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm text-zinc-700">
-                    {session.academic_program?.name}
+                    {student.full_name}
                   </div>
-                </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">
-                  {session.academic_year?.name}
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
-                    S{session.semester}
+                    {student.gender === "M" ? "Masculin" : "Féminin"}
                   </span>
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
-                  {new Date(session.session_date).toLocaleDateString("fr-FR", {
+                  {new Date(student.date_of_birth).toLocaleDateString("fr-FR", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
                   })}
                 </td>
-                <td className="px-6 py-5">
-                  <DeliberationStatusBadge status={session.status} />
+                <td className="px-6 py-5 text-sm text-zinc-600">
+                  {student.phone}
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {session.president?.full_name}
-                  </div>
-                </td>
-                <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {session.stats?.total_students ?? 0}
-                  </div>
+                  <StudentStatusBadge status={student.status} />
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
                     {onEdit && (
                       <button
-                        onClick={() => onEdit(session.id)}
+                        onClick={() => onEdit(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
@@ -122,7 +106,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                       </button>
                     )}
                     <Link
-                      href={`/deliberations/${session.id}`}
+                      href={`/students/${student.id}`}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
@@ -141,23 +125,9 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                         />
                       </svg>
                     </Link>
-                    <Link
-                      href={`/deliberations/${session.id}/results`}
-                      className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-[#008D36]/10 hover:text-[#008D36]"
-                      title="Résultats"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </Link>
                     {onDelete && (
                       <button
-                        onClick={() => onDelete(session.id)}
+                        onClick={() => onDelete(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >

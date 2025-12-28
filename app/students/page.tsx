@@ -3,36 +3,33 @@
 import { useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
-import DeliberationTable from "@/components/deliberations/deliberation-table";
-import DeliberationForm from "@/components/deliberations/deliberation-form";
+import StudentTable from "@/components/students/student-table";
+import StudentForm from "@/components/students/student-form";
 import Modal from "@/components/ui/modal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import {
-  useDeliberationSessions,
-  useDeliberationSession,
-  useDeleteDeliberationSession,
-  useCreateDeliberationSession,
-  useUpdateDeliberationSession,
-  useAcademicPrograms,
-  useAcademicYears,
-  useFacultyMembers,
-} from "@/hooks/use-deliberations";
-import type { DeliberationSessionFilters, CreateDeliberationSessionInput } from "@/types/deliberation";
-import { DeliberationStatus } from "@/types/deliberation";
+  useStudents,
+  useStudent,
+  useDeleteStudent,
+  useCreateStudent,
+  useUpdateStudent,
+} from "@/hooks/use-students";
+import type { StudentFilters, CreateStudentInput } from "@/types/student";
+import { StudentStatus, Gender } from "@/types/student";
 
-export default function DeliberationsPage() {
-  const [filters, setFilters] = useState<DeliberationSessionFilters>({
+export default function StudentsPage() {
+  const [filters, setFilters] = useState<StudentFilters>({
     page: 1,
     limit: 10,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editSessionId, setEditSessionId] = useState<string | null>(null);
+  const [editStudentId, setEditStudentId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sessionId: string | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; studentId: string | null }>({
     isOpen: false,
-    sessionId: null,
+    studentId: null,
   });
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
     isOpen: false,
@@ -40,90 +37,85 @@ export default function DeliberationsPage() {
     type: "success",
   });
 
-  const { data, isLoading, error } = useDeliberationSessions(filters);
-  const { data: sessionToEdit } = useDeliberationSession(editSessionId || "", !!editSessionId);
-  const deleteMutation = useDeleteDeliberationSession();
-  const createMutation = useCreateDeliberationSession();
-  const updateMutation = useUpdateDeliberationSession();
+  const { data, isLoading, error } = useStudents(filters);
+  const { data: studentToEdit } = useStudent(editStudentId || "", !!editStudentId);
+  const deleteMutation = useDeleteStudent();
+  const createMutation = useCreateStudent();
+  const updateMutation = useUpdateStudent();
 
-  // Load form data
-  const { data: programs, isLoading: loadingPrograms } = useAcademicPrograms();
-  const { data: years, isLoading: loadingYears } = useAcademicYears();
-  const { data: facultyMembers, isLoading: loadingFaculty } = useFacultyMembers();
-
-  const handleCreateSubmit = async (data: CreateDeliberationSessionInput) => {
+  const handleCreateSubmit = async (data: CreateStudentInput) => {
     try {
       await createMutation.mutateAsync(data);
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
-        message: "Session de délibération créée avec succès",
+        message: "Étudiant créé avec succès",
         type: "success",
       });
     } catch (err) {
-      console.error("Error creating deliberation session:", err);
+      console.error("Error creating student:", err);
       setToast({
         isOpen: true,
-        message: "Erreur lors de la création de la session",
+        message: "Erreur lors de la création de l'étudiant",
         type: "error",
       });
     }
   };
 
   const handleEditClick = (id: string) => {
-    setEditSessionId(id);
+    setEditStudentId(id);
   };
 
-  const handleEditSubmit = async (data: CreateDeliberationSessionInput) => {
-    if (!editSessionId) return;
+  const handleEditSubmit = async (data: CreateStudentInput) => {
+    if (!editStudentId) return;
 
     try {
       await updateMutation.mutateAsync({
-        id: editSessionId,
+        id: editStudentId,
         input: data,
       });
-      setEditSessionId(null);
+      setEditStudentId(null);
       setToast({
         isOpen: true,
-        message: "Session modifiée avec succès",
+        message: "Étudiant modifié avec succès",
         type: "success",
       });
     } catch (err) {
-      console.error("Error updating deliberation session:", err);
+      console.error("Error updating student:", err);
       setToast({
         isOpen: true,
-        message: "Erreur lors de la modification de la session",
+        message: "Erreur lors de la modification de l'étudiant",
         type: "error",
       });
     }
   };
 
   const handleDeleteClick = (id: string) => {
-    setDeleteConfirm({ isOpen: true, sessionId: id });
+    setDeleteConfirm({ isOpen: true, studentId: id });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteConfirm.sessionId) return;
+    if (!deleteConfirm.studentId) return;
 
     try {
-      await deleteMutation.mutateAsync(deleteConfirm.sessionId);
-      setDeleteConfirm({ isOpen: false, sessionId: null });
+      await deleteMutation.mutateAsync(deleteConfirm.studentId);
+      setDeleteConfirm({ isOpen: false, studentId: null });
       setToast({
         isOpen: true,
-        message: "Session supprimée avec succès",
+        message: "Étudiant supprimé avec succès",
         type: "success",
       });
     } catch (err) {
-      console.error("Error deleting session:", err);
+      console.error("Error deleting student:", err);
       setToast({
         isOpen: true,
-        message: "Erreur lors de la suppression de la session",
+        message: "Erreur lors de la suppression de l'étudiant",
         type: "error",
       });
     }
   };
 
-  const handleFilterChange = (key: keyof DeliberationSessionFilters, value: string) => {
+  const handleFilterChange = (key: keyof StudentFilters, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,
@@ -147,7 +139,7 @@ export default function DeliberationsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout title="Délibérations">
+      <DashboardLayout title="Étudiants">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -171,8 +163,8 @@ export default function DeliberationsPage() {
                 type="search"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Rechercher une session..."
-                className="block w-96 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                placeholder="Rechercher un étudiant..."
+                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
               />
             </div>
             <button
@@ -192,9 +184,9 @@ export default function DeliberationsPage() {
                 />
               </svg>
               Filtres
-              {(filters.status || filters.semester || filters.academic_year_id || filters.academic_program_id) && (
+              {(filters.status || filters.gender) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {[filters.status, filters.semester, filters.academic_year_id, filters.academic_program_id].filter(Boolean).length}
+                  {[filters.status, filters.gender].filter(Boolean).length}
                 </span>
               )}
             </button>
@@ -211,7 +203,7 @@ export default function DeliberationsPage() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            Nouvelle Session
+            Nouvel Étudiant
           </button>
         </div>
 
@@ -227,7 +219,7 @@ export default function DeliberationsPage() {
                 Réinitialiser tout
               </button>
             </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Status Filter */}
               <div>
                 <label
@@ -243,56 +235,31 @@ export default function DeliberationsPage() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les statuts</option>
-                  <option value={DeliberationStatus.SCHEDULED}>Programmée</option>
-                  <option value={DeliberationStatus.IN_PROGRESS}>En cours</option>
-                  <option value={DeliberationStatus.COMPLETED}>Terminée</option>
-                  <option value={DeliberationStatus.CLOSED}>Clôturée</option>
+                  <option value={StudentStatus.ACTIVE}>Actif</option>
+                  <option value={StudentStatus.SUSPENDED}>Suspendu</option>
+                  <option value={StudentStatus.GRADUATED}>Diplômé</option>
+                  <option value={StudentStatus.WITHDRAWN}>Désisté</option>
+                  <option value={StudentStatus.EXPELLED}>Exclu</option>
                 </select>
               </div>
 
-              {/* Semester Filter */}
+              {/* Gender Filter */}
               <div>
                 <label
-                  htmlFor="semester"
+                  htmlFor="gender"
                   className="block text-sm font-medium text-zinc-700 mb-2"
                 >
-                  Semestre
+                  Genre
                 </label>
                 <select
-                  id="semester"
-                  value={filters.semester?.toString() ?? ""}
-                  onChange={(e) => handleFilterChange("semester", e.target.value)}
+                  id="gender"
+                  value={filters.gender ?? ""}
+                  onChange={(e) => handleFilterChange("gender", e.target.value)}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
-                  <option value="">Tous les semestres</option>
-                  {[1, 2, 3, 4, 5, 6].map((sem) => (
-                    <option key={sem} value={sem}>
-                      Semestre {sem}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Academic Year Filter */}
-              <div>
-                <label
-                  htmlFor="year"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
-                  Année académique
-                </label>
-                <select
-                  id="year"
-                  value={filters.academic_year_id ?? ""}
-                  onChange={(e) => handleFilterChange("academic_year_id", e.target.value)}
-                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-                >
-                  <option value="">Toutes les années</option>
-                  {Array.isArray(years) && years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.name} {year.is_current && "(Actuelle)"}
-                    </option>
-                  ))}
+                  <option value="">Tous les genres</option>
+                  <option value={Gender.M}>Masculin</option>
+                  <option value={Gender.F}>Féminin</option>
                 </select>
               </div>
             </div>
@@ -303,7 +270,7 @@ export default function DeliberationsPage() {
         {error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">
-              Erreur lors du chargement des sessions. Veuillez réessayer.
+              Erreur lors du chargement des étudiants. Veuillez réessayer.
             </p>
           </div>
         ) : isLoading ? (
@@ -311,42 +278,23 @@ export default function DeliberationsPage() {
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
               <p className="mt-3 text-sm text-zinc-500">
-                Chargement des sessions...
+                Chargement des étudiants...
               </p>
             </div>
           </div>
         ) : (
           <>
-            <DeliberationTable
-              sessions={data?.data ?? []}
+            <StudentTable
+              students={data?.data ?? []}
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
             />
 
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
-              <div className="flex items-center gap-4">
-                <p className="text-sm text-zinc-500">
-                  Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} sessions
-                </p>
-                <div className="flex items-center gap-2">
-                  <label htmlFor="perPage" className="text-sm text-zinc-600">
-                    Éléments par page:
-                  </label>
-                  <select
-                    id="perPage"
-                    value={filters.limit ?? 10}
-                    onChange={(e) => setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
-                    className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 transition-colors focus:border-[#008D36] focus:outline-none focus:ring-2 focus:ring-[#008D36]/20"
-                  >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                </div>
-              </div>
+              <p className="text-sm text-zinc-500">
+                Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} étudiants
+              </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
@@ -374,65 +322,40 @@ export default function DeliberationsPage() {
         <Modal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
-          title="Nouvelle Session de Délibération"
-          subtitle="Formulaire de création de session de jury"
+          title="Nouvel Étudiant"
+          subtitle="Formulaire de création d'étudiant"
           size="lg"
         >
-          {loadingPrograms || loadingYears || loadingFaculty ? (
-            <div className="flex min-h-[400px] items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-                <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
-                  Chargement des données...
-                </p>
-              </div>
-            </div>
-          ) : (
-            <DeliberationForm
-              onSubmit={handleCreateSubmit}
-              onCancel={() => setIsCreateModalOpen(false)}
-              programs={Array.isArray(programs) ? programs : []}
-              years={Array.isArray(years) ? years : []}
-              facultyMembers={Array.isArray(facultyMembers) ? facultyMembers : []}
-              isLoading={createMutation.isPending}
-            />
-          )}
+          <StudentForm
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isLoading={createMutation.isPending}
+          />
         </Modal>
 
         {/* Edit Modal */}
         <Modal
-          isOpen={!!editSessionId}
-          onClose={() => setEditSessionId(null)}
-          title="Modifier Session de Délibération"
-          subtitle="Formulaire de modification de session de jury"
+          isOpen={!!editStudentId}
+          onClose={() => setEditStudentId(null)}
+          title="Modifier Étudiant"
+          subtitle="Formulaire de modification d'étudiant"
           size="lg"
         >
-          {loadingPrograms || loadingYears || loadingFaculty || !sessionToEdit ? (
+          {!studentToEdit ? (
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-                <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="mt-3 text-sm text-zinc-500">
                   Chargement des données...
                 </p>
               </div>
             </div>
           ) : (
-            <DeliberationForm
+            <StudentForm
               onSubmit={handleEditSubmit}
-              onCancel={() => setEditSessionId(null)}
-              programs={Array.isArray(programs) ? programs : []}
-              years={Array.isArray(years) ? years : []}
-              facultyMembers={Array.isArray(facultyMembers) ? facultyMembers : []}
+              onCancel={() => setEditStudentId(null)}
               isLoading={updateMutation.isPending}
-              initialData={{
-                academic_program_id: sessionToEdit.academic_program_id,
-                academic_year_id: sessionToEdit.academic_year_id,
-                semester: sessionToEdit.semester,
-                session_name: sessionToEdit.session_name,
-                session_date: sessionToEdit.session_date,
-                presided_by: sessionToEdit.presided_by,
-                jury_members: sessionToEdit.jury_members || [],
-              }}
+              initialData={studentToEdit}
             />
           )}
         </Modal>
@@ -440,10 +363,10 @@ export default function DeliberationsPage() {
         {/* Delete Confirmation Dialog */}
         <ConfirmDialog
           isOpen={deleteConfirm.isOpen}
-          onClose={() => setDeleteConfirm({ isOpen: false, sessionId: null })}
+          onClose={() => setDeleteConfirm({ isOpen: false, studentId: null })}
           onConfirm={handleDeleteConfirm}
-          title="Supprimer la session"
-          message="Êtes-vous sûr de vouloir supprimer cette session de délibération ? Cette action est irréversible."
+          title="Supprimer l'étudiant"
+          message="Êtes-vous sûr de vouloir supprimer cet étudiant ? Cette action est irréversible."
           confirmText="Supprimer"
           cancelText="Annuler"
           variant="danger"

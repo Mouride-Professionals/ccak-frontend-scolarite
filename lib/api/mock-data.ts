@@ -12,6 +12,9 @@ import { DocumentType as DocDocumentType, DocumentStatus as DocDocumentStatus } 
 import type { Student, Guardian, Document, Admin } from "@/types/student";
 import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
 
+import type { Student, Guardian, Document, Admin } from "@/types/student";
+import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
+
 // =====================
 // ACADEMIC YEARS
 // =====================
@@ -441,6 +444,9 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 45,
       results_count: 0,
+      passed_students: 0,
+      failed_students: 0,
+      pending_students: 45,
     },
   },
   {
@@ -484,6 +490,9 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 42,
       results_count: 0,
+      passed_students: 0,
+      failed_students: 0,
+      pending_students: 42,
     },
   },
   {
@@ -522,6 +531,9 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 38,
       results_count: 15,
+      passed_students: 10,
+      failed_students: 2,
+      pending_students: 26,
     },
   },
   {
@@ -565,6 +577,9 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 25,
       results_count: 25,
+      passed_students: 20,
+      failed_students: 1,
+      pending_students: 4,
     },
   },
   {
@@ -603,6 +618,9 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 12,
       results_count: 12,
+      passed_students: 10,
+      failed_students: 0,
+      pending_students: 2,
     },
   },
 ];
