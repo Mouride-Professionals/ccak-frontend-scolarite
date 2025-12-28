@@ -28,8 +28,11 @@ function ProtectedRouteInner({ children }: ProtectedRouteProps) {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-zinc-500">
-        Checking your session…
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+          <p className="mt-4 text-sm text-zinc-600">Vérification de votre session...</p>
+        </div>
       </div>
     );
   }
@@ -45,8 +48,11 @@ export default function ProtectedRoute(props: ProtectedRouteProps) {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center text-sm text-zinc-500">
-          Preparing your session…
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+            <p className="mt-4 text-sm text-zinc-600">Préparation de votre session...</p>
+          </div>
         </div>
       }
     >
