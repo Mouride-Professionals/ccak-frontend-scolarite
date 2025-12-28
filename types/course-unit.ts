@@ -29,6 +29,15 @@ export interface UpdateCourseUnitInput extends CreateCourseUnitInput {
   id: string;
 }
 
+export interface CourseUnitFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  academicProgramId?: string;
+  type?: 'OBLIGATOIRE' | 'OPTIONNEL';
+  isActive?: boolean;
+}
+
 export interface AcademicProgram {
   id: string;
   name: string;

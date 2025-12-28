@@ -84,7 +84,7 @@ export default function ProgrammeForm({
           id="department_id"
           value={formData.department_id}
           onChange={(e) => handleChange("department_id", e.target.value)}
-          className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
             errors.department_id ? "border-red-300" : "border-zinc-300"
           }`}
           disabled={isLoading}
@@ -114,7 +114,7 @@ export default function ProgrammeForm({
           id="name"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
-          className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
             errors.name ? "border-red-300" : "border-zinc-300"
           }`}
           placeholder="Ex: Licence Informatique"
@@ -137,7 +137,7 @@ export default function ProgrammeForm({
           id="level"
           value={formData.level}
           onChange={(e) => handleChange("level", e.target.value)}
-          className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+          className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
           disabled={isLoading}
         >
           <option value={AcademicLevel.LICENCE}>Licence</option>
@@ -160,7 +160,7 @@ export default function ProgrammeForm({
           value={formData.duration_semesters}
           onChange={(e) => handleChange("duration_semesters", parseInt(e.target.value) || 0)}
           min="1"
-          className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
             errors.duration_semesters ? "border-red-300" : "border-zinc-300"
           }`}
           disabled={isLoading}
@@ -184,7 +184,7 @@ export default function ProgrammeForm({
           value={formData.total_credits_required}
           onChange={(e) => handleChange("total_credits_required", parseInt(e.target.value) || 0)}
           min="1"
-          className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
             errors.total_credits_required ? "border-red-300" : "border-zinc-300"
           }`}
           disabled={isLoading}

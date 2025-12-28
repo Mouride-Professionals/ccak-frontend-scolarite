@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ProgrammeTable from "@/components/programmes/programme-table";
@@ -15,18 +14,20 @@ import {
   useAcademicProgram,
   useDeleteAcademicProgram,
   useUpdateAcademicProgram,
+  useCreateAcademicProgram,
   useDepartments,
 } from "@/hooks/use-academic";
 import type { AcademicProgram } from "@/types/academic";
 import { AcademicLevel } from "@/types/academic";
 import type { CreateProgrammeInput, AcademicProgramFilters } from "@/types/programme";
 
-export default function ProgrammesPage() {
+function ProgrammesPageContent() {
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<AcademicProgramFilters>({
     page: 1,
     limit: 10,
   });
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editProgrammeId, setEditProgrammeId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,6 +46,7 @@ export default function ProgrammesPage() {
   const { data: programmeToEdit } = useAcademicProgram(editProgrammeId || "", !!editProgrammeId);
   const deleteMutation = useDeleteAcademicProgram();
   const updateMutation = useUpdateAcademicProgram();
+  const createMutation = useCreateAcademicProgram();
 
   // Load form data
   const { data: departments, isLoading: loadingDepartments } = useDepartments();
@@ -59,6 +61,25 @@ export default function ProgrammesPage() {
 
   const handleEditClick = (id: string) => {
     setEditProgrammeId(id);
+  };
+
+  const handleCreateSubmit = async (data: CreateProgrammeInput) => {
+    try {
+      await createMutation.mutateAsync(data);
+      setIsCreateModalOpen(false);
+      setToast({
+        isOpen: true,
+        message: "Programme créé avec succès",
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Error creating academic programme:", err);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la création du programme",
+        type: "error",
+      });
+    }
   };
 
   const handleEditSubmit = async (data: CreateProgrammeInput) => {
@@ -186,8 +207,8 @@ export default function ProgrammesPage() {
               )}
             </button>
           </div>
-          <Link
-            href="/programmes/new"
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +220,7 @@ export default function ProgrammesPage() {
               />
             </svg>
             Nouveau Programme
-          </Link>
+          </button>
         </div>
 
         {/* Filters Panel */}
@@ -335,6 +356,33 @@ export default function ProgrammesPage() {
           </>
         )}
 
+        {/* Create Modal */}
+        <Modal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          title="Nouveau Programme Académique"
+          subtitle="Formulaire de création de programme"
+          size="lg"
+        >
+          {loadingDepartments ? (
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="text-center">
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+                <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+                  Chargement des données...
+                </p>
+              </div>
+            </div>
+          ) : (
+            <ProgrammeForm
+              onSubmit={handleCreateSubmit}
+              onCancel={() => setIsCreateModalOpen(false)}
+              departments={Array.isArray(departments) ? departments : []}
+              isLoading={createMutation.isPending}
+            />
+          )}
+        </Modal>
+
         {/* Edit Modal */}
         <Modal
           isOpen={!!editProgrammeId}
@@ -392,5 +440,26 @@ export default function ProgrammesPage() {
         />
       </DashboardLayout>
     </ProtectedRoute>
+  );
+}
+
+export default function ProgrammesPage() {
+  return (
+    <Suspense fallback={
+      <ProtectedRoute>
+        <DashboardLayout title="Programmes Académiques">
+          <div className="flex min-h-[400px] items-center justify-center">
+            <div className="text-center">
+              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+              <p className="mt-3 text-sm text-zinc-500">
+                Chargement...
+              </p>
+            </div>
+          </div>
+        </DashboardLayout>
+      </ProtectedRoute>
+    }>
+      <ProgrammesPageContent />
+    </Suspense>
   );
 }
