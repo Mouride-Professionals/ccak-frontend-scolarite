@@ -7,6 +7,8 @@ import type { AcademicYear, AcademicProgram, FacultyMember } from "@/types/acade
 import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
+import type { GeneratedDocument } from "@/types/document";
+import { DocumentType, DocumentStatus } from "@/types/document";
 
 // =====================
 // ACADEMIC YEARS
@@ -167,6 +169,227 @@ export const mockFacultyMembers: FacultyMember[] = [
     is_active: true,
     created_at: "2022-09-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+// =====================
+// GENERATED DOCUMENTS
+// =====================
+
+export const mockGeneratedDocuments: GeneratedDocument[] = [
+  {
+    id: "doc-1",
+    student_id: "student-1",
+    type: DocumentType.TRANSCRIPT,
+    document_number: "TRS-2025-1234-AB",
+    file_path: "documents/TRANSCRIPT/2025/12/TRS-2025-1234-AB.pdf",
+    status: DocumentStatus.ISSUED,
+    generated_at: "2025-12-15T10:30:00Z",
+    issued_at: "2025-12-15T10:35:00Z",
+    metadata: {
+      academic_year: "2024-2025",
+      include_all_semesters: true,
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-1",
+      email: "student1@ucak.sn",
+      full_name: "Amadou Diallo",
+      student_number: "STU-2024-001",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-2",
+    student_id: "student-1",
+    type: DocumentType.CERTIFICATE,
+    document_number: "CER-2025-5678-CD",
+    file_path: "documents/CERTIFICATE/2025/12/CER-2025-5678-CD.pdf",
+    status: DocumentStatus.ISSUED,
+    generated_at: "2025-12-10T14:20:00Z",
+    issued_at: "2025-12-10T14:25:00Z",
+    metadata: {
+      purpose: "Inscription à un concours",
+      academic_year: "2024-2025",
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-1",
+      email: "student1@ucak.sn",
+      full_name: "Amadou Diallo",
+      student_number: "STU-2024-001",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-3",
+    student_id: "student-1",
+    type: DocumentType.ID_CARD,
+    document_number: "IDC-2025-9012-EF",
+    file_path: "documents/ID_CARD/2025/12/IDC-2025-9012-EF.pdf",
+    status: DocumentStatus.ISSUED,
+    generated_at: "2025-12-01T09:00:00Z",
+    issued_at: "2025-12-01T09:05:00Z",
+    metadata: {
+      with_watermark: false,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-1",
+      email: "student1@ucak.sn",
+      full_name: "Amadou Diallo",
+      student_number: "STU-2024-001",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-4",
+    student_id: "student-2",
+    type: DocumentType.TRANSCRIPT,
+    document_number: "TRS-2025-3456-GH",
+    file_path: "documents/TRANSCRIPT/2025/12/TRS-2025-3456-GH.pdf",
+    status: DocumentStatus.DRAFT,
+    generated_at: "2025-12-20T11:00:00Z",
+    metadata: {
+      academic_year: "2024-2025",
+      include_all_semesters: false,
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-2",
+      email: "student2@ucak.sn",
+      full_name: "Fatou Ndiaye",
+      student_number: "STU-2024-002",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-5",
+    student_id: "student-2",
+    type: DocumentType.DIPLOMA,
+    document_number: "DIP-2025-7890-IJ",
+    file_path: "documents/DIPLOMA/2025/12/DIP-2025-7890-IJ.pdf",
+    status: DocumentStatus.ISSUED,
+    generated_at: "2025-12-18T15:30:00Z",
+    issued_at: "2025-12-18T15:35:00Z",
+    metadata: {
+      degree: "Licence",
+      graduation_date: "2025-06-30",
+      honors: "BIEN",
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-2",
+      email: "student2@ucak.sn",
+      full_name: "Fatou Ndiaye",
+      student_number: "STU-2024-002",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-6",
+    student_id: "student-3",
+    type: DocumentType.ATTESTATION,
+    document_number: "ATT-2025-2468-KL",
+    file_path: "documents/ATTESTATION/2025/12/ATT-2025-2468-KL.pdf",
+    status: DocumentStatus.ISSUED,
+    generated_at: "2025-12-12T13:45:00Z",
+    issued_at: "2025-12-12T13:50:00Z",
+    metadata: {
+      custom_text: "Je soussigné(e), certifie que l'étudiant(e) est régulièrement inscrit(e) à l'UCAK pour l'année académique 2024-2025.",
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-3",
+      email: "student3@ucak.sn",
+      full_name: "Ibrahima Sarr",
+      student_number: "STU-2024-003",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-7",
+    student_id: "student-1",
+    type: DocumentType.ATTESTATION,
+    document_number: "ATT-2025-1357-MN",
+    file_path: "documents/ATTESTATION/2025/11/ATT-2025-1357-MN.pdf",
+    status: DocumentStatus.REVOKED,
+    generated_at: "2025-11-20T10:00:00Z",
+    issued_at: "2025-11-20T10:05:00Z",
+    revoked_at: "2025-12-05T14:00:00Z",
+    metadata: {
+      custom_text: "Attestation de scolarité",
+      revocation_reason: "Document perdu, nouvelle émission demandée",
+      revoked_by: "staff-1",
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-1",
+      email: "student1@ucak.sn",
+      full_name: "Amadou Diallo",
+      student_number: "STU-2024-001",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
+  },
+  {
+    id: "doc-8",
+    student_id: "student-3",
+    type: DocumentType.CERTIFICATE,
+    document_number: "CER-2025-3691-OP",
+    file_path: "documents/CERTIFICATE/2025/12/CER-2025-3691-OP.pdf",
+    status: DocumentStatus.DRAFT,
+    generated_at: "2025-12-22T16:00:00Z",
+    metadata: {
+      purpose: "Demande de bourse",
+      academic_year: "2024-2025",
+      with_watermark: true,
+      with_qr_code: true,
+    },
+    student: {
+      id: "student-3",
+      email: "student3@ucak.sn",
+      full_name: "Ibrahima Sarr",
+      student_number: "STU-2024-003",
+    },
+    generated_by: {
+      id: "staff-1",
+      email: "staff@ucak.sn",
+      full_name: "Admin Staff",
+    },
   },
 ];
 

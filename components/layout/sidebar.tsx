@@ -56,6 +56,12 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
+        id: "documents",
+        label: "Documents",
+        href: "/documents",
+        icon: null as any,
+      },
+      {
         id: "enrollments",
         label: "Inscriptions",
         href: "/enrollments",
