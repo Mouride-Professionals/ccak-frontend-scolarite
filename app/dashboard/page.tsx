@@ -8,7 +8,7 @@ import QuickActions from '@/components/cards/QuickActions';
 import InscriptionsLineChart from '@/components/charts/InscriptionsLineChart';
 import ValidationGauge from '@/components/charts/ValidationGauge';
 import RecentActivitiesTable from '@/components/tables/RecentActivitiesTable';
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -85,10 +85,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        
+
 
         <div className="mt-8 grid grid-cols-12 gap-6">
-          
+
 
           {/* Ligne 1 */}
           <div className="col-span-8">
@@ -117,7 +117,7 @@ export default function DashboardPage() {
           </div>
 
         </div>
-          
+
         <div className="mt-8">
           <RecentActivitiesTable />
         </div>

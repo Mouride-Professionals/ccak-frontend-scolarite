@@ -1,4 +1,4 @@
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import { BarChart3, Calendar, ChevronRight, FileText, UserPlus } from 'lucide-react';
 
 const actions = [
