@@ -4,6 +4,7 @@
  */
 
 import { api } from "@/lib/api-client";
+import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import type {
   DeliberationSession,
   DeliberationSessionsResponse,
@@ -16,6 +17,7 @@ import type {
   CreateDeliberationResultInput,
   UpdateDeliberationResultInput,
 } from "@/types/deliberation";
+import { DeliberationStatus } from "@/types/deliberation";
 import {
   mockDeliberationSessions,
   mockAcademicPrograms,
@@ -296,7 +298,7 @@ export async function getAcademicPrograms() {
     await delay(200);
     return mockAcademicPrograms;
   }
-  return api.get("/academic-programs");
+  return api.get<AcademicProgram[]>("/academic-programs");
 }
 
 /**
@@ -307,7 +309,7 @@ export async function getAcademicYears() {
     await delay(200);
     return mockAcademicYears;
   }
-  return api.get("/academic-years");
+  return api.get<AcademicYear[]>("/academic-years");
 }
 
 /**
@@ -318,7 +320,7 @@ export async function getFacultyMembers() {
     await delay(200);
     return mockFacultyMembers;
   }
-  return api.get("/faculty-members");
+  return api.get<FacultyMember[]>("/faculty-members");
 }
 
 // =====================

@@ -3,7 +3,7 @@
  * This file contains static data for testing while backend is being developed
  */
 
-import type { AcademicYear, AcademicProgram, FacultyMember } from "@/types/academic";
+import type { AcademicYear, AcademicProgram, FacultyMember, Department } from "@/types/academic";
 import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
@@ -11,6 +11,8 @@ import type { GeneratedDocument } from "@/types/document";
 import { DocumentType as DocDocumentType, DocumentStatus as DocDocumentStatus } from "@/types/document";
 import type { Student, Guardian, Document, Admin } from "@/types/student";
 import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
+import type { Faculty } from "@/types/faculty";
+import type { Department as DepartmentType } from "@/types/department";
 
 // =====================
 // ACADEMIC YEARS
@@ -104,6 +106,127 @@ export const mockAcademicPrograms: AcademicProgram[] = [
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
+  },
+];
+
+// =====================
+// FACULTIES
+// =====================
+
+export const mockFaculties: Faculty[] = [
+  {
+    id: "fac-1",
+    name: "Faculté des Sciences et Technologies",
+    code: "FST",
+    dean_id: "user-1",
+    dean: {
+      id: "user-1",
+      name: "Dr. Mamadou Diallo",
+      email: "mamadou.diallo@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "fac-2",
+    name: "Faculté des Lettres et Sciences Humaines",
+    code: "FLSH",
+    dean_id: "user-2",
+    dean: {
+      id: "user-2",
+      name: "Dr. Aminata Sow",
+      email: "aminata.sow@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "fac-3",
+    name: "Faculté de Droit et des Sciences Juridiques",
+    code: "FDSJ",
+    dean_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DEPARTMENTS
+// =====================
+
+export const mockDepartments: DepartmentType[] = [
+  {
+    id: "dept-1",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Informatique",
+    code: "INFO",
+    head_id: "user-1",
+    head: {
+      id: "user-1",
+      name: "Dr. Mamadou Diallo",
+      email: "mamadou.diallo@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-2",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Mathématiques",
+    code: "MATH",
+    head_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-3",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Physique",
+    code: "PHYS",
+    head_id: "user-2",
+    head: {
+      id: "user-2",
+      name: "Dr. Aminata Sow",
+      email: "aminata.sow@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-4",
+    faculty_id: "fac-2",
+    faculty: {
+      id: "fac-2",
+      name: "Faculté des Lettres et Sciences Humaines",
+      code: "FLSH",
+    },
+    name: "Littérature Française",
+    code: "LITT",
+    head_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
 ];
 
@@ -917,3 +1040,12 @@ export const mockStudents: Student[] = [
     updated_at: "2022-03-20T00:00:00Z",
   },
 ];
+
+// Debug log for mock data loading
+console.log("Mock data loaded:", {
+  mockAcademicPrograms: mockAcademicPrograms.length,
+  mockDepartments: mockDepartments.length,
+  mockAcademicYears: mockAcademicYears.length,
+  mockFacultyMembers: mockFacultyMembers.length,
+  mockDeliberationSessions: mockDeliberationSessions.length
+});
