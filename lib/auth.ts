@@ -1,7 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import KeycloakProvider from "next-auth/providers/keycloak";
-import { buildKeycloakIssuer, buildKeycloakTokenUrl } from "@/lib/keycloak";
+import { buildKeycloakIssuer, buildKeycloakTokenUrl, buildKeycloakLogoutUrl } from "@/lib/keycloak";
 
 type RefreshableToken = JWT & {
   accessToken?: string;

@@ -10,7 +10,11 @@ import type {
   DeliberationSessionFilters,
   CreateDeliberationSessionInput,
   UpdateDeliberationSessionInput,
+  DeliberationResult,
+  CreateDeliberationResultInput,
+  UpdateDeliberationResultInput,
 } from "@/types/deliberation";
+import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import * as deliberationsApi from "@/lib/api/deliberations";
 
 // =====================
@@ -132,7 +136,7 @@ export function useUpdateDeliberationStatus() {
  * Get all academic programs for form selects
  */
 export function useAcademicPrograms() {
-  return useQuery({
+  return useQuery<AcademicProgram[]>({
     queryKey: ["academic-programs"],
     queryFn: () => deliberationsApi.getAcademicPrograms(),
     staleTime: 300000, // 5 minutes
@@ -143,7 +147,7 @@ export function useAcademicPrograms() {
  * Get all academic years for form selects
  */
 export function useAcademicYears() {
-  return useQuery({
+  return useQuery<AcademicYear[]>({
     queryKey: ["academic-years"],
     queryFn: () => deliberationsApi.getAcademicYears(),
     staleTime: 300000,
@@ -154,9 +158,86 @@ export function useAcademicYears() {
  * Get all faculty members for form selects
  */
 export function useFacultyMembers() {
-  return useQuery({
+  return useQuery<FacultyMember[]>({
     queryKey: ["faculty-members"],
     queryFn: () => deliberationsApi.getFacultyMembers(),
     staleTime: 300000,
+  });
+}
+
+// =====================
+// DELIBERATION RESULTS
+// =====================
+
+export const deliberationResultKeys = {
+  all: ["deliberation-results"] as const,
+  lists: () => [...deliberationResultKeys.all, "list"] as const,
+  list: (sessionId: string, filters?: any) =>
+    [...deliberationResultKeys.lists(), sessionId, filters] as const,
+  details: () => [...deliberationResultKeys.all, "detail"] as const,
+  detail: (id: string) => [...deliberationResultKeys.details(), id] as const,
+};
+
+/**
+ * Get deliberation results for a session
+ */
+export function useDeliberationResults(
+  sessionId: string,
+  filters?: any
+) {
+  return useQuery({
+    queryKey: deliberationResultKeys.list(sessionId, filters),
+    queryFn: () => deliberationsApi.getDeliberationResults(sessionId, filters),
+    enabled: !!sessionId,
+    staleTime: 10000, // 10 seconds (shorter for active editing)
+  });
+}
+
+/**
+ * Create a deliberation result
+ */
+export function useCreateDeliberationResult() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deliberationsApi.createDeliberationResult,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
+  });
+}
+
+/**
+ * Update a deliberation result
+ */
+export function useUpdateDeliberationResult() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: any }) =>
+      deliberationsApi.updateDeliberationResult(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
+  });
+}
+
+/**
+ * Batch update deliberation results
+ */
+export function useBatchUpdateDeliberationResults() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deliberationsApi.batchUpdateDeliberationResults,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
   });
 }

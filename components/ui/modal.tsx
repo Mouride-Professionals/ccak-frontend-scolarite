@@ -102,7 +102,7 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, size
           </div>
 
           {/* Content */}
-          <div className="max-h-[calc(90vh-100px)] overflow-y-auto bg-white px-8 py-8">
+          <div className={`max-h-[calc(90vh-100px)] overflow-y-auto bg-white ${size === "full" ? "p-0" : "px-8 py-8"}`}>
             {children}
           </div>
         </div>
