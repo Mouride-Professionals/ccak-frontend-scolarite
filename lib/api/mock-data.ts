@@ -774,6 +774,13 @@ export const mockGuardians: Guardian[] = [
     created_at: "2024-09-01T00:00:00Z",
     updated_at: "2024-09-01T00:00:00Z",
   },
+];
+
+// =====================
+// DOCUMENTS
+// =====================
+
+export const mockDocuments: Document[] = [
   {
     id: "guardian-3",
     student_id: "stud-2",

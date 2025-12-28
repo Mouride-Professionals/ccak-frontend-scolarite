@@ -5310,4 +5310,5 @@ snapshots:
   zustand@5.0.9(@types/react@19.2.7)(react@19.2.0):
     optionalDependencies:
       '@types/react': 19.2.7
+      immer: 11.1.0
       react: 19.2.0

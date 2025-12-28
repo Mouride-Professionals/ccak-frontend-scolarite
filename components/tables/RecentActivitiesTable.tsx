@@ -1,6 +1,22 @@
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 
-const activities = [
+const statusStyles = {
+  green: 'bg-green-100 text-green-700',
+  blue: 'bg-blue-100 text-blue-700',
+  yellow: 'bg-yellow-100 text-yellow-700',
+} as const;
+
+type Activity = {
+  name: string;
+  avatar: string;
+  action: string;
+  course: string;
+  date: string;
+  status: string;
+  color: keyof typeof statusStyles;
+};
+
+const activities: Activity[] = [
   {
     name: 'Sokhna Anta',
     avatar: '🧑🏽‍🎓',
@@ -30,12 +46,6 @@ const activities = [
   },
 ];
 
-const statusStyles = {
-  green: 'bg-green-100 text-green-700',
-  blue: 'bg-blue-100 text-blue-700',
-  yellow: 'bg-yellow-100 text-yellow-700',
-};
-
 export default function RecentActivitiesTable() {
   return (
     <Card title="Activités Récentes">
@@ -64,7 +74,7 @@ export default function RecentActivitiesTable() {
               <td className="text-slate-500">{a.date}</td>
               <td>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${ statusStyles[a.color]}`}
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[a.color]}`}
                 >
                   {a.status}
                 </span>
