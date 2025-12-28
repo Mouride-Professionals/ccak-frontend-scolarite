@@ -3,7 +3,7 @@
  * This file contains static data for testing while backend is being developed
  */
 
-import type { AcademicYear, AcademicProgram, FacultyMember } from "@/types/academic";
+import type { AcademicYear, AcademicProgram, FacultyMember, Department } from "@/types/academic";
 import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
@@ -11,9 +11,8 @@ import type { GeneratedDocument } from "@/types/document";
 import { DocumentType as DocDocumentType, DocumentStatus as DocDocumentStatus } from "@/types/document";
 import type { Student, Guardian, Document, Admin } from "@/types/student";
 import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
-
-import type { Student, Guardian, Document, Admin } from "@/types/student";
-import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
+import type { Faculty } from "@/types/faculty";
+import type { Department as DepartmentType } from "@/types/department";
 
 // =====================
 // ACADEMIC YEARS
@@ -107,6 +106,127 @@ export const mockAcademicPrograms: AcademicProgram[] = [
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
+  },
+];
+
+// =====================
+// FACULTIES
+// =====================
+
+export const mockFaculties: Faculty[] = [
+  {
+    id: "fac-1",
+    name: "Faculté des Sciences et Technologies",
+    code: "FST",
+    dean_id: "user-1",
+    dean: {
+      id: "user-1",
+      name: "Dr. Mamadou Diallo",
+      email: "mamadou.diallo@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "fac-2",
+    name: "Faculté des Lettres et Sciences Humaines",
+    code: "FLSH",
+    dean_id: "user-2",
+    dean: {
+      id: "user-2",
+      name: "Dr. Aminata Sow",
+      email: "aminata.sow@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "fac-3",
+    name: "Faculté de Droit et des Sciences Juridiques",
+    code: "FDSJ",
+    dean_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DEPARTMENTS
+// =====================
+
+export const mockDepartments: DepartmentType[] = [
+  {
+    id: "dept-1",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Informatique",
+    code: "INFO",
+    head_id: "user-1",
+    head: {
+      id: "user-1",
+      name: "Dr. Mamadou Diallo",
+      email: "mamadou.diallo@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-2",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Mathématiques",
+    code: "MATH",
+    head_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-3",
+    faculty_id: "fac-1",
+    faculty: {
+      id: "fac-1",
+      name: "Faculté des Sciences et Technologies",
+      code: "FST",
+    },
+    name: "Physique",
+    code: "PHYS",
+    head_id: "user-2",
+    head: {
+      id: "user-2",
+      name: "Dr. Aminata Sow",
+      email: "aminata.sow@ucak.sn",
+    },
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dept-4",
+    faculty_id: "fac-2",
+    faculty: {
+      id: "fac-2",
+      name: "Faculté des Lettres et Sciences Humaines",
+      code: "FLSH",
+    },
+    name: "Littérature Française",
+    code: "LITT",
+    head_id: null,
+    is_active: true,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
   },
 ];
 
@@ -444,9 +564,6 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 45,
       results_count: 0,
-      passed_students: 0,
-      failed_students: 0,
-      pending_students: 45,
     },
   },
   {
@@ -490,9 +607,6 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 42,
       results_count: 0,
-      passed_students: 0,
-      failed_students: 0,
-      pending_students: 42,
     },
   },
   {
@@ -531,9 +645,6 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 38,
       results_count: 15,
-      passed_students: 10,
-      failed_students: 2,
-      pending_students: 26,
     },
   },
   {
@@ -577,9 +688,6 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 25,
       results_count: 25,
-      passed_students: 20,
-      failed_students: 1,
-      pending_students: 4,
     },
   },
   {
@@ -618,9 +726,166 @@ export const mockDeliberationSessions: DeliberationSession[] = [
     stats: {
       total_students: 12,
       results_count: 12,
-      passed_students: 10,
-      failed_students: 0,
-      pending_students: 2,
+    },
+  },
+];
+
+// =====================
+// ADMINS
+// =====================
+
+export const mockAdmins: Admin[] = [
+  {
+    id: "admin-1",
+    full_name: "Dr. Marie Diop",
+  },
+  {
+    id: "admin-2",
+    full_name: "M. Jean-Pierre Niang",
+  },
+];
+
+// =====================
+// GUARDIANS
+// =====================
+
+export const mockGuardians: Guardian[] = [
+  {
+    id: "guardian-1",
+    student_id: "stud-1",
+    full_name: "Mamadou Diallo Sr.",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221771234560",
+    email: "mamadou.diallo.sr@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Ingénieur",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-2",
+    student_id: "stud-1",
+    full_name: "Fatou Diallo",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221772345671",
+    email: "fatou.diallo@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Enseignante",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-3",
+    student_id: "stud-2",
+    full_name: "Moussa Sow",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221773456782",
+    email: "moussa.sow@email.com",
+    address: "456 Avenue Léopold Sédar Senghor, Saint-Louis, Sénégal",
+    occupation: "Commerçant",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-4",
+    student_id: "stud-3",
+    full_name: "Marie Ndiaye",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221774567893",
+    email: "marie.ndiaye@email.com",
+    address: "789 Boulevard Général de Gaulle, Thiès, Sénégal",
+    occupation: "Médecin",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DOCUMENTS
+// =====================
+
+export const mockDocuments: Document[] = [
+  {
+    id: "doc-1",
+    student_id: "stud-1",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-1/cni.pdf",
+    file_name: "cni_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Document valide",
+    uploaded_at: "2024-09-01T10:00:00Z",
+    reviewed_at: "2024-09-02T14:30:00Z",
+    created_at: "2024-09-01T10:00:00Z",
+    updated_at: "2024-09-02T14:30:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-2",
+    student_id: "stud-1",
+    type: DocumentType.BIRTH_CERT,
+    file_path: "/uploads/students/stud-1/birth_cert.pdf",
+    file_name: "acte_naissance_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Certificat de naissance authentique",
+    uploaded_at: "2024-09-01T10:15:00Z",
+    reviewed_at: "2024-09-02T14:35:00Z",
+    created_at: "2024-09-01T10:15:00Z",
+    updated_at: "2024-09-02T14:35:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-3",
+    student_id: "stud-1",
+    type: DocumentType.PHOTO,
+    file_path: "/uploads/students/stud-1/photo.jpg",
+    file_name: "photo_mamadou_diallo.jpg",
+    status: DocumentStatus.PENDING,
+    uploaded_at: "2024-09-01T10:30:00Z",
+    created_at: "2024-09-01T10:30:00Z",
+    updated_at: "2024-09-01T10:30:00Z",
+  },
+  {
+    id: "doc-4",
+    student_id: "stud-2",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-2/cni.pdf",
+    file_name: "cni_amidata_sow.pdf",
+    status: DocumentStatus.REJECTED,
+    reviewed_by: "admin-2",
+    notes: "Document expiré - Veuillez fournir une CNI valide",
+    uploaded_at: "2024-09-01T11:00:00Z",
+    reviewed_at: "2024-09-03T09:15:00Z",
+    created_at: "2024-09-01T11:00:00Z",
+    updated_at: "2024-09-03T09:15:00Z",
+    reviewer: {
+      id: "admin-2",
+      full_name: "M. Jean-Pierre Niang",
+    },
+  },
+  {
+    id: "doc-5",
+    student_id: "stud-2",
+    type: DocumentType.BAC_DIPLOMA,
+    file_path: "/uploads/students/stud-2/bac.pdf",
+    file_name: "bac_amidata_sow.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Diplôme du BAC validé",
+    uploaded_at: "2024-09-01T11:15:00Z",
+    reviewed_at: "2024-09-02T16:00:00Z",
+    created_at: "2024-09-01T11:15:00Z",
+    updated_at: "2024-09-02T16:00:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
     },
   },
 ];
@@ -935,3 +1200,12 @@ export const mockStudents: Student[] = [
     updated_at: "2022-03-20T00:00:00Z",
   },
 ];
+
+// Debug log for mock data loading
+console.log("Mock data loaded:", {
+  mockAcademicPrograms: mockAcademicPrograms.length,
+  mockDepartments: mockDepartments.length,
+  mockAcademicYears: mockAcademicYears.length,
+  mockFacultyMembers: mockFacultyMembers.length,
+  mockDeliberationSessions: mockDeliberationSessions.length
+});
