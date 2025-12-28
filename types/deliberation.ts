@@ -74,9 +74,9 @@ export interface DeliberationSession {
   stats?: {
     total_students: number;
     results_count: number;
-    passed_students: number;
-    failed_students: number;
-    pending_students: number;
+    passed_students?: number;
+    failed_students?: number;
+    pending_students?: number;
   };
 }
 

@@ -14,6 +14,7 @@ import type {
   CreateDeliberationResultInput,
   UpdateDeliberationResultInput,
 } from "@/types/deliberation";
+import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import * as deliberationsApi from "@/lib/api/deliberations";
 
 // =====================
@@ -135,7 +136,7 @@ export function useUpdateDeliberationStatus() {
  * Get all academic programs for form selects
  */
 export function useAcademicPrograms() {
-  return useQuery({
+  return useQuery<AcademicProgram[]>({
     queryKey: ["academic-programs"],
     queryFn: () => deliberationsApi.getAcademicPrograms(),
     staleTime: 300000, // 5 minutes
@@ -146,7 +147,7 @@ export function useAcademicPrograms() {
  * Get all academic years for form selects
  */
 export function useAcademicYears() {
-  return useQuery({
+  return useQuery<AcademicYear[]>({
     queryKey: ["academic-years"],
     queryFn: () => deliberationsApi.getAcademicYears(),
     staleTime: 300000,
@@ -157,7 +158,7 @@ export function useAcademicYears() {
  * Get all faculty members for form selects
  */
 export function useFacultyMembers() {
-  return useQuery({
+  return useQuery<FacultyMember[]>({
     queryKey: ["faculty-members"],
     queryFn: () => deliberationsApi.getFacultyMembers(),
     staleTime: 300000,

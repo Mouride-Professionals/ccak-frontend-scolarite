@@ -1,0 +1,7 @@
+Lines 10-13 should be:
+
+import type { GeneratedDocument } from "@/types/document";
+import { DocumentType, DocumentStatus } from "@/types/document";
+import type { Student } from "@/types/student";
+import { Gender, StudentStatus } from "@/types/student";
+
