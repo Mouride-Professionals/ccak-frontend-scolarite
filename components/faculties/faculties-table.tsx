@@ -1,38 +1,28 @@
 "use client";
 
+import type { Faculty } from "@/types/faculty";
 import Link from "next/link";
-import type { AcademicProgram } from "@/types/academic";
-import { AcademicLevel } from "@/types/academic";
 
-interface ProgrammeTableProps {
-  programmes: AcademicProgram[];
+interface FacultiesTableProps {
+  faculties: Faculty[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onView?: (id: string) => void;
 }
 
-export default function ProgrammeTable({ programmes, onEdit, onDelete }: ProgrammeTableProps) {
-  if (programmes.length === 0) {
+export default function FacultiesTable({
+  faculties,
+  onEdit,
+  onDelete,
+  onView,
+}: FacultiesTableProps) {
+  if (faculties.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucun programme académique trouvé.
-        </p>
+        <p className="text-sm text-zinc-500">Aucune faculté trouvée.</p>
       </div>
     );
   }
-
-  const getLevelLabel = (level: AcademicLevel) => {
-    switch (level) {
-      case AcademicLevel.LICENCE:
-        return "Licence";
-      case AcademicLevel.MASTER:
-        return "Master";
-      case AcademicLevel.DOCTORAT:
-        return "Doctorat";
-      default:
-        return level;
-    }
-  };
 
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
@@ -41,79 +31,70 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
           <thead>
             <tr className="border-b border-zinc-200 bg-[#00365F]/10">
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Programme
+                Nom
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Niveau
+                Code
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Département
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Durée
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Crédits
+                Doyen
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Statut
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {programmes.map((programme) => (
-              <tr key={programme.id} className="bg-white transition-colors hover:bg-zinc-50/50">
+            {faculties.map((faculty) => (
+              <tr
+                key={faculty.id}
+                className="bg-white transition-colors hover:bg-zinc-50/50"
+              >
                 <td className="px-6 py-5">
                   <div className="text-sm font-medium text-zinc-900">
-                    {programme.name}
+                    {faculty.name}
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
-                    {getLevelLabel(programme.level)}
+                  <span className="inline-flex rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
+                    {faculty.code}
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {programme.department?.name || "N/A"}
-                  </div>
-                  <div className="text-xs text-zinc-500">
-                    {programme.department?.code}
-                  </div>
-                </td>
-                <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {programme.duration_semesters} semestres
-                  </div>
-                </td>
-                <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {programme.total_credits_required}
+                  <div className="text-sm text-zinc-700">
+                    {faculty.dean?.name || (
+                      <span className="text-zinc-400">Non assigné</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-5">
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                      programme.is_active
+                      faculty.is_active
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {programme.is_active ? "Actif" : "Inactif"}
+                    {faculty.is_active ? "Actif" : "Inactif"}
                   </span>
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
                     {onEdit && (
                       <button
-                        onClick={() => onEdit(programme.id)}
+                        onClick={() => onEdit(faculty.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -123,33 +104,39 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                         </svg>
                       </button>
                     )}
-                    <Link
-                      href={`/programmes/${programme.id}`}
+                    {/* View (center) */}
+                    <button
+                      onClick={() => onView?.(faculty.id)}
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
                         />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                        />
+                        <circle cx="12" cy="12" r="3" strokeWidth={2} />
                       </svg>
-                    </Link>
+                    </button>
                     {onDelete && (
                       <button
-                        onClick={() => onDelete(programme.id)}
+                        onClick={() => onDelete(faculty.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
