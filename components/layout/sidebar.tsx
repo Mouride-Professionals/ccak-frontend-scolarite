@@ -57,7 +57,7 @@ const menuItems: MenuItem[] = [
       },
       {
         id: "enrollments",
-        label: "Inscriptions",
+        label: "Enrollements",
         href: "/enrollments",
         icon: null as any,
       },
