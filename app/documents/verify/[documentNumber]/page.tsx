@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { useVerifyDocument } from "@/hooks/use-documents";
+import { useVerifyDocument } from "@/hooks/use-documents-generate";
 import DocumentTypeBadge from "@/components/documents/document-type-badge";
 import DocumentStatusBadge from "@/components/documents/document-status-badge";
 

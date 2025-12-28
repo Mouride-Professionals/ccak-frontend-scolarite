@@ -8,7 +8,9 @@ import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
 import type { GeneratedDocument } from "@/types/document";
-import { DocumentType, DocumentStatus } from "@/types/document";
+import { DocumentType as DocDocumentType, DocumentStatus as DocDocumentStatus } from "@/types/document";
+import type { Student, Guardian, Document, Admin } from "@/types/student";
+import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
 
 // =====================
 // ACADEMIC YEARS
@@ -180,10 +182,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-1",
     student_id: "student-1",
-    type: DocumentType.TRANSCRIPT,
+    type: DocDocumentStatus.TRANSCRIPT,
     document_number: "TRS-2025-1234-AB",
     file_path: "documents/TRANSCRIPT/2025/12/TRS-2025-1234-AB.pdf",
-    status: DocumentStatus.ISSUED,
+    status: DocDocumentStatus.ISSUED,
     generated_at: "2025-12-15T10:30:00Z",
     issued_at: "2025-12-15T10:35:00Z",
     metadata: {
@@ -207,10 +209,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-2",
     student_id: "student-1",
-    type: DocumentType.CERTIFICATE,
+    type: DocDocumentType.CERTIFICATE,
     document_number: "CER-2025-5678-CD",
     file_path: "documents/CERTIFICATE/2025/12/CER-2025-5678-CD.pdf",
-    status: DocumentStatus.ISSUED,
+    status: DocDocumentStatus.ISSUED,
     generated_at: "2025-12-10T14:20:00Z",
     issued_at: "2025-12-10T14:25:00Z",
     metadata: {
@@ -234,10 +236,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-3",
     student_id: "student-1",
-    type: DocumentType.ID_CARD,
+    type: DocDocumentType.ID_CARD,
     document_number: "IDC-2025-9012-EF",
     file_path: "documents/ID_CARD/2025/12/IDC-2025-9012-EF.pdf",
-    status: DocumentStatus.ISSUED,
+    status: DocDocumentStatus.ISSUED,
     generated_at: "2025-12-01T09:00:00Z",
     issued_at: "2025-12-01T09:05:00Z",
     metadata: {
@@ -259,10 +261,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-4",
     student_id: "student-2",
-    type: DocumentType.TRANSCRIPT,
+    type: DocDocumentType.TRANSCRIPT,
     document_number: "TRS-2025-3456-GH",
     file_path: "documents/TRANSCRIPT/2025/12/TRS-2025-3456-GH.pdf",
-    status: DocumentStatus.DRAFT,
+    status: DocDocumentStatus.DRAFT,
     generated_at: "2025-12-20T11:00:00Z",
     metadata: {
       academic_year: "2024-2025",
@@ -285,10 +287,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-5",
     student_id: "student-2",
-    type: DocumentType.DIPLOMA,
+    type: DocDocumentType.DIPLOMA,
     document_number: "DIP-2025-7890-IJ",
     file_path: "documents/DIPLOMA/2025/12/DIP-2025-7890-IJ.pdf",
-    status: DocumentStatus.ISSUED,
+    status: DocDocumentStatus.ISSUED,
     generated_at: "2025-12-18T15:30:00Z",
     issued_at: "2025-12-18T15:35:00Z",
     metadata: {
@@ -313,10 +315,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-6",
     student_id: "student-3",
-    type: DocumentType.ATTESTATION,
+    type: DocDocumentType.ATTESTATION,
     document_number: "ATT-2025-2468-KL",
     file_path: "documents/ATTESTATION/2025/12/ATT-2025-2468-KL.pdf",
-    status: DocumentStatus.ISSUED,
+    status: DocDocumentStatus.ISSUED,
     generated_at: "2025-12-12T13:45:00Z",
     issued_at: "2025-12-12T13:50:00Z",
     metadata: {
@@ -368,10 +370,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-8",
     student_id: "student-3",
-    type: DocumentType.CERTIFICATE,
+    type: DocDocumentType.CERTIFICATE,
     document_number: "CER-2025-3691-OP",
     file_path: "documents/CERTIFICATE/2025/12/CER-2025-3691-OP.pdf",
-    status: DocumentStatus.DRAFT,
+    status: DocDocumentStatus.DRAFT,
     generated_at: "2025-12-22T16:00:00Z",
     metadata: {
       purpose: "Demande de bourse",
@@ -602,5 +604,316 @@ export const mockDeliberationSessions: DeliberationSession[] = [
       total_students: 12,
       results_count: 12,
     },
+  },
+];
+
+// =====================
+// ADMINS
+// =====================
+
+export const mockAdmins: Admin[] = [
+  {
+    id: "admin-1",
+    full_name: "Dr. Marie Diop",
+  },
+  {
+    id: "admin-2",
+    full_name: "M. Jean-Pierre Niang",
+  },
+];
+
+// =====================
+// GUARDIANS
+// =====================
+
+export const mockGuardians: Guardian[] = [
+  {
+    id: "guardian-1",
+    student_id: "stud-1",
+    full_name: "Mamadou Diallo Sr.",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221771234560",
+    email: "mamadou.diallo.sr@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Ingénieur",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-2",
+    student_id: "stud-1",
+    full_name: "Fatou Diallo",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221772345671",
+    email: "fatou.diallo@email.com",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    occupation: "Enseignante",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-3",
+    student_id: "stud-2",
+    full_name: "Moussa Sow",
+    relationship: GuardianRelationship.FATHER,
+    phone: "+221773456782",
+    email: "moussa.sow@email.com",
+    address: "456 Avenue Léopold Sédar Senghor, Saint-Louis, Sénégal",
+    occupation: "Commerçant",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "guardian-4",
+    student_id: "stud-3",
+    full_name: "Marie Ndiaye",
+    relationship: GuardianRelationship.MOTHER,
+    phone: "+221774567893",
+    email: "marie.ndiaye@email.com",
+    address: "789 Boulevard Général de Gaulle, Thiès, Sénégal",
+    occupation: "Médecin",
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+];
+
+// =====================
+// DOCUMENTS
+// =====================
+
+export const mockDocuments: Document[] = [
+  {
+    id: "doc-1",
+    student_id: "stud-1",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-1/cni.pdf",
+    file_name: "cni_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Document valide",
+    uploaded_at: "2024-09-01T10:00:00Z",
+    reviewed_at: "2024-09-02T14:30:00Z",
+    created_at: "2024-09-01T10:00:00Z",
+    updated_at: "2024-09-02T14:30:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-2",
+    student_id: "stud-1",
+    type: DocumentType.BIRTH_CERT,
+    file_path: "/uploads/students/stud-1/birth_cert.pdf",
+    file_name: "acte_naissance_mamadou_diallo.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Certificat de naissance authentique",
+    uploaded_at: "2024-09-01T10:15:00Z",
+    reviewed_at: "2024-09-02T14:35:00Z",
+    created_at: "2024-09-01T10:15:00Z",
+    updated_at: "2024-09-02T14:35:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+  {
+    id: "doc-3",
+    student_id: "stud-1",
+    type: DocumentType.PHOTO,
+    file_path: "/uploads/students/stud-1/photo.jpg",
+    file_name: "photo_mamadou_diallo.jpg",
+    status: DocumentStatus.PENDING,
+    uploaded_at: "2024-09-01T10:30:00Z",
+    created_at: "2024-09-01T10:30:00Z",
+    updated_at: "2024-09-01T10:30:00Z",
+  },
+  {
+    id: "doc-4",
+    student_id: "stud-2",
+    type: DocumentType.CNI,
+    file_path: "/uploads/students/stud-2/cni.pdf",
+    file_name: "cni_amidata_sow.pdf",
+    status: DocumentStatus.REJECTED,
+    reviewed_by: "admin-2",
+    notes: "Document expiré - Veuillez fournir une CNI valide",
+    uploaded_at: "2024-09-01T11:00:00Z",
+    reviewed_at: "2024-09-03T09:15:00Z",
+    created_at: "2024-09-01T11:00:00Z",
+    updated_at: "2024-09-03T09:15:00Z",
+    reviewer: {
+      id: "admin-2",
+      full_name: "M. Jean-Pierre Niang",
+    },
+  },
+  {
+    id: "doc-5",
+    student_id: "stud-2",
+    type: DocumentType.BAC_DIPLOMA,
+    file_path: "/uploads/students/stud-2/bac.pdf",
+    file_name: "bac_amidata_sow.pdf",
+    status: DocumentStatus.APPROVED,
+    reviewed_by: "admin-1",
+    notes: "Diplôme du BAC validé",
+    uploaded_at: "2024-09-01T11:15:00Z",
+    reviewed_at: "2024-09-02T16:00:00Z",
+    created_at: "2024-09-01T11:15:00Z",
+    updated_at: "2024-09-02T16:00:00Z",
+    reviewer: {
+      id: "admin-1",
+      full_name: "Dr. Marie Diop",
+    },
+  },
+];
+
+// =====================
+// STUDENTS
+// =====================
+
+export const mockStudents: Student[] = [
+  {
+    id: "stud-1",
+    user_id: "user-stud-1",
+    student_number: "UCAK2024001",
+    full_name: "Mamadou Diallo",
+    gender: Gender.M,
+    date_of_birth: "2000-05-15",
+    place_of_birth: "Dakar",
+    nationality: "Sénégalaise",
+    phone: "+221771234567",
+    emergency_contact_name: "Fatou Diallo",
+    emergency_contact_phone: "+221772345678",
+    address: "123 Rue de la Paix, Dakar, Sénégal",
+    photo_url: null,
+    status: StudentStatus.ACTIVE,
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "stud-2",
+    user_id: "user-stud-2",
+    student_number: "UCAK2024002",
+    full_name: "Aminata Sow",
+    gender: Gender.F,
+    date_of_birth: "2001-03-22",
+    place_of_birth: "Saint-Louis",
+    nationality: "Sénégalaise",
+    phone: "+221772345678",
+    emergency_contact_name: "Moussa Sow",
+    emergency_contact_phone: "+221773456789",
+    address: "456 Avenue Léopold Sédar Senghor, Saint-Louis, Sénégal",
+    photo_url: null,
+    status: StudentStatus.ACTIVE,
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "stud-3",
+    user_id: "user-stud-3",
+    student_number: "UCAK2024003",
+    full_name: "Ousmane Ndiaye",
+    gender: Gender.M,
+    date_of_birth: "1999-11-08",
+    place_of_birth: "Thiès",
+    nationality: "Sénégalaise",
+    phone: "+221773456789",
+    emergency_contact_name: "Marie Ndiaye",
+    emergency_contact_phone: "+221774567890",
+    address: "789 Boulevard Général de Gaulle, Thiès, Sénégal",
+    photo_url: null,
+    status: StudentStatus.ACTIVE,
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "stud-4",
+    user_id: "user-stud-4",
+    student_number: "UCAK2024004",
+    full_name: "Fatou Ba",
+    gender: Gender.F,
+    date_of_birth: "2002-07-30",
+    place_of_birth: "Ziguinchor",
+    nationality: "Sénégalaise",
+    phone: "+221774567890",
+    emergency_contact_name: "Ibrahima Ba",
+    emergency_contact_phone: "+221775678901",
+    address: "321 Rue de l'Indépendance, Ziguinchor, Sénégal",
+    photo_url: null,
+    status: StudentStatus.ACTIVE,
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-09-01T00:00:00Z",
+  },
+  {
+    id: "stud-5",
+    user_id: "user-stud-5",
+    student_number: "UCAK2024005",
+    full_name: "Cheikh Faye",
+    gender: Gender.M,
+    date_of_birth: "2000-12-12",
+    place_of_birth: "Kaolack",
+    nationality: "Sénégalaise",
+    phone: "+221775678901",
+    emergency_contact_name: "Aïssatou Faye",
+    emergency_contact_phone: "+221776789012",
+    address: "654 Avenue Cheikh Anta Diop, Kaolack, Sénégal",
+    photo_url: null,
+    status: StudentStatus.SUSPENDED,
+    created_at: "2024-09-01T00:00:00Z",
+    updated_at: "2024-11-15T00:00:00Z",
+  },
+  {
+    id: "stud-6",
+    user_id: "user-stud-6",
+    student_number: "UCAK2023006",
+    full_name: "Sokhna Diop",
+    gender: Gender.F,
+    date_of_birth: "1998-09-05",
+    place_of_birth: "Dakar",
+    nationality: "Sénégalaise",
+    phone: "+221776789012",
+    emergency_contact_name: "Papa Diop",
+    emergency_contact_phone: "+221777890123",
+    address: "987 Rue Félix Faure, Dakar, Sénégal",
+    photo_url: null,
+    status: StudentStatus.GRADUATED,
+    created_at: "2023-09-01T00:00:00Z",
+    updated_at: "2024-06-30T00:00:00Z",
+  },
+  {
+    id: "stud-7",
+    user_id: "user-stud-7",
+    student_number: "UCAK2022007",
+    full_name: "Abdoulaye Thiam",
+    gender: Gender.M,
+    date_of_birth: "1997-01-18",
+    place_of_birth: "Louga",
+    nationality: "Sénégalaise",
+    phone: "+221777890123",
+    emergency_contact_name: "Ndeye Thiam",
+    emergency_contact_phone: "+221778901234",
+    address: "147 Boulevard de la République, Louga, Sénégal",
+    photo_url: null,
+    status: StudentStatus.WITHDRAWN,
+    created_at: "2022-09-01T00:00:00Z",
+    updated_at: "2023-12-15T00:00:00Z",
+  },
+  {
+    id: "stud-8",
+    user_id: "user-stud-8",
+    student_number: "UCAK2021008",
+    full_name: "Mariama Cissé",
+    gender: Gender.F,
+    date_of_birth: "1996-04-25",
+    place_of_birth: "Matam",
+    nationality: "Sénégalaise",
+    phone: "+221778901234",
+    emergency_contact_name: "Mamadou Cissé",
+    emergency_contact_phone: "+221779012345",
+    address: "258 Rue de la Gare, Matam, Sénégal",
+    photo_url: null,
+    status: StudentStatus.EXPELLED,
+    created_at: "2021-09-01T00:00:00Z",
+    updated_at: "2022-03-20T00:00:00Z",
   },
 ];

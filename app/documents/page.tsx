@@ -19,7 +19,7 @@ import {
   useGenerateIdCard,
   useGenerateDiploma,
   useGenerateAttestation,
-} from "@/hooks/use-documents";
+} from "@/hooks/use-documents-generate";
 import type { 
   DocumentFilters, 
   DocumentType, 

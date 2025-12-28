@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import PdfViewer from "@/components/documents/pdf-viewer";
-import * as documentsApi from "@/lib/api/documents";
+import * as documentsApi from "@/lib/api/documents-genarate";
 
 export default function DocumentPreviewPage() {
   const params = useParams();

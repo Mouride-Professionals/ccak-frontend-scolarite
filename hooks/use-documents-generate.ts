@@ -15,7 +15,7 @@ import type {
   GenerateAttestationInput,
   DocumentVerificationResponse,
 } from "@/types/document";
-import * as documentsApi from "@/lib/api/documents";
+import * as documentsApi from "@/lib/api/documents-genarate";
 
 // =====================
 // QUERY KEYS

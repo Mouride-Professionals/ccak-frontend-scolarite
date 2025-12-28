@@ -11,7 +11,7 @@ import {
   useDownloadDocument,
   useIssueDocument,
   useRevokeDocument,
-} from "@/hooks/use-documents";
+} from "@/hooks/use-documents-generate";
 import type { DocumentFilters } from "@/types/document";
 
 export default function StudentDocumentsPage() {
