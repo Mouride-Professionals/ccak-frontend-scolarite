@@ -16,6 +16,9 @@ export default function DocumentPreviewPage() {
   const [documentNumber, setDocumentNumber] = useState<string>("N/A");
 
   useEffect(() => {
+    let isMounted = true;
+    let currentPdfUrl: string | null = null;
+
     const loadPdf = async () => {
       try {
         setIsLoading(true);
@@ -26,15 +29,22 @@ export default function DocumentPreviewPage() {
         
         // Create a URL for the blob
         const url = URL.createObjectURL(blob);
-        setPdfUrl(url);
+        currentPdfUrl = url;
         
-        // Set document number from document ID (you can enhance this if needed)
-        setDocumentNumber(documentId);
+        if (isMounted) {
+          setPdfUrl(url);
+          // Set document number from document ID
+          setDocumentNumber(documentId);
+        }
       } catch (err) {
         console.error("Error loading PDF:", err);
-        setError("Échec du chargement du document PDF");
+        if (isMounted) {
+          setError("Échec du chargement du document PDF");
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -44,11 +54,12 @@ export default function DocumentPreviewPage() {
 
     // Cleanup: revoke the object URL when component unmounts
     return () => {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
+      isMounted = false;
+      if (currentPdfUrl) {
+        URL.revokeObjectURL(currentPdfUrl);
       }
     };
-  }, [documentId, pdfUrl]);
+  }, [documentId]);
 
   const handleClose = () => {
     router.back();
@@ -154,9 +165,9 @@ export default function DocumentPreviewPage() {
       </div>
 
       {/* PDF Viewer Content */}
-      <div className="flex-1 overflow-hidden bg-zinc-100">
+      <div className="flex-1 overflow-hidden bg-zinc-100 relative">
         {isLoading && (
-          <div className="flex items-center justify-center h-full">
+          <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-solid border-[#008D36] border-r-transparent mb-4"></div>
               <p className="text-zinc-600">Chargement du document...</p>
@@ -165,7 +176,7 @@ export default function DocumentPreviewPage() {
         )}
 
         {error && (
-          <div className="flex items-center justify-center h-full">
+          <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center max-w-md">
               <svg
                 className="w-16 h-16 mx-auto mb-4 text-red-500"
@@ -195,12 +206,13 @@ export default function DocumentPreviewPage() {
         )}
 
         {!isLoading && !error && pdfUrl && (
-          <PdfViewer
-            url={pdfUrl}
-            documentId={documentId}
-            documentNumber={documentNumber}
-            onDownload={handleDownload}
-          />
+          <div className="w-full h-full">
+            <iframe
+              src={pdfUrl}
+              className="w-full h-full border-0"
+              title={`Document ${documentNumber}`}
+            />
+          </div>
         )}
       </div>
     </div>
