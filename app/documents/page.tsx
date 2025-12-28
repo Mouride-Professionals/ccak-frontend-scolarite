@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DocumentTable from "@/components/documents/document-table";
 import GenerateDocumentForm from "@/components/documents/generate-document-form";
-import PdfViewer from "@/components/documents/pdf-viewer";
 import Modal from "@/components/ui/modal";
 import Toast from "@/components/ui/toast";
 import {
@@ -33,6 +33,7 @@ import type {
 import { DocumentType as DocType, DocumentStatus as DocStatus } from "@/types/document";
 
 export default function DocumentsPage() {
+  const router = useRouter();
   // View mode: "all" for admin (all documents) or "student" for specific student
   const [viewMode, setViewMode] = useState<"all" | "student">("all");
   // For testing with mock data, use one of: "student-1", "student-2", "student-3"
@@ -46,11 +47,6 @@ export default function DocumentsPage() {
   const [isBulkGenerateModalOpen, setIsBulkGenerateModalOpen] = useState(false);
   const [generateType, setGenerateType] = useState<DocumentType | null>(null);
   const [generateStudentId, setGenerateStudentId] = useState<string>("");
-  const [previewDocument, setPreviewDocument] = useState<{ 
-    id: string; 
-    url: string;
-    documentNumber?: string;
-  } | null>(null);
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
     isOpen: false,
     message: "",
@@ -89,33 +85,9 @@ export default function DocumentsPage() {
     }
   };
 
-  const handlePreview = async (documentId: string) => {
-    try {
-      // Only run on client side to avoid hydration issues
-      if (typeof window === "undefined") return;
-      
-      // Find the document to get its number
-      const document = documents?.find((doc) => doc.id === documentId);
-      
-      // Fetch the PDF blob from the API
-      const blob = await downloadMutation.mutateAsync(documentId);
-      
-      // Create a blob URL for preview
-      const url = URL.createObjectURL(blob);
-      
-      setPreviewDocument({ 
-        id: documentId, 
-        url,
-        documentNumber: document?.document_number,
-      });
-    } catch (err) {
-      console.error("Error previewing document:", err);
-      setToast({
-        isOpen: true,
-        message: "Erreur lors de la prévisualisation du document",
-        type: "error",
-      });
-    }
+  const handlePreview = (documentId: string) => {
+    // Navigate to the dedicated preview page
+    router.push(`/documents/preview/${documentId}`);
   };
 
   const handleIssue = async (documentId: string) => {
@@ -402,38 +374,6 @@ export default function DocumentsPage() {
             </Modal>
           )}
 
-          {/* Preview Modal */}
-          {previewDocument && (
-            <Modal
-              isOpen={!!previewDocument}
-              onClose={() => {
-                if (previewDocument?.url && typeof window !== "undefined") {
-                  URL.revokeObjectURL(previewDocument.url);
-                }
-                setPreviewDocument(null);
-              }}
-              title="Prévisualisation du document"
-              subtitle="Aperçu du document PDF"
-              size="full"
-            >
-              <div className="h-[calc(100vh-200px)]">
-                <PdfViewer
-                  url={previewDocument.url}
-                  documentId={previewDocument.id}
-                  documentNumber={previewDocument.documentNumber}
-                  onDownload={async () => {
-                    await handleDownload(previewDocument.id);
-                  }}
-                  onClose={() => {
-                    if (previewDocument?.url && typeof window !== "undefined") {
-                      URL.revokeObjectURL(previewDocument.url);
-                    }
-                    setPreviewDocument(null);
-                  }}
-                />
-              </div>
-            </Modal>
-          )}
 
           {/* Toast */}
           <Toast
