@@ -21,7 +21,7 @@ export default function TemplatePreviewModal({
     const data: Record<string, string> = {};
     template.variables.forEach((variable) => {
       if (variable.includes("name")) {
-        data[variable] = "Jean Dupont";
+        data[variable] = "Yacine Gueye";
       } else if (variable.includes("url")) {
         data[variable] = "https://example.com";
       } else if (variable.includes("score")) {

@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { notificationsApi, type SendNotificationPayload } from "@/lib/api/notifications";
 import SendNotificationModal from "@/components/notifications/SendNotificationModal";
-import NotificationList from "@/components/notifications/NotificationList";
+import NotificationList from "@/components/notifications/NotificationListAdmin";
 
 export default function NotificationsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,8 +17,7 @@ export default function NotificationsPage() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: (payload: SendNotificationPayload) =>
-      notificationsApi.sendNotification(payload),
+    mutationFn: (payload: SendNotificationPayload) => notificationsApi.sendNotification(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
       setIsModalOpen(false);
@@ -30,23 +29,14 @@ export default function NotificationsPage() {
       <div className="p-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Gestion des Notifications
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Envoyer et gérer les notifications système
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900">Gestion des Notifications</h1>
+            <p className="mt-1 text-sm text-gray-500">Envoyer et gérer les notifications système</p>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white hover:bg-[#00365F]/90 transition-colors"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -80,9 +70,7 @@ export default function NotificationsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Total envoyées
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Total envoyées</dt>
                     <dd className="text-lg font-semibold text-gray-900">
                       {notifications?.meta?.total || 0}
                     </dd>
@@ -112,9 +100,7 @@ export default function NotificationsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Lues
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Lues</dt>
                     <dd className="text-lg font-semibold text-gray-900">
                       {notifications?.data?.filter((n) => n.is_read).length || 0}
                     </dd>
@@ -144,9 +130,7 @@ export default function NotificationsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Non lues
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Non lues</dt>
                     <dd className="text-lg font-semibold text-gray-900">
                       {notifications?.data?.filter((n) => !n.is_read).length || 0}
                     </dd>
