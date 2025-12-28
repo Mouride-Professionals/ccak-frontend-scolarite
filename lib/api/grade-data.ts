@@ -275,6 +275,7 @@ export const mockGrades: Grade[] = [
       code: "INF101",
       name: "Introduction à la Programmation",
     },
+    
     entered_by_user: {
       id: "prof-1",
       full_name: "Dr. Mamadou Diallo",
