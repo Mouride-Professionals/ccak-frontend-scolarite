@@ -137,7 +137,7 @@ export default function TemplatePreviewModal({
                 <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
                   <div className="rounded-md bg-white p-6 shadow-sm">
                     <div className="mb-4 rounded-t-md bg-gradient-to-r from-[#667eea] to-[#764ba2] p-6 text-center">
-                      <h1 className="text-2xl font-bold text-white">UCAK</h1>
+                      <img src="/logo.svg" alt="UCAK" className="mx-auto h-16" />
                     </div>
                     <div className="p-6">
                       <h2 className="mb-4 text-xl font-semibold">
