@@ -3,6 +3,8 @@
  * Based on UML diagram for CCAK academic management system
  */
 
+import type { Department as DepartmentType } from "./department";
+
 // =====================
 // ENUMS
 // =====================
@@ -57,22 +59,7 @@ export interface Faculty {
   updated_at: string;
 }
 
-/**
- * Department (Département)
- */
-export interface Department {
-  id: string;
-  faculty_id: string;
-  name: string; // Ex: "Informatique"
-  code: string; // Ex: "INFO"
-  head_id: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-
-  // Relations
-  faculty?: Faculty;
-}
+export type Department = DepartmentType;
 
 /**
  * Academic Program (Programme académique)

@@ -4,6 +4,12 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import NotificationList from "@/components/notifications/NotificationList";
 
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+
+// 👇 1. On importe ton composant ici
+import NotificationPopup from "@/components/notifications/NotificationPopup";
+
+
 interface NavbarProps {
   title: string;
 }
@@ -12,6 +18,8 @@ export default function Navbar({ title }: NavbarProps) {
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +46,33 @@ export default function Navbar({ title }: NavbarProps) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Get Keycloak configuration from environment
+      const keycloakBaseUrl = process.env.NEXT_PUBLIC_KEYCLOAK_BASE_URL;
+      const keycloakRealm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM;
+
+      // Build Keycloak logout URL if idToken is available
+      if (keycloakBaseUrl && keycloakRealm && session?.idToken) {
+        const redirectUri = `${window.location.origin}/login`;
+        const keycloakLogoutUrl = `${keycloakBaseUrl}/realms/${keycloakRealm}/protocol/openid-connect/logout?id_token_hint=${session.idToken}&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+        // Sign out from NextAuth first
+        await signOut({ redirect: false });
+
+        // Then redirect to Keycloak logout
+        window.location.href = keycloakLogoutUrl;
+      } else {
+        // Fallback to simple NextAuth logout
+        await signOut({ callbackUrl: "/login" });
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <nav className="fixed left-[230px] right-0 top-0 z-30 h-16 border-b border-zinc-200 bg-white">
@@ -73,6 +108,12 @@ export default function Navbar({ title }: NavbarProps) {
             )}
           </div>
 
+          {/* 👇 2. LA GREFFE EST ICI ! */}
+          {/* J'ai supprimé l'ancien <button> avec le SVG statique */}
+          {/* Et j'ai mis ton composant intelligent à la place */}
+          <NotificationPopup />
+
+
           {/* User Profile */}
           <div className="relative" ref={menuRef}>
             <button
@@ -97,7 +138,10 @@ export default function Navbar({ title }: NavbarProps) {
                 </div>
                 <div className="py-2">
                   <button
-                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    onClick={() => {
+                      setShowLogoutDialog(true);
+                      setShowUserMenu(false);
+                    }}
                     className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,6 +160,19 @@ export default function Navbar({ title }: NavbarProps) {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+        title="Confirmation de déconnexion"
+        message="Êtes-vous sûr de vouloir vous déconnecter ?"
+        confirmText="Se déconnecter"
+        cancelText="Annuler"
+        variant="danger"
+        isLoading={isLoggingOut}
+      />
     </nav>
   );
 }
