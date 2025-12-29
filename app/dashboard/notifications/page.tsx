@@ -7,13 +7,27 @@ import { notificationsApi, type SendNotificationPayload } from "@/lib/api/notifi
 import SendNotificationModal from "@/components/notifications/SendNotificationModal";
 import NotificationList from "@/components/notifications/NotificationListAdmin";
 
+interface NotificationFilters {
+  type?: string;
+  is_read?: boolean;
+  page?: number;
+  per_page?: number;
+  search?: string;
+}
+
 export default function NotificationsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<NotificationFilters>({
+    page: 1,
+    per_page: 15,
+  });
   const queryClient = useQueryClient();
 
   const { data: notifications, isLoading } = useQuery({
-    queryKey: ["admin-notifications"],
-    queryFn: () => notificationsApi.getNotifications({ per_page: 50 }),
+    queryKey: ["admin-notifications", filters],
+    queryFn: () => notificationsApi.getNotifications(filters),
   });
 
   const sendMutation = useMutation({
@@ -24,17 +38,85 @@ export default function NotificationsPage() {
     },
   });
 
+  const handleFilterChange = (key: keyof NotificationFilters, value: string | boolean) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value || undefined,
+      page: 1,
+    }));
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setFilters((prev) => ({
+      ...prev,
+      search: value || undefined,
+      page: 1,
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setFilters({ page: 1, per_page: 15 });
+  };
+
   return (
     <DashboardLayout title="Gestion des Notifications">
       <div className="p-6">
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Gestion des Notifications</h1>
-            <p className="mt-1 text-sm text-gray-500">Envoyer et gérer les notifications système</p>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg
+                  className="h-5 w-5 text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Rechercher une notification..."
+                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              />
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                showFilters
+                  ? "border-[#00365F] bg-[#00365F]/10 text-[#00365F]"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+              }`}
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
+              </svg>
+              Filtres
+              {(filters.type || filters.is_read !== undefined) && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00365F] text-xs font-semibold text-white">
+                  {[filters.type, filters.is_read !== undefined].filter(Boolean).length}
+                </span>
+              )}
+            </button>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white hover:bg-[#00365F]/90 transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -47,6 +129,66 @@ export default function NotificationsPage() {
             Nouvelle notification
           </button>
         </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mb-6 animate-in slide-in-from-top-2 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#00365F]">Filtres avancés</h3>
+              <button
+                onClick={handleClearFilters}
+                className="text-sm text-zinc-500 hover:text-[#00365F] transition-colors"
+              >
+                Réinitialiser tout
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Type Filter */}
+              <div>
+                <label
+                  htmlFor="type"
+                  className="block text-sm font-medium text-zinc-700 mb-2"
+                >
+                  Type de notification
+                </label>
+                <select
+                  id="type"
+                  value={filters.type ?? ""}
+                  onChange={(e) => handleFilterChange("type", e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+                >
+                  <option value="">Tous les types</option>
+                  <option value="system">Système</option>
+                  <option value="grade_published">Note publiée</option>
+                  <option value="enrollment_confirmed">Inscription confirmée</option>
+                  <option value="document_ready">Document prêt</option>
+                  <option value="welcome">Bienvenue</option>
+                  <option value="password_reset">Réinitialisation mot de passe</option>
+                </select>
+              </div>
+
+              {/* Read Status Filter */}
+              <div>
+                <label
+                  htmlFor="is_read"
+                  className="block text-sm font-medium text-zinc-700 mb-2"
+                >
+                  Statut de lecture
+                </label>
+                <select
+                  id="is_read"
+                  value={filters.is_read === undefined ? "" : filters.is_read.toString()}
+                  onChange={(e) => handleFilterChange("is_read", e.target.value === "true")}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+                >
+                  <option value="">Tous</option>
+                  <option value="false">Non lues</option>
+                  <option value="true">Lues</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
@@ -156,6 +298,34 @@ export default function NotificationsPage() {
             )}
           </div>
         </div>
+
+        {/* Pagination */}
+        {notifications && notifications.meta.total > 0 && (
+          <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4 rounded-lg">
+            <p className="text-sm text-zinc-500">
+              Affichage de {((notifications.meta.current_page - 1) * notifications.meta.per_page) + 1} à {Math.min(notifications.meta.current_page * notifications.meta.per_page, notifications.meta.total)} sur {notifications.meta.total} notifications
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
+                disabled={notifications.meta.current_page === 1}
+                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Précédent
+              </button>
+              <button className="rounded-lg bg-[#00365F] px-4 py-2 text-sm font-semibold text-white shadow-sm">
+                {notifications.meta.current_page}
+              </button>
+              <button
+                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
+                disabled={notifications.meta.current_page >= notifications.meta.last_page}
+                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Send Notification Modal */}
         <SendNotificationModal

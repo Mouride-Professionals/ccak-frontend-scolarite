@@ -40,6 +40,7 @@ export const notificationsApi = {
     is_read?: boolean;
     page?: number;
     per_page?: number;
+    search?: string;
   }): Promise<NotificationListResponse> => {
     const queryParams = new URLSearchParams();
     if (params?.type) queryParams.append("type", params.type);
@@ -48,6 +49,7 @@ export const notificationsApi = {
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.per_page)
       queryParams.append("per_page", params.per_page.toString());
+    if (params?.search) queryParams.append("search", params.search);
 
     const url = `/notifications${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);
