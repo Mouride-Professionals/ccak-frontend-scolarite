@@ -30,12 +30,7 @@ export const templatesApi = {
         name: "grade_published",
         display_name: "Note publiée",
         description: "Notification de publication de note",
-        variables: [
-          "user.name",
-          "grade.subject",
-          "grade.score",
-          "grade.url",
-        ],
+        variables: ["user.name", "grade.subject", "grade.score", "grade.url"],
         path: "emails.notifications.grade-published",
       },
       {
@@ -65,7 +60,7 @@ export const templatesApi = {
   // Get template preview
   getTemplatePreview: async (
     templateName: string,
-    variables: Record<string, any>
+    variables: Record<string, unknown>
   ): Promise<{ html: string }> => {
     // This would call a backend endpoint to render the template
     // For now, return a mock preview

@@ -129,9 +129,7 @@ export default function ConfirmDialog({
               </div>
 
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                  {title}
-                </h3>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{title}</h3>
               </div>
             </div>
 
@@ -154,11 +152,7 @@ export default function ConfirmDialog({
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
-                    <svg
-                      className="h-4 w-4 animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle
                         className="opacity-25"
                         cx="12"

@@ -5,10 +5,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type {
-  AcademicProgram,
-  Department,
-} from "@/types/academic";
+import type { AcademicProgram, Department } from "@/types/academic";
 import type {
   AcademicProgramFilters,
   CreateProgrammeInput,
@@ -80,8 +77,7 @@ export function useCreateAcademicProgram() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateProgrammeInput) =>
-      academicApi.createAcademicProgram(input),
+    mutationFn: (input: CreateProgrammeInput) => academicApi.createAcademicProgram(input),
     onSuccess: () => {
       // Invalidate and refetch programs
       queryClient.invalidateQueries({ queryKey: academicKeys.programLists() });
@@ -96,14 +92,10 @@ export function useUpdateAcademicProgram() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateProgrammeInput) =>
-      academicApi.updateAcademicProgram(input),
+    mutationFn: (input: UpdateProgrammeInput) => academicApi.updateAcademicProgram(input),
     onSuccess: (updatedProgram) => {
       // Update the specific program in cache
-      queryClient.setQueryData(
-        academicKeys.programDetail(updatedProgram.id),
-        updatedProgram
-      );
+      queryClient.setQueryData(academicKeys.programDetail(updatedProgram.id), updatedProgram);
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: academicKeys.programLists() });
     },

@@ -15,6 +15,7 @@ Ce document décrit le système complet de gestion des notifications et annonces
 ## 🎯 Vue d'ensemble
 
 Le système permet de :
+
 - **Envoyer des notifications** aux utilisateurs via multiple canaux (In-App, Email, SMS)
 - **Créer et gérer des annonces** avec ciblage d'audience
 - **Gérer les templates d'emails** utilisés pour les notifications
@@ -53,6 +54,7 @@ ccak-frontend-scolarite/
 ### 1. Gestion des Notifications (`/dashboard/notifications`)
 
 Interface pour :
+
 - Envoyer des notifications à un ou plusieurs utilisateurs
 - Visualiser l'historique des notifications
 - Statistiques (total, lues, non lues)
@@ -63,6 +65,7 @@ Interface pour :
 ### 2. Gestion des Annonces (`/dashboard/announcements`)
 
 Interface pour :
+
 - Créer des annonces (brouillon ou publiées)
 - Modifier et supprimer des annonces
 - Publier des brouillons
@@ -74,6 +77,7 @@ Interface pour :
 ### 3. Gestion des Templates (`/dashboard/templates`)
 
 Interface pour :
+
 - Visualiser tous les templates disponibles
 - Voir les variables disponibles
 - Prévisualiser le rendu avec données d'exemple
@@ -86,9 +90,11 @@ Interface pour :
 ### Notifications
 
 #### `SendNotificationModal`
+
 Modal pour créer et envoyer une notification.
 
 **Props** :
+
 ```typescript
 {
   isOpen: boolean;
@@ -99,6 +105,7 @@ Modal pour créer et envoyer une notification.
 ```
 
 **Fonctionnalités** :
+
 - Sélection des destinataires (IDs multiples)
 - Choix du type de notification
 - Titre et message personnalisables
@@ -106,9 +113,11 @@ Modal pour créer et envoyer une notification.
 - Prévisualisation du template utilisé
 
 #### `NotificationList`
+
 Liste tabulaire des notifications.
 
 **Props** :
+
 ```typescript
 {
   notifications: Notification[];
@@ -116,6 +125,7 @@ Liste tabulaire des notifications.
 ```
 
 **Affichage** :
+
 - Type avec badge coloré
 - Titre et message
 - Canaux d'envoi
@@ -125,9 +135,11 @@ Liste tabulaire des notifications.
 ### Annonces
 
 #### `CreateAnnouncementModal`
+
 Modal pour créer ou modifier une annonce.
 
 **Props** :
+
 ```typescript
 {
   isOpen: boolean;
@@ -139,6 +151,7 @@ Modal pour créer ou modifier une annonce.
 ```
 
 **Fonctionnalités** :
+
 - Titre et contenu
 - Niveaux de priorité (Basse, Moyenne, Haute, Critique)
 - Ciblage par rôles (Étudiants, Enseignants, Admin, Personnel)
@@ -147,9 +160,11 @@ Modal pour créer ou modifier une annonce.
 - Mode brouillon/publié
 
 #### `AnnouncementCard`
+
 Carte affichant une annonce.
 
 **Props** :
+
 ```typescript
 {
   announcement: Announcement;
@@ -160,6 +175,7 @@ Carte affichant une annonce.
 ```
 
 **Actions** :
+
 - Modifier
 - Publier (si brouillon)
 - Supprimer
@@ -167,9 +183,11 @@ Carte affichant une annonce.
 ### Templates
 
 #### `TemplateCard`
+
 Carte affichant un template email.
 
 **Props** :
+
 ```typescript
 {
   template: EmailTemplate;
@@ -178,15 +196,18 @@ Carte affichant un template email.
 ```
 
 **Affichage** :
+
 - Nom et description
 - Chemin du fichier
 - Variables disponibles
 - Actions (Aperçu, Voir sur GitHub)
 
 #### `TemplatePreviewModal`
+
 Modal de prévisualisation de template.
 
 **Props** :
+
 ```typescript
 {
   template: EmailTemplate;
@@ -196,6 +217,7 @@ Modal de prévisualisation de template.
 ```
 
 **Fonctionnalités** :
+
 - Génération de données d'exemple
 - Prévisualisation du rendu HTML
 - Liste des variables avec valeurs
@@ -254,10 +276,10 @@ announcementsApi.publishAnnouncement(id)
 
 ```typescript
 // Récupérer les templates
-templatesApi.getTemplates()
+templatesApi.getTemplates();
 
 // Prévisualiser un template
-templatesApi.getTemplatePreview(templateName, variables)
+templatesApi.getTemplatePreview(templateName, variables);
 ```
 
 ## 📧 Templates Email
@@ -369,6 +391,7 @@ MAIL_FROM_NAME=UCAK
 ### Modifier les couleurs
 
 Les couleurs sont définies dans les composants :
+
 - Priorités : `priorityColors` dans `AnnouncementCard`
 - Types : `typeColors` dans `NotificationList`
 - Thème principal : `#00365F` (bleu UCAK)
@@ -376,16 +399,19 @@ Les couleurs sont définies dans les composants :
 ## 🐛 Dépannage
 
 ### Les notifications ne s'envoient pas
+
 - Vérifier que le backend est démarré
 - Vérifier les credentials RabbitMQ
 - Vérifier les logs Laravel
 
 ### Les templates ne s'affichent pas
+
 - Vérifier que les fichiers .blade.php existent
 - Vérifier les permissions des fichiers
 - Vider le cache Laravel : `php artisan cache:clear`
 
 ### Erreur d'authentification
+
 - Vérifier le token JWT
 - Vérifier la configuration Keycloak
 - Vérifier que l'utilisateur a le rôle ADMIN

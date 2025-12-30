@@ -137,9 +137,7 @@ export default function GradeDetailPage() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-zinc-900">
-              {grade.student?.full_name}
-            </h2>
+            <h2 className="text-2xl font-semibold text-zinc-900">{grade.student?.full_name}</h2>
             <p className="mt-1 text-sm text-zinc-500">
               {grade.course?.code} - {grade.course?.name}
             </p>
@@ -194,14 +192,16 @@ export default function GradeDetailPage() {
               </div>
               <div className="text-right">
                 <p className="text-sm font-medium text-zinc-500">Pourcentage</p>
-                <p className={`mt-2 text-4xl font-bold ${
-                  percentage >= 50 ? "text-[#008D36]" : "text-red-600"
-                }`}>
+                <p
+                  className={`mt-2 text-4xl font-bold ${
+                    percentage >= 50 ? "text-[#008D36]" : "text-red-600"
+                  }`}
+                >
                   {percentage.toFixed(1)}%
                 </p>
               </div>
             </div>
-            
+
             {/* Progress Bar */}
             <div className="mt-4">
               <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-200">
@@ -229,9 +229,7 @@ export default function GradeDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-zinc-500">Numéro étudiant</p>
-                <p className="mt-1 text-sm text-zinc-900">
-                  {grade.student?.student_number}
-                </p>
+                <p className="mt-1 text-sm text-zinc-900">{grade.student?.student_number}</p>
               </div>
             </div>
           </div>
@@ -244,9 +242,7 @@ export default function GradeDetailPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <p className="text-sm font-medium text-zinc-500">Nom du cours</p>
-                <p className="mt-1 text-sm font-semibold text-zinc-900">
-                  {grade.course?.name}
-                </p>
+                <p className="mt-1 text-sm font-semibold text-zinc-900">{grade.course?.name}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-zinc-500">Code du cours</p>
@@ -370,7 +366,7 @@ export default function GradeDetailPage() {
                 max_score: grade.max_score,
                 weight: grade.weight,
                 status: grade.status,
-                comments: grade.comments,
+                comments: grade.comments ?? undefined,
               }}
             />
           )}

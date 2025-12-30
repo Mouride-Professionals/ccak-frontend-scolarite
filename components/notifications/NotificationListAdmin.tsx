@@ -26,15 +26,9 @@ const typeColors: Record<string, string> = {
   welcome: "bg-pink-100 text-pink-800",
 };
 
-export default function NotificationList({
-  notifications,
-}: NotificationListProps) {
+export default function NotificationList({ notifications }: NotificationListProps) {
   if (!notifications.length) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        Aucune notification
-      </div>
-    );
+    return <div className="text-center py-8 text-gray-500">Aucune notification</div>;
   }
 
   return (
@@ -75,9 +69,7 @@ export default function NotificationList({
                 </span>
               </td>
               <td className="px-6 py-4">
-                <div className="text-sm font-medium text-gray-900">
-                  {notification.title}
-                </div>
+                <div className="text-sm font-medium text-gray-900">{notification.title}</div>
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm text-gray-500 truncate max-w-xs">
@@ -115,11 +107,7 @@ export default function NotificationList({
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {format(
-                  new Date(notification.created_at),
-                  "dd MMM yyyy HH:mm",
-                  { locale: fr }
-                )}
+                {format(new Date(notification.created_at), "dd MMM yyyy HH:mm", { locale: fr })}
               </td>
             </tr>
           ))}

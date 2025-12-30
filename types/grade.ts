@@ -44,7 +44,7 @@ export interface Grade {
   comments?: string | null;
   created_at: string;
   updated_at: string;
-  
+
   // Populated fields
   student?: {
     id: string;
@@ -72,7 +72,7 @@ export interface Student {
   current_semester: number;
   enrollment_date: string;
   is_active: boolean;
-  
+
   program?: {
     id: string;
     name: string;
@@ -88,7 +88,7 @@ export interface Course {
   semester: number;
   program_id: string;
   is_active: boolean;
-  
+
   program?: {
     id: string;
     name: string;

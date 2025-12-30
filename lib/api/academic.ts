@@ -20,10 +20,7 @@ export type {
   UpdateProgrammeInput,
   ProgrammesResponse,
 };
-import {
-  mockAcademicPrograms,
-  mockDepartments,
-} from "./mock-data";
+import { mockAcademicPrograms, mockDepartments } from "./mock-data";
 
 // Flag to toggle between mock data and real API
 const USE_MOCK_DATA = true;
@@ -108,9 +105,7 @@ export async function getAcademicProgram(id: string): Promise<AcademicProgram> {
 /**
  * Create a new academic program
  */
-export async function createAcademicProgram(
-  input: CreateProgrammeInput
-): Promise<AcademicProgram> {
+export async function createAcademicProgram(input: CreateProgrammeInput): Promise<AcademicProgram> {
   if (USE_MOCK_DATA) {
     await delay(800);
 
@@ -131,15 +126,16 @@ export async function createAcademicProgram(
     return newProgram;
   }
 
-  return api.post<AcademicProgram>("/academic/programs", input as unknown as Record<string, unknown>);
+  return api.post<AcademicProgram>(
+    "/academic/programs",
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**
  * Update an academic program
  */
-export async function updateAcademicProgram(
-  input: UpdateProgrammeInput
-): Promise<AcademicProgram> {
+export async function updateAcademicProgram(input: UpdateProgrammeInput): Promise<AcademicProgram> {
   if (USE_MOCK_DATA) {
     await delay(800);
 
@@ -160,7 +156,10 @@ export async function updateAcademicProgram(
     return updatedProgram;
   }
 
-  return api.put<AcademicProgram>(`/academic/programs/${input.id}`, input.input as unknown as Record<string, unknown>);
+  return api.put<AcademicProgram>(
+    `/academic/programs/${input.id}`,
+    input.input as unknown as Record<string, unknown>
+  );
 }
 
 /**

@@ -36,7 +36,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const isDevelopment = process.env.NODE_ENV === "development";
 
 // Make a mutable copy of mock data for development
-let gradesData = [...mockGrades];
+const gradesData = [...mockGrades];
 
 // =====================
 // GRADES CRUD

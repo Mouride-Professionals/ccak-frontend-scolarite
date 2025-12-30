@@ -14,9 +14,7 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
   if (programmes.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucun programme académique trouvé.
-        </p>
+        <p className="text-sm text-zinc-500">Aucun programme académique trouvé.</p>
       </div>
     );
   }
@@ -67,9 +65,7 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
             {programmes.map((programme) => (
               <tr key={programme.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {programme.name}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-900">{programme.name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
@@ -77,12 +73,8 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {programme.department?.name || "N/A"}
-                  </div>
-                  <div className="text-xs text-zinc-500">
-                    {programme.department?.code}
-                  </div>
+                  <div className="text-sm text-zinc-900">{programme.department?.name || "N/A"}</div>
+                  <div className="text-xs text-zinc-500">{programme.department?.code}</div>
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm text-zinc-900">
@@ -90,9 +82,7 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {programme.total_credits_required}
-                  </div>
+                  <div className="text-sm text-zinc-900">{programme.total_credits_required}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span
@@ -113,7 +103,12 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -128,7 +123,12 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -149,7 +149,12 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

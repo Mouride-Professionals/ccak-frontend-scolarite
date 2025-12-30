@@ -13,9 +13,7 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
   if (courseUnits.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucune unité d'enseignement trouvée.
-        </p>
+        <p className="text-sm text-zinc-500">Aucune unité d'enseignement trouvée.</p>
       </div>
     );
   }
@@ -56,14 +54,10 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
             {courseUnits.map((courseUnit) => (
               <tr key={courseUnit.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {courseUnit.code}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-900">{courseUnit.code}</div>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {courseUnit.name}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-900">{courseUnit.name}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm text-zinc-900">
@@ -71,14 +65,10 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-zinc-900">
-                    Semestre {courseUnit.semesterNumber}
-                  </div>
+                  <div className="text-sm text-zinc-900">Semestre {courseUnit.semesterNumber}</div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm text-zinc-900">
-                    {courseUnit.credits}
-                  </div>
+                  <div className="text-sm text-zinc-900">{courseUnit.credits}</div>
                 </td>
                 <td className="px-6 py-4">
                   <span
@@ -110,7 +100,12 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -125,7 +120,12 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -146,7 +146,12 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

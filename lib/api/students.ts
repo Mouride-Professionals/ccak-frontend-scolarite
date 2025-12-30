@@ -97,9 +97,11 @@ export async function createStudent(input: CreateStudentInput): Promise<Student>
 
     // Générer automatiquement le numéro d'étudiant
     const currentYear = new Date().getFullYear();
-    const existingStudents = mockStudents.filter(s => s.student_number.startsWith(`UCAK${currentYear}`));
+    const existingStudents = mockStudents.filter((s) =>
+      s.student_number.startsWith(`UCAK${currentYear}`)
+    );
     const nextNumber = existingStudents.length + 1;
-    const studentNumber = `UCAK${currentYear}${nextNumber.toString().padStart(4, '0')}`;
+    const studentNumber = `UCAK${currentYear}${nextNumber.toString().padStart(4, "0")}`;
 
     const newStudent: Student = {
       id: `stud-${Date.now()}`,
@@ -125,11 +127,17 @@ export async function createStudent(input: CreateStudentInput): Promise<Student>
       for (const file of input.documents) {
         // Déterminer le type de document basé sur le nom du fichier ou type
         let documentType: DocumentType = DocumentType.CNI; // Default
-        if (file.name.toLowerCase().includes('photo') || file.type.startsWith('image/')) {
+        if (file.name.toLowerCase().includes("photo") || file.type.startsWith("image/")) {
           documentType = DocumentType.PHOTO;
-        } else if (file.name.toLowerCase().includes('naissance') || file.name.toLowerCase().includes('birth')) {
+        } else if (
+          file.name.toLowerCase().includes("naissance") ||
+          file.name.toLowerCase().includes("birth")
+        ) {
           documentType = DocumentType.BIRTH_CERT;
-        } else if (file.name.toLowerCase().includes('bac') || file.name.toLowerCase().includes('diploma')) {
+        } else if (
+          file.name.toLowerCase().includes("bac") ||
+          file.name.toLowerCase().includes("diploma")
+        ) {
           documentType = DocumentType.BAC_DIPLOMA;
         }
 
@@ -211,9 +219,6 @@ export async function deleteStudent(id: string): Promise<void> {
 /**
  * Update student status
  */
-export async function updateStudentStatus(
-  id: string,
-  status: Student["status"]
-): Promise<Student> {
+export async function updateStudentStatus(id: string, status: Student["status"]): Promise<Student> {
   return updateStudent(id, { status });
 }

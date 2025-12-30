@@ -122,9 +122,7 @@ export default function StudentStatusChanger({
           <div className="space-y-4">
             {/* Status Selection */}
             <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-2">
-                Nouveau statut
-              </label>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">Nouveau statut</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value as StudentStatus)}

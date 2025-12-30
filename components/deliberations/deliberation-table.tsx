@@ -14,9 +14,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
   if (sessions.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucune session de délibération trouvée.
-        </p>
+        <p className="text-sm text-zinc-500">Aucune session de délibération trouvée.</p>
       </div>
     );
   }
@@ -58,10 +56,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {sessions.map((session) => (
-              <tr
-                key={session.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={session.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
                   <Link
                     href={`/deliberations/${session.id}`}
@@ -71,13 +66,9 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                   </Link>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {session.academic_program?.name}
-                  </div>
+                  <div className="text-sm text-zinc-700">{session.academic_program?.name}</div>
                 </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">
-                  {session.academic_year?.name}
-                </td>
+                <td className="px-6 py-5 text-sm text-zinc-600">{session.academic_year?.name}</td>
                 <td className="px-6 py-5">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
                     S{session.semester}
@@ -94,9 +85,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                   <DeliberationStatusBadge status={session.status} />
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {session.president?.full_name}
-                  </div>
+                  <div className="text-sm text-zinc-700">{session.president?.full_name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm font-medium text-zinc-900">
@@ -111,7 +100,12 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -126,7 +120,12 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -146,7 +145,12 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-[#008D36]/10 hover:text-[#008D36]"
                       title="Résultats"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -161,7 +165,12 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

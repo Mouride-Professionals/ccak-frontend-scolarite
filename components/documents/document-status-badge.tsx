@@ -26,10 +26,7 @@ const statusConfig = {
   },
 };
 
-export default function DocumentStatusBadge({
-  status,
-  className = "",
-}: DocumentStatusBadgeProps) {
+export default function DocumentStatusBadge({ status, className = "" }: DocumentStatusBadgeProps) {
   const config = statusConfig[status];
 
   return (
@@ -41,4 +38,3 @@ export default function DocumentStatusBadge({
     </span>
   );
 }
-

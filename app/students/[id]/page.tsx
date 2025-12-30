@@ -11,11 +11,7 @@ import DocumentUploader from "@/components/students/document-uploader";
 import DocumentApproval from "@/components/students/document-approval";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
-import {
-  useStudent,
-  useDeleteStudent,
-  useUpdateStudentStatus,
-} from "@/hooks/use-students";
+import { useStudent, useDeleteStudent, useUpdateStudentStatus } from "@/hooks/use-students";
 import {
   useGuardians,
   useCreateGuardian,
@@ -39,7 +35,11 @@ export default function StudentDetailPage() {
 
   const [activeTab, setActiveTab] = useState<TabType>("info");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -193,9 +193,7 @@ export default function StudentDetailPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement de l'étudiant...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement de l'étudiant...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -220,11 +218,10 @@ export default function StudentDetailPage() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-zinc-900">
-              {student.full_name}
-            </h2>
+            <h2 className="text-2xl font-semibold text-zinc-900">{student.full_name}</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              {student.student_number} • Créé le {new Date(student.created_at).toLocaleDateString("fr-FR")}
+              {student.student_number} • Créé le{" "}
+              {new Date(student.created_at).toLocaleDateString("fr-FR")}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -311,15 +308,11 @@ export default function StudentDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Lieu de naissance</p>
-                    <p className="mt-1 text-sm text-zinc-900">
-                      {student.place_of_birth}
-                    </p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.place_of_birth}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Nationalité</p>
-                    <p className="mt-1 text-sm text-zinc-900">
-                      {student.nationality}
-                    </p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.nationality}</p>
                   </div>
                 </div>
               </div>
@@ -332,9 +325,7 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                    <p className="mt-1 text-sm text-zinc-900">
-                      {student.phone}
-                    </p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.phone}</p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="text-sm font-medium text-zinc-500">Adresse</p>
@@ -353,15 +344,11 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Nom du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">
-                      {student.emergency_contact_name}
-                    </p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_name}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">
-                      {student.emergency_contact_phone}
-                    </p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_phone}</p>
                   </div>
                 </div>
               </div>
@@ -389,15 +376,21 @@ export default function StudentDetailPage() {
               ) : (
                 <div className="space-y-4">
                   {guardians.map((guardian) => (
-                    <div key={guardian.id} className="border border-zinc-200 rounded-lg p-4 bg-white">
+                    <div
+                      key={guardian.id}
+                      className="border border-zinc-200 rounded-lg p-4 bg-white"
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-zinc-900">
                             {guardian.full_name}
                           </h4>
                           <p className="text-xs text-zinc-500 mt-1">
-                            {guardian.relationship === "FATHER" ? "Père" :
-                             guardian.relationship === "MOTHER" ? "Mère" : "Tuteur"}
+                            {guardian.relationship === "FATHER"
+                              ? "Père"
+                              : guardian.relationship === "MOTHER"
+                                ? "Mère"
+                                : "Tuteur"}
                           </p>
                           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -407,19 +400,40 @@ export default function StudentDetailPage() {
                               <span className="text-zinc-500">Email:</span> {guardian.email}
                             </div>
                             <div className="sm:col-span-2">
-                              <span className="text-zinc-500">Profession:</span> {guardian.occupation}
+                              <span className="text-zinc-500">Profession:</span>{" "}
+                              {guardian.occupation}
                             </div>
                           </div>
                         </div>
                         <div className="flex gap-2">
                           <button className="text-zinc-400 hover:text-zinc-600">
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
                             </svg>
                           </button>
                           <button className="text-zinc-400 hover:text-red-600">
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -468,7 +482,9 @@ export default function StudentDetailPage() {
                         document={document}
                         onApprove={handleApproveDocument}
                         onReject={handleRejectDocument}
-                        isLoading={approveDocumentMutation.isPending || rejectDocumentMutation.isPending}
+                        isLoading={
+                          approveDocumentMutation.isPending || rejectDocumentMutation.isPending
+                        }
                       />
                     ))}
                   </div>

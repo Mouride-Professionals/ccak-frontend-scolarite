@@ -27,11 +27,17 @@ export default function StudentsPage() {
   const [editStudentId, setEditStudentId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; studentId: string | null }>({
-    isOpen: false,
-    studentId: null,
-  });
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; studentId: string | null }>(
+    {
+      isOpen: false,
+      studentId: null,
+    }
+  );
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -222,10 +228,7 @@ export default function StudentsPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Status Filter */}
               <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="status" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
@@ -245,10 +248,7 @@ export default function StudentsPage() {
 
               {/* Gender Filter */}
               <div>
-                <label
-                  htmlFor="gender"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="gender" className="block text-sm font-medium text-zinc-700 mb-2">
                   Genre
                 </label>
                 <select
@@ -277,9 +277,7 @@ export default function StudentsPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement des étudiants...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement des étudiants...</p>
             </div>
           </div>
         ) : (
@@ -293,7 +291,8 @@ export default function StudentsPage() {
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
               <p className="text-sm text-zinc-500">
-                Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} étudiants
+                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
+                étudiants
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -345,9 +344,7 @@ export default function StudentsPage() {
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-                <p className="mt-3 text-sm text-zinc-500">
-                  Chargement des données...
-                </p>
+                <p className="mt-3 text-sm text-zinc-500">Chargement des données...</p>
               </div>
             </div>
           ) : (

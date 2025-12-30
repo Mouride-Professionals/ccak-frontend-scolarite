@@ -24,8 +24,7 @@ import * as deliberationsApi from "@/lib/api/deliberations";
 export const deliberationKeys = {
   all: ["deliberations"] as const,
   lists: () => [...deliberationKeys.all, "list"] as const,
-  list: (filters?: DeliberationSessionFilters) =>
-    [...deliberationKeys.lists(), filters] as const,
+  list: (filters?: DeliberationSessionFilters) => [...deliberationKeys.lists(), filters] as const,
   details: () => [...deliberationKeys.all, "detail"] as const,
   detail: (id: string) => [...deliberationKeys.details(), id] as const,
 };
@@ -181,10 +180,7 @@ export const deliberationResultKeys = {
 /**
  * Get deliberation results for a session
  */
-export function useDeliberationResults(
-  sessionId: string,
-  filters?: any
-) {
+export function useDeliberationResults(sessionId: string, filters?: any) {
   return useQuery({
     queryKey: deliberationResultKeys.list(sessionId, filters),
     queryFn: () => deliberationsApi.getDeliberationResults(sessionId, filters),

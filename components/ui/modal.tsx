@@ -11,7 +11,14 @@ interface ModalProps {
   size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
-export default function Modal({ isOpen, onClose, title, subtitle, children, size = "lg" }: ModalProps) {
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  children,
+  size = "lg",
+}: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Close on ESC key
@@ -60,7 +67,12 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, size
             <div className="flex items-center gap-3">
               {/* Icon */}
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20">
-                <svg className="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="h-7 w-7 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -71,26 +83,15 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, size
               </div>
               {/* Title */}
               <div>
-                <h2 className="text-lg font-semibold text-white">
-                  {title}
-                </h2>
-                {subtitle && (
-                  <p className="text-sm text-white/80">
-                    {subtitle}
-                  </p>
-                )}
+                <h2 className="text-lg font-semibold text-white">{title}</h2>
+                {subtitle && <p className="text-sm text-white/80">{subtitle}</p>}
               </div>
             </div>
             <button
               onClick={onClose}
               className="rounded-lg p-1.5 text-white transition-colors hover:bg-white/10"
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -102,7 +103,9 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, size
           </div>
 
           {/* Content */}
-          <div className={`max-h-[calc(90vh-100px)] overflow-y-auto bg-white ${size === "full" ? "p-0" : "px-8 py-8"}`}>
+          <div
+            className={`max-h-[calc(90vh-100px)] overflow-y-auto bg-white ${size === "full" ? "p-0" : "px-8 py-8"}`}
+          >
             {children}
           </div>
         </div>

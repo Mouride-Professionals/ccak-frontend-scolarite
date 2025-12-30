@@ -74,10 +74,7 @@ export default function ProgrammeForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Department */}
       <div>
-        <label
-          htmlFor="department_id"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="department_id" className="block text-sm font-medium text-zinc-700 mb-2">
           Département *
         </label>
         <select
@@ -103,10 +100,7 @@ export default function ProgrammeForm({
 
       {/* Name */}
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="name" className="block text-sm font-medium text-zinc-700 mb-2">
           Nom du programme *
         </label>
         <input
@@ -120,17 +114,12 @@ export default function ProgrammeForm({
           placeholder="Ex: Licence Informatique"
           disabled={isLoading}
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-        )}
+        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
       </div>
 
       {/* Level */}
       <div>
-        <label
-          htmlFor="level"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="level" className="block text-sm font-medium text-zinc-700 mb-2">
           Niveau *
         </label>
         <select

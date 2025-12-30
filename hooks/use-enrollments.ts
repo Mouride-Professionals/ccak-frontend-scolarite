@@ -20,8 +20,7 @@ import * as enrollmentsApi from "@/lib/api/enrollments";
 export const enrollmentKeys = {
   all: ["enrollments"] as const,
   lists: () => [...enrollmentKeys.all, "list"] as const,
-  list: (filters?: EnrollmentFilters) =>
-    [...enrollmentKeys.lists(), filters] as const,
+  list: (filters?: EnrollmentFilters) => [...enrollmentKeys.lists(), filters] as const,
   details: () => [...enrollmentKeys.all, "detail"] as const,
   detail: (id: string) => [...enrollmentKeys.details(), id] as const,
 };
@@ -64,8 +63,7 @@ export function useCreateEnrollment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateEnrollmentInput) =>
-      enrollmentsApi.createEnrollment(input),
+    mutationFn: (input: CreateEnrollmentInput) => enrollmentsApi.createEnrollment(input),
     onSuccess: () => {
       // Invalidate all lists to refetch
       queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() });

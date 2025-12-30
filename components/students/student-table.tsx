@@ -14,9 +14,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
   if (students.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucun étudiant trouvé.
-        </p>
+        <p className="text-sm text-zinc-500">Aucun étudiant trouvé.</p>
       </div>
     );
   }
@@ -52,10 +50,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {students.map((student) => (
-              <tr
-                key={student.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={student.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
                   <Link
                     href={`/students/${student.id}`}
@@ -65,9 +60,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                   </Link>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {student.full_name}
-                  </div>
+                  <div className="text-sm text-zinc-700">{student.full_name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
@@ -81,9 +74,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                     year: "numeric",
                   })}
                 </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">
-                  {student.phone}
-                </td>
+                <td className="px-6 py-5 text-sm text-zinc-600">{student.phone}</td>
                 <td className="px-6 py-5">
                   <StudentStatusBadge status={student.status} />
                 </td>
@@ -95,7 +86,12 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -110,7 +106,12 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -131,7 +132,12 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

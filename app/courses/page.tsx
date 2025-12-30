@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, Suspense } from 'react';
-import ProtectedRoute from '@/components/auth/protected-route';
-import DashboardLayout from '@/components/layout/dashboard-layout';
-import CourseTable from '@/components/courses/course-table';
-import CourseForm from '@/components/courses/course-form';
-import Modal from '@/components/ui/modal';
-import ConfirmDialog from '@/components/ui/confirm-dialog';
-import Toast from '@/components/ui/toast';
+import { useState, Suspense } from "react";
+import ProtectedRoute from "@/components/auth/protected-route";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import CourseTable from "@/components/courses/course-table";
+import CourseForm from "@/components/courses/course-form";
+import Modal from "@/components/ui/modal";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import Toast from "@/components/ui/toast";
 import {
   useCourses,
   useCourse,
@@ -15,8 +15,8 @@ import {
   useUpdateCourse,
   useDeleteCourse,
   useCourseUnits,
-} from '@/hooks/use-courses';
-import type { CreateCourseInput, CourseFilters } from '@/types/course';
+} from "@/hooks/use-courses";
+import type { CreateCourseInput, CourseFilters } from "@/types/course";
 
 function CoursesPageContent() {
   const [filters, setFilters] = useState<CourseFilters>({
@@ -26,7 +26,7 @@ function CoursesPageContent() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editCourseId, setEditCourseId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     courseId: string | null;
@@ -37,23 +37,22 @@ function CoursesPageContent() {
   const [toast, setToast] = useState<{
     isOpen: boolean;
     message: string;
-    type: 'success' | 'error';
+    type: "success" | "error";
   }>({
     isOpen: false,
-    message: '',
-    type: 'success',
+    message: "",
+    type: "success",
   });
 
   // Data queries
   const { data, isLoading, error } = useCourses(filters);
-  const { data: courseToEdit } = useCourse(editCourseId || '');
+  const { data: courseToEdit } = useCourse(editCourseId || "");
   const deleteMutation = useDeleteCourse();
   const createMutation = useCreateCourse();
   const updateMutation = useUpdateCourse();
 
   // Load form data
-  const { data: courseUnits, isLoading: loadingCourseUnits } =
-    useCourseUnits();
+  const { data: courseUnits, isLoading: loadingCourseUnits } = useCourseUnits();
 
   // Handlers
   const handleEditClick = (id: string) => {
@@ -66,15 +65,15 @@ function CoursesPageContent() {
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
-        message: 'Cours créé avec succès',
-        type: 'success',
+        message: "Cours créé avec succès",
+        type: "success",
       });
     } catch (err) {
-      console.error('Error creating course:', err);
+      console.error("Error creating course:", err);
       setToast({
         isOpen: true,
-        message: 'Erreur lors de la création du cours',
-        type: 'error',
+        message: "Erreur lors de la création du cours",
+        type: "error",
       });
     }
   };
@@ -90,15 +89,15 @@ function CoursesPageContent() {
       setEditCourseId(null);
       setToast({
         isOpen: true,
-        message: 'Cours modifié avec succès',
-        type: 'success',
+        message: "Cours modifié avec succès",
+        type: "success",
       });
     } catch (err) {
-      console.error('Error updating course:', err);
+      console.error("Error updating course:", err);
       setToast({
         isOpen: true,
-        message: 'Erreur lors de la modification du cours',
-        type: 'error',
+        message: "Erreur lors de la modification du cours",
+        type: "error",
       });
     }
   };
@@ -115,15 +114,15 @@ function CoursesPageContent() {
       setDeleteConfirm({ isOpen: false, courseId: null });
       setToast({
         isOpen: true,
-        message: 'Cours supprimé avec succès',
-        type: 'success',
+        message: "Cours supprimé avec succès",
+        type: "success",
       });
     } catch (err) {
-      console.error('Error deleting course:', err);
+      console.error("Error deleting course:", err);
       setToast({
         isOpen: true,
-        message: 'Erreur lors de la suppression du cours',
-        type: 'error',
+        message: "Erreur lors de la suppression du cours",
+        type: "error",
       });
     }
   };
@@ -146,7 +145,7 @@ function CoursesPageContent() {
   };
 
   const handleClearFilters = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setFilters({ page: 1, limit: 10 });
   };
 
@@ -184,16 +183,11 @@ function CoursesPageContent() {
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
                 showFilters
-                  ? 'border-[#008D36] bg-[#008D36]/10 text-[#008D36]'
-                  : 'border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                  ? "border-[#008D36] bg-[#008D36]/10 text-[#008D36]"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
               }`}
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -204,8 +198,7 @@ function CoursesPageContent() {
               Filtres
               {filters.course_unit_id || filters.is_active !== undefined ? (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {[filters.course_unit_id, filters.is_active].filter(Boolean)
-                    .length}
+                  {[filters.course_unit_id, filters.is_active].filter(Boolean).length}
                 </span>
               ) : null}
             </button>
@@ -214,12 +207,7 @@ function CoursesPageContent() {
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -235,9 +223,7 @@ function CoursesPageContent() {
         {showFilters && (
           <div className="mb-6 animate-in slide-in-from-top-2 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-[#00365F]">
-                Filtres avancés
-              </h3>
+              <h3 className="text-sm font-semibold text-[#00365F]">Filtres avancés</h3>
               <button
                 onClick={handleClearFilters}
                 className="text-sm text-zinc-500 hover:text-[#008D36] transition-colors"
@@ -256,10 +242,8 @@ function CoursesPageContent() {
                 </label>
                 <select
                   id="courseUnit"
-                  value={filters.course_unit_id ?? ''}
-                  onChange={(e) =>
-                    handleFilterChange('course_unit_id', e.target.value)
-                  }
+                  value={filters.course_unit_id ?? ""}
+                  onChange={(e) => handleFilterChange("course_unit_id", e.target.value)}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Toutes les unités</option>
@@ -274,18 +258,13 @@ function CoursesPageContent() {
 
               {/* Active Status Filter */}
               <div>
-                <label
-                  htmlFor="active"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="active" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
                   id="active"
-                  value={filters.is_active?.toString() ?? ''}
-                  onChange={(e) =>
-                    handleFilterChange('is_active', e.target.value === 'true')
-                  }
+                  value={filters.is_active?.toString() ?? ""}
+                  onChange={(e) => handleFilterChange("is_active", e.target.value === "true")}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les statuts</option>
@@ -308,9 +287,7 @@ function CoursesPageContent() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement des cours...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement des cours...</p>
             </div>
           </div>
         ) : (
@@ -324,11 +301,8 @@ function CoursesPageContent() {
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
               <p className="text-sm text-zinc-500">
-                Affichage de{' '}
-                {data
-                  ? (data.page - 1) * data.limit + 1
-                  : 0}{' '}
-                sur {data?.total ?? 0} cours
+                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
+                cours
               </p>
               <div className="flex items-center gap-2">
                 <button

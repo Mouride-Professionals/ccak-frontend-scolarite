@@ -1,9 +1,9 @@
-import Card from '@/components/ui/card';
+import { Card } from "../ui/Card";
 
 const statusStyles = {
-  green: 'bg-green-100 text-green-700',
-  blue: 'bg-blue-100 text-blue-700',
-  yellow: 'bg-yellow-100 text-yellow-700',
+  green: "bg-green-100 text-green-700",
+  blue: "bg-blue-100 text-blue-700",
+  yellow: "bg-yellow-100 text-yellow-700",
 } as const;
 
 type Activity = {
@@ -18,31 +18,31 @@ type Activity = {
 
 const activities: Activity[] = [
   {
-    name: 'Sokhna Anta',
-    avatar: '🧑🏽‍🎓',
-    action: 'Inscription',
-    course: 'Mathématiques L3',
-    date: 'Il y a 2h',
-    status: 'Validé',
-    color: 'green',
+    name: "Sokhna Anta",
+    avatar: "🧑🏽‍🎓",
+    action: "Inscription",
+    course: "Mathématiques L3",
+    date: "Il y a 2h",
+    status: "Validé",
+    color: "green",
   },
   {
-    name: 'Serigne Cheikh',
-    avatar: '👨🏽‍🎓',
-    action: 'Note ajoutée',
-    course: 'Physique M1',
-    date: 'Il y a 4h',
-    status: 'Traité',
-    color: 'blue',
+    name: "Serigne Cheikh",
+    avatar: "👨🏽‍🎓",
+    action: "Note ajoutée",
+    course: "Physique M1",
+    date: "Il y a 4h",
+    status: "Traité",
+    color: "blue",
   },
   {
-    name: 'Modou GUEYE',
-    avatar: '👤',
-    action: 'Demande changement',
-    course: 'Informatique L2',
-    date: 'Il y a 6h',
-    status: 'En attente',
-    color: 'yellow',
+    name: "Modou GUEYE",
+    avatar: "👤",
+    action: "Demande changement",
+    course: "Informatique L2",
+    date: "Il y a 6h",
+    status: "En attente",
+    color: "yellow",
   },
 ];
 

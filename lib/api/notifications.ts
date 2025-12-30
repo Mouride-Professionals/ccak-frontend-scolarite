@@ -44,8 +44,7 @@ export const notificationsApi = {
   }): Promise<NotificationListResponse> => {
     const queryParams = new URLSearchParams();
     if (params?.type) queryParams.append("type", params.type);
-    if (params?.is_read !== undefined)
-      queryParams.append("is_read", params.is_read.toString());
+    if (params?.is_read !== undefined) queryParams.append("is_read", params.is_read.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.per_page)
       queryParams.append("per_page", params.per_page.toString());
@@ -68,9 +67,7 @@ export const notificationsApi = {
   },
 
   // Mark as read
-  markAsRead: async (
-    id: string
-  ): Promise<{ message: string; notification: Notification }> => {
+  markAsRead: async (id: string): Promise<{ message: string; notification: Notification }> => {
     const response = await authFetch(`/notifications/${id}/read`, {
       method: "PUT",
     });

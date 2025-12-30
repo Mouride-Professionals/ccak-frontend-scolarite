@@ -9,7 +9,7 @@ export default function DocumentPreviewPage() {
   const params = useParams();
   const router = useRouter();
   const documentId = params.documentId as string;
-  
+
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,14 +23,14 @@ export default function DocumentPreviewPage() {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Fetch the PDF blob from the API
         const blob = await documentsApi.downloadDocument(documentId);
-        
+
         // Create a URL for the blob
         const url = URL.createObjectURL(blob);
         currentPdfUrl = url;
-        
+
         if (isMounted) {
           setPdfUrl(url);
           // Set document number from document ID
@@ -95,12 +95,7 @@ export default function DocumentPreviewPage() {
             onClick={handleClose}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 transition-colors"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -110,14 +105,10 @@ export default function DocumentPreviewPage() {
             </svg>
             Retour
           </button>
-          
+
           <div>
-            <h1 className="text-lg font-semibold text-zinc-900">
-              {documentNumber}
-            </h1>
-            <p className="text-sm text-zinc-600">
-              Document PDF
-            </p>
+            <h1 className="text-lg font-semibold text-zinc-900">{documentNumber}</h1>
+            <p className="text-sm text-zinc-600">Document PDF</p>
           </div>
         </div>
 
@@ -126,12 +117,7 @@ export default function DocumentPreviewPage() {
             onClick={handleDownload}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 transition-colors"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -146,12 +132,7 @@ export default function DocumentPreviewPage() {
             onClick={handlePrint}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-50 transition-colors"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -191,9 +172,7 @@ export default function DocumentPreviewPage() {
                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <h2 className="text-xl font-semibold text-zinc-900 mb-2">
-                Erreur
-              </h2>
+              <h2 className="text-xl font-semibold text-zinc-900 mb-2">Erreur</h2>
               <p className="text-zinc-600">{error}</p>
               <button
                 onClick={handleClose}
@@ -218,4 +197,3 @@ export default function DocumentPreviewPage() {
     </div>
   );
 }
-

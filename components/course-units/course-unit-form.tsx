@@ -77,10 +77,7 @@ export default function CourseUnitForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Academic Program */}
       <div>
-        <label
-          htmlFor="academicProgramId"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="academicProgramId" className="block text-sm font-medium text-zinc-700 mb-2">
           Programme Académique *
         </label>
         <select
@@ -106,10 +103,7 @@ export default function CourseUnitForm({
 
       {/* Code */}
       <div>
-        <label
-          htmlFor="code"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="code" className="block text-sm font-medium text-zinc-700 mb-2">
           Code *
         </label>
         <input
@@ -123,17 +117,12 @@ export default function CourseUnitForm({
           placeholder="Ex: UE001"
           disabled={isLoading}
         />
-        {errors.code && (
-          <p className="mt-1 text-sm text-red-600">{errors.code}</p>
-        )}
+        {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code}</p>}
       </div>
 
       {/* Name */}
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="name" className="block text-sm font-medium text-zinc-700 mb-2">
           Nom de l'unité d'enseignement *
         </label>
         <input
@@ -147,17 +136,12 @@ export default function CourseUnitForm({
           placeholder="Ex: Algorithmique et Programmation"
           disabled={isLoading}
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-        )}
+        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
       </div>
 
       {/* Semester Number */}
       <div>
-        <label
-          htmlFor="semesterNumber"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="semesterNumber" className="block text-sm font-medium text-zinc-700 mb-2">
           Numéro de semestre *
         </label>
         <input
@@ -178,10 +162,7 @@ export default function CourseUnitForm({
 
       {/* Credits */}
       <div>
-        <label
-          htmlFor="credits"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="credits" className="block text-sm font-medium text-zinc-700 mb-2">
           Crédits *
         </label>
         <input
@@ -195,17 +176,12 @@ export default function CourseUnitForm({
           }`}
           disabled={isLoading}
         />
-        {errors.credits && (
-          <p className="mt-1 text-sm text-red-600">{errors.credits}</p>
-        )}
+        {errors.credits && <p className="mt-1 text-sm text-red-600">{errors.credits}</p>}
       </div>
 
       {/* Type */}
       <div>
-        <label
-          htmlFor="type"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-2">
           Type *
         </label>
         <select

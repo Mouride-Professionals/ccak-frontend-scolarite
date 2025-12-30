@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getCourseUnits,
   getCourseUnit,
@@ -6,17 +6,17 @@ import {
   updateCourseUnit,
   deleteCourseUnit,
   getAcademicPrograms,
-} from '@/lib/api/course-units';
-import { CreateCourseUnitInput, UpdateCourseUnitInput } from '@/types/course-unit';
+} from "@/lib/api/course-units";
+import { CreateCourseUnitInput, UpdateCourseUnitInput } from "@/types/course-unit";
 
 // Query keys
 export const courseUnitKeys = {
-  all: ['course-units'] as const,
-  lists: () => [...courseUnitKeys.all, 'list'] as const,
+  all: ["course-units"] as const,
+  lists: () => [...courseUnitKeys.all, "list"] as const,
   list: (filters?: any) => [...courseUnitKeys.lists(), filters] as const,
-  details: () => [...courseUnitKeys.all, 'detail'] as const,
+  details: () => [...courseUnitKeys.all, "detail"] as const,
   detail: (id: string) => [...courseUnitKeys.details(), id] as const,
-  academicPrograms: () => [...courseUnitKeys.all, 'academic-programs'] as const,
+  academicPrograms: () => [...courseUnitKeys.all, "academic-programs"] as const,
 };
 
 // Hooks

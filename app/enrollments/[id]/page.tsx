@@ -8,10 +8,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import EnrollmentStatusBadge from "@/components/enrollments/enrollment-status-badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
-import {
-  useEnrollment,
-  useDeleteEnrollment,
-} from "@/hooks/use-enrollments";
+import { useEnrollment, useDeleteEnrollment } from "@/hooks/use-enrollments";
 
 export default function EnrollmentDetailPage() {
   const router = useRouter();
@@ -19,7 +16,11 @@ export default function EnrollmentDetailPage() {
   const enrollmentId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -71,9 +72,7 @@ export default function EnrollmentDetailPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement de l'inscription...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement de l'inscription...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -190,7 +189,8 @@ export default function EnrollmentDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Frais d'inscription payés</p>
                 <p className="mt-1 text-2xl font-bold text-zinc-900">
-                  {enrollment.registration_fee_paid.toLocaleString("fr-FR")} <span className="text-base font-normal">FCFA</span>
+                  {enrollment.registration_fee_paid.toLocaleString("fr-FR")}{" "}
+                  <span className="text-base font-normal">FCFA</span>
                 </p>
               </div>
             </div>
@@ -264,40 +264,33 @@ export default function EnrollmentDetailPage() {
               {enrollment.student?.place_of_birth && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Lieu de naissance</p>
-                  <p className="mt-1 text-sm text-zinc-900">
-                    {enrollment.student.place_of_birth}
-                  </p>
+                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.place_of_birth}</p>
                 </div>
               )}
               {enrollment.student?.nationality && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Nationalité</p>
-                  <p className="mt-1 text-sm text-zinc-900">
-                    {enrollment.student.nationality}
-                  </p>
+                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.nationality}</p>
                 </div>
               )}
               {enrollment.student?.phone && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                  <p className="mt-1 text-sm text-zinc-900">
-                    {enrollment.student.phone}
-                  </p>
+                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.phone}</p>
                 </div>
               )}
               {enrollment.student?.address && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Adresse</p>
-                  <p className="mt-1 text-sm text-zinc-900">
-                    {enrollment.student.address}
-                  </p>
+                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.address}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Emergency Contact */}
-          {(enrollment.student?.emergency_contact_name || enrollment.student?.emergency_contact_phone) && (
+          {(enrollment.student?.emergency_contact_name ||
+            enrollment.student?.emergency_contact_phone) && (
             <div className="rounded-lg border border-zinc-200 bg-white p-6">
               <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
                 Contact d'urgence

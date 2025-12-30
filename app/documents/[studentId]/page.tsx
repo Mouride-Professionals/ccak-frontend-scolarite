@@ -22,7 +22,11 @@ export default function StudentDocumentsPage() {
     page: 1,
     limit: 10,
   });
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -136,4 +140,3 @@ export default function StudentDocumentsPage() {
     </ProtectedRoute>
   );
 }
-

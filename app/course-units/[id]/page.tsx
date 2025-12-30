@@ -9,7 +9,7 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useCourseUnit, useDeleteCourseUnit } from "@/hooks/use-course-units";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function CourseUnitDetailPage() {
   const router = useRouter();
@@ -17,7 +17,11 @@ export default function CourseUnitDetailPage() {
   const courseUnitId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -107,9 +111,7 @@ export default function CourseUnitDetailPage() {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-zinc-900">
-                {courseUnit.name}
-              </h2>
+              <h2 className="text-2xl font-semibold text-zinc-900">{courseUnit.name}</h2>
               <p className="mt-1 text-sm text-zinc-500">
                 Unité créée le {new Date(courseUnit.createdAt).toLocaleDateString("fr-FR")}
               </p>
@@ -170,9 +172,7 @@ export default function CourseUnitDetailPage() {
                 </div>
                 <div>
                   <dt className="text-sm font-medium text-zinc-500">Crédits</dt>
-                  <dd className="mt-1 text-sm text-zinc-900">
-                    {courseUnit.credits} crédits
-                  </dd>
+                  <dd className="mt-1 text-sm text-zinc-900">{courseUnit.credits} crédits</dd>
                 </div>
                 <div>
                   <dt className="text-sm font-medium text-zinc-500">Type</dt>
@@ -208,7 +208,9 @@ export default function CourseUnitDetailPage() {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">Nom du programme</dt>
-                    <dd className="mt-1 text-sm text-zinc-900">{courseUnit.academicProgram.name}</dd>
+                    <dd className="mt-1 text-sm text-zinc-900">
+                      {courseUnit.academicProgram.name}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">ID</dt>
@@ -226,26 +228,26 @@ export default function CourseUnitDetailPage() {
                 Informations temporelles
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium text-zinc-500">Date de création</dt>
-                <dd className="mt-1 text-sm text-zinc-900">
-                  {new Date(courseUnit.createdAt).toLocaleDateString("fr-FR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-zinc-500">Dernière modification</dt>
-                <dd className="mt-1 text-sm text-zinc-900">
-                  {new Date(courseUnit.updatedAt).toLocaleDateString("fr-FR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </dd>
-              </div>
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">Date de création</dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {new Date(courseUnit.createdAt).toLocaleDateString("fr-FR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">Dernière modification</dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {new Date(courseUnit.updatedAt).toLocaleDateString("fr-FR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </dd>
+                </div>
               </div>
             </div>
 

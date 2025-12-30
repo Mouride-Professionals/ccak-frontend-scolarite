@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useRouter, useParams } from 'next/navigation';
-import ProtectedRoute from '@/components/auth/protected-route';
-import DashboardLayout from '@/components/layout/dashboard-layout';
-import CourseForm from '@/components/courses/course-form';
-import { useCourse, useUpdateCourse, useCourseUnits } from '@/hooks/use-courses';
-import type { CreateCourseInput } from '@/types/course';
+import { useRouter, useParams } from "next/navigation";
+import ProtectedRoute from "@/components/auth/protected-route";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import CourseForm from "@/components/courses/course-form";
+import { useCourse, useUpdateCourse, useCourseUnits } from "@/hooks/use-courses";
+import type { CreateCourseInput } from "@/types/course";
 
 export default function EditCoursePage() {
   const router = useRouter();
@@ -22,10 +22,10 @@ export default function EditCoursePage() {
         ...data,
         id: courseId,
       });
-      router.push('/courses');
+      router.push("/courses");
     } catch (error) {
-      console.error('Error updating course:', error);
-      alert('Erreur lors de la modification du cours. Veuillez réessayer.');
+      console.error("Error updating course:", error);
+      alert("Erreur lors de la modification du cours. Veuillez réessayer.");
     }
   };
 
@@ -36,9 +36,7 @@ export default function EditCoursePage() {
       <DashboardLayout title="Modifier Cours">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
-            <p className="text-sm text-zinc-600">
-              Modifiez les informations du cours
-            </p>
+            <p className="text-sm text-zinc-600">Modifiez les informations du cours</p>
           </div>
 
           {/* Form */}
@@ -55,7 +53,7 @@ export default function EditCoursePage() {
             ) : (
               <CourseForm
                 onSubmit={handleSubmit}
-                onCancel={() => router.push('/courses')}
+                onCancel={() => router.push("/courses")}
                 courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
                 isLoading={updateMutation.isPending}
                 initialData={course}

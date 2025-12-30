@@ -162,6 +162,20 @@ export interface DeliberationResultFilters {
   page?: number;
   limit?: number;
 }
+export interface SemesterResult {
+  id: string;
+  student_id: string;
+  academic_program_id: string;
+  academic_year_id: string;
+  semester: number;
+  semester_average: number;
+  semester_gpa: number;
+  total_credits_earned: number;
+  total_credits_enrolled: number;
+  is_validated: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 // =====================
 // API RESPONSES

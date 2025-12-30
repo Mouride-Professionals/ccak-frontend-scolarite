@@ -47,13 +47,8 @@ export default function AnnouncementsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: Partial<CreateAnnouncementPayload>;
-    }) => announcementsApi.updateAnnouncement(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateAnnouncementPayload> }) =>
+      announcementsApi.updateAnnouncement(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-announcements"] });
       setIsModalOpen(false);
@@ -125,6 +120,11 @@ export default function AnnouncementsPage() {
       <div className="p-6">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Gestion des Annonces</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Créer et gérer les annonces pour les utilisateurs
+            </p>
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -178,12 +178,7 @@ export default function AnnouncementsPage() {
             onClick={handleNewClick}
             className="flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -275,9 +270,7 @@ export default function AnnouncementsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Total
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Total</dt>
                     <dd className="text-lg font-semibold text-gray-900">
                       {announcements?.meta?.total || 0}
                     </dd>
@@ -307,12 +300,8 @@ export default function AnnouncementsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Publiées
-                    </dt>
-                    <dd className="text-lg font-semibold text-gray-900">
-                      {publishedCount}
-                    </dd>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Publiées</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{publishedCount}</dd>
                   </dl>
                 </div>
               </div>
@@ -339,12 +328,8 @@ export default function AnnouncementsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Brouillons
-                    </dt>
-                    <dd className="text-lg font-semibold text-gray-900">
-                      {draftCount}
-                    </dd>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Brouillons</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{draftCount}</dd>
                   </dl>
                 </div>
               </div>
@@ -371,12 +356,9 @@ export default function AnnouncementsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Critiques
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Critiques</dt>
                     <dd className="text-lg font-semibold text-gray-900">
-                      {announcements?.data?.filter((a) => a.priority === "critical")
-                        .length || 0}
+                      {announcements?.data?.filter((a) => a.priority === "critical").length || 0}
                     </dd>
                   </dl>
                 </div>
@@ -388,9 +370,7 @@ export default function AnnouncementsPage() {
         {/* Announcements Grid */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
-              Liste des annonces
-            </h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Liste des annonces</h3>
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#00365F]"></div>
