@@ -65,11 +65,7 @@ export function useAllDocuments(filters?: DocumentFilters & { student_id?: strin
 /**
  * Verify a document (public endpoint)
  */
-export function useVerifyDocument(
-  documentNumber: string,
-  studentId?: string,
-  enabled = true
-) {
+export function useVerifyDocument(documentNumber: string, studentId?: string, enabled = true) {
   return useQuery({
     queryKey: documentKeys.verificationDetail(documentNumber, studentId),
     queryFn: () => documentsApi.verifyDocument(documentNumber, studentId),
@@ -225,4 +221,3 @@ export function useRevokeDocument() {
     },
   });
 }
-

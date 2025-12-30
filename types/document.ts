@@ -10,9 +10,9 @@
 export enum DocumentType {
   TRANSCRIPT = "TRANSCRIPT",
   CERTIFICATE = "CERTIFICATE",
-  ATTESTATION = "ATTESTATION",
   ID_CARD = "ID_CARD",
   DIPLOMA = "DIPLOMA",
+  ATTESTATION = "ATTESTATION",
 }
 
 export enum DocumentStatus {
@@ -147,4 +147,3 @@ export interface DocumentsResponse {
   limit?: number;
   total_pages?: number;
 }
-

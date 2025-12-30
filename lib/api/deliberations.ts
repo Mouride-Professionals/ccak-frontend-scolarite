@@ -17,7 +17,6 @@ import type {
   CreateDeliberationResultInput,
   UpdateDeliberationResultInput,
 } from "@/types/deliberation";
-import { DeliberationStatus } from "@/types/deliberation";
 import {
   mockDeliberationSessions,
   mockAcademicPrograms,
@@ -80,11 +79,13 @@ function generateJuryRemarks(average: number, decision: DeliberationDecision): s
     average >= 12 && average < 14 ? "Bon travail dans l'ensemble." : null,
     average >= 10 && average < 12 ? "Résultats satisfaisants." : null,
     decision === DeliberationDecision.RESIT ? "Doit repasser les examens non validés." : null,
-    decision === DeliberationDecision.FAILED ? "Travail insuffisant, redoublement recommandé." : null,
+    decision === DeliberationDecision.FAILED
+      ? "Travail insuffisant, redoublement recommandé."
+      : null,
   ].filter(Boolean);
 
   // Randomly return a remark or null (60% chance of having a remark)
-  return Math.random() > 0.4 && remarks.length > 0 ? remarks[0] as string : null;
+  return Math.random() > 0.4 && remarks.length > 0 ? (remarks[0] as string) : null;
 }
 
 /**
@@ -143,9 +144,7 @@ export async function getDeliberationSessions(
   if (filters?.page) queryParams.set("page", filters.page.toString());
   if (filters?.limit) queryParams.set("limit", filters.limit.toString());
 
-  return api.get<DeliberationSessionsResponse>(
-    `/deliberations?${queryParams.toString()}`
-  );
+  return api.get<DeliberationSessionsResponse>(`/deliberations?${queryParams.toString()}`);
 }
 
 /**
@@ -226,7 +225,10 @@ export async function createDeliberationSession(
     return newSession;
   }
 
-  return api.post<DeliberationSession>("/deliberations", input as unknown as Record<string, unknown>);
+  return api.post<DeliberationSession>(
+    "/deliberations",
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**
@@ -254,7 +256,10 @@ export async function updateDeliberationSession(
     return updated;
   }
 
-  return api.put<DeliberationSession>(`/deliberations/${id}`, input as unknown as Record<string, unknown>);
+  return api.put<DeliberationSession>(
+    `/deliberations/${id}`,
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**
@@ -345,12 +350,13 @@ export async function getDeliberationResults(
 
     // Get semester results for this session's semester and academic year
     const semesterResults = mockSemesterResults.filter(
-      (sr) =>
-        sr.academic_year_id === session.academic_year_id && sr.semester === session.semester
+      (sr) => sr.academic_year_id === session.academic_year_id && sr.semester === session.semester
     );
 
     // Check if session is completed (has results)
-    const isCompleted = session.status === DeliberationStatus.COMPLETED || session.status === DeliberationStatus.CLOSED;
+    const isCompleted =
+      session.status === DeliberationStatus.COMPLETED ||
+      session.status === DeliberationStatus.CLOSED;
 
     // Map semester results to deliberation results with student info
     const mockResults: DeliberationResult[] = semesterResults.map((sr) => {
@@ -381,12 +387,14 @@ export async function getDeliberationResults(
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         // Include student info for display
-        student: student ? {
-          id: student.id,
-          student_number: student.student_number,
-          full_name: student.full_name,
-          photo_url: student.photo_url,
-        } : undefined,
+        student: student
+          ? {
+              id: student.id,
+              student_number: student.student_number,
+              full_name: student.full_name,
+              photo_url: student.photo_url,
+            }
+          : undefined,
         // Include semester average for reference
         semester_result: {
           semester_average: sr.semester_average,
@@ -435,7 +443,10 @@ export async function createDeliberationResult(
     return newResult;
   }
 
-  return api.post<DeliberationResult>("/deliberation-results", input as unknown as Record<string, unknown>);
+  return api.post<DeliberationResult>(
+    "/deliberation-results",
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**

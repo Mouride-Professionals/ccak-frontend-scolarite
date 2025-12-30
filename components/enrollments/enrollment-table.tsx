@@ -12,13 +12,17 @@ interface EnrollmentTableProps {
   onDelete?: (id: string) => void;
 }
 
-export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses, onDelete }: EnrollmentTableProps) {
+export default function EnrollmentTable({
+  enrollments,
+  onView,
+  onEdit,
+  onCourses,
+  onDelete,
+}: EnrollmentTableProps) {
   if (enrollments.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucun enrollement trouvé.
-        </p>
+        <p className="text-sm text-zinc-500">Aucun enrollement trouvé.</p>
       </div>
     );
   }
@@ -54,24 +58,17 @@ export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {enrollments.map((enrollment) => (
-              <tr
-                key={enrollment.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={enrollment.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
                   <div className="text-sm font-medium text-[#00365F]">
                     {enrollment.student?.student_number}
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-900">
-                    {enrollment.student?.full_name}
-                  </div>
+                  <div className="text-sm text-zinc-900">{enrollment.student?.full_name}</div>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {enrollment.academic_year?.name}
-                  </div>
+                  <div className="text-sm text-zinc-700">{enrollment.academic_year?.name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
@@ -98,7 +95,12 @@ export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Voir les détails"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -120,7 +122,12 @@ export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
                         title="Gérer les cours"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -136,7 +143,12 @@ export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                         title="Éditer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -152,7 +164,12 @@ export default function EnrollmentTable({ enrollments, onView, onEdit, onCourses
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Supprimer"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"

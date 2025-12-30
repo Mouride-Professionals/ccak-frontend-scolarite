@@ -29,9 +29,7 @@ export default function DocumentTable({
   if (documents.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">
-          Aucun document trouvé.
-        </p>
+        <p className="text-sm text-zinc-500">Aucun document trouvé.</p>
       </div>
     );
   }
@@ -66,10 +64,7 @@ export default function DocumentTable({
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {documents.map((document) => (
-              <tr
-                key={document.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={document.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
                   <DocumentTypeBadge type={document.type} />
                 </td>
@@ -121,4 +116,3 @@ export default function DocumentTable({
     </div>
   );
 }
-

@@ -8,10 +8,7 @@ interface DashboardLayoutProps {
   title: string;
 }
 
-export default function DashboardLayout({
-  children,
-  title,
-}: DashboardLayoutProps) {
+export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-[#DAE4EB]">
       {/* Sidebar */}

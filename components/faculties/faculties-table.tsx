@@ -9,11 +9,7 @@ interface FacultiesTableProps {
   onDelete?: (id: string) => void;
 }
 
-export default function FacultiesTable({
-  faculties,
-  onEdit,
-  onDelete,
-}: FacultiesTableProps) {
+export default function FacultiesTable({ faculties, onEdit, onDelete }: FacultiesTableProps) {
   if (faculties.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -47,14 +43,9 @@ export default function FacultiesTable({
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {faculties.map((faculty) => (
-              <tr
-                key={faculty.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={faculty.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {faculty.name}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-900">{faculty.name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
@@ -63,17 +54,13 @@ export default function FacultiesTable({
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm text-zinc-700">
-                    {faculty.dean?.name || (
-                      <span className="text-zinc-400">Non assigné</span>
-                    )}
+                    {faculty.dean?.name || <span className="text-zinc-400">Non assigné</span>}
                   </div>
                 </td>
                 <td className="px-6 py-5">
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                      faculty.is_active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                      faculty.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
                     {faculty.is_active ? "Actif" : "Inactif"}

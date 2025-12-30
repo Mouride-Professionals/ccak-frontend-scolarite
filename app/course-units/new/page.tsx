@@ -9,11 +9,15 @@ import Toast from "@/components/ui/toast";
 import { useCreateCourseUnit, useAcademicPrograms } from "@/hooks/use-course-units";
 import type { CreateCourseUnitInput } from "@/types/course-unit";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function NewCourseUnitPage() {
   const router = useRouter();
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -55,9 +59,7 @@ export default function NewCourseUnitPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement...</p>
             </div>
           </div>
         </DashboardLayout>

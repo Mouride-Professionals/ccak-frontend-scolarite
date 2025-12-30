@@ -20,9 +20,9 @@ import {
   useGenerateDiploma,
   useGenerateAttestation,
 } from "@/hooks/use-documents-generate";
-import type { 
-  DocumentFilters, 
-  DocumentType, 
+import type {
+  DocumentFilters,
+  DocumentType,
   DocumentStatus,
   GenerateTranscriptInput,
   GenerateCertificateInput,
@@ -47,7 +47,11 @@ export default function DocumentsPage() {
   const [isBulkGenerateModalOpen, setIsBulkGenerateModalOpen] = useState(false);
   const [generateType, setGenerateType] = useState<DocumentType | null>(null);
   const [generateStudentId, setGenerateStudentId] = useState<string>("");
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -56,8 +60,12 @@ export default function DocumentsPage() {
   // Use appropriate query based on view mode
   const studentDocumentsQuery = useStudentDocuments(studentId, filters);
   const allDocumentsQuery = useAllDocuments(filters);
-  
-  const { data: documents, isLoading, error } = viewMode === "all" ? allDocumentsQuery : studentDocumentsQuery;
+
+  const {
+    data: documents,
+    isLoading,
+    error,
+  } = viewMode === "all" ? allDocumentsQuery : studentDocumentsQuery;
   const downloadMutation = useDownloadDocument();
   const issueMutation = useIssueDocument();
   const revokeMutation = useRevokeDocument();
@@ -126,16 +134,19 @@ export default function DocumentsPage() {
     }
   };
 
-  const handleFilterChange = (key: keyof (DocumentFilters & { student_id?: string }), value: string | number | undefined) => {
+  const handleFilterChange = (
+    key: keyof (DocumentFilters & { student_id?: string }),
+    value: string | number | undefined
+  ) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,
       page: 1, // Reset to first page when filter changes
     }));
-    
+
     // Update studentId when filtering by student
     if (key === "student_id") {
-      setStudentId(value as string || "");
+      setStudentId((value as string) || "");
       setViewMode(value ? "student" : "all");
     }
   };
@@ -155,7 +166,9 @@ export default function DocumentsPage() {
           await generateTranscriptMutation.mutateAsync(data as unknown as GenerateTranscriptInput);
           break;
         case DocType.CERTIFICATE:
-          await generateCertificateMutation.mutateAsync(data as unknown as GenerateCertificateInput);
+          await generateCertificateMutation.mutateAsync(
+            data as unknown as GenerateCertificateInput
+          );
           break;
         case DocType.ID_CARD:
           await generateIdCardMutation.mutateAsync(data as unknown as GenerateIdCardInput);
@@ -164,7 +177,9 @@ export default function DocumentsPage() {
           await generateDiplomaMutation.mutateAsync(data as unknown as GenerateDiplomaInput);
           break;
         case DocType.ATTESTATION:
-          await generateAttestationMutation.mutateAsync(data as unknown as GenerateAttestationInput);
+          await generateAttestationMutation.mutateAsync(
+            data as unknown as GenerateAttestationInput
+          );
           break;
         default:
           return;
@@ -227,7 +242,6 @@ export default function DocumentsPage() {
                 </button>
               </div>
             )}
-          
           </div>
 
           {/* Filters */}
@@ -235,10 +249,7 @@ export default function DocumentsPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* Student Filter */}
               <div>
-                <label
-                  htmlFor="student"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="student" className="block text-sm font-medium text-zinc-700 mb-2">
                   Étudiant
                 </label>
                 <select
@@ -256,10 +267,7 @@ export default function DocumentsPage() {
 
               {/* Type Filter */}
               <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-2">
                   Type
                 </label>
                 <select
@@ -279,10 +287,7 @@ export default function DocumentsPage() {
 
               {/* Status Filter */}
               <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="status" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
@@ -300,10 +305,7 @@ export default function DocumentsPage() {
 
               {/* Search */}
               <div>
-                <label
-                  htmlFor="search"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="search" className="block text-sm font-medium text-zinc-700 mb-2">
                   Recherche
                 </label>
                 <input
@@ -374,7 +376,6 @@ export default function DocumentsPage() {
             </Modal>
           )}
 
-
           {/* Toast */}
           <Toast
             isOpen={toast.isOpen}
@@ -387,4 +388,3 @@ export default function DocumentsPage() {
     </ProtectedRoute>
   );
 }
-

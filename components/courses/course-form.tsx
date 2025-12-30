@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import type { CreateCourseInput, Course } from '@/types/course';
-import type { CourseUnit } from '@/types/course-unit';
+import { useState } from "react";
+import type { CreateCourseInput, Course } from "@/types/course";
+import type { CourseUnit } from "@/types/course-unit";
 
 interface CourseFormProps {
   onSubmit: (data: CreateCourseInput) => Promise<void>;
@@ -20,10 +20,10 @@ export default function CourseForm({
   initialData,
 }: CourseFormProps) {
   const [formData, setFormData] = useState<CreateCourseInput>({
-    course_unit_id: initialData?.course_unit_id || '',
-    code: initialData?.code || '',
-    name: initialData?.name || '',
-    description: initialData?.description || '',
+    course_unit_id: initialData?.course_unit_id || "",
+    code: initialData?.code || "",
+    name: initialData?.name || "",
+    description: initialData?.description || "",
     credits: initialData?.credits || 3,
     hours_lecture: initialData?.hours_lecture || 0,
     hours_td: initialData?.hours_td || 0,
@@ -33,21 +33,19 @@ export default function CourseForm({
     is_active: initialData?.is_active !== false,
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
 
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === 'checkbox'
+        type === "checkbox"
           ? (e.target as HTMLInputElement).checked
-          : type === 'number'
+          : type === "number"
             ? parseInt(value) || 0
             : value,
     }));
@@ -55,25 +53,25 @@ export default function CourseForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!formData.course_unit_id) {
-      setError('Veuillez sélectionner une unité d\'enseignement');
+      setError("Veuillez sélectionner une unité d'enseignement");
       return;
     }
 
     if (!formData.code.trim()) {
-      setError('Le code du cours est obligatoire');
+      setError("Le code du cours est obligatoire");
       return;
     }
 
     if (!formData.name.trim()) {
-      setError('Le nom du cours est obligatoire');
+      setError("Le nom du cours est obligatoire");
       return;
     }
 
     if (formData.credits <= 0) {
-      setError('Les crédits doivent être supérieurs à 0');
+      setError("Les crédits doivent être supérieurs à 0");
       return;
     }
 
@@ -81,9 +79,7 @@ export default function CourseForm({
       await onSubmit(formData);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Une erreur est survenue lors de la sauvegarde'
+        err instanceof Error ? err.message : "Une erreur est survenue lors de la sauvegarde"
       );
     }
   };
@@ -98,10 +94,7 @@ export default function CourseForm({
 
       {/* Course Unit */}
       <div>
-        <label
-          htmlFor="course_unit_id"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="course_unit_id" className="block text-sm font-medium text-zinc-700 mb-2">
           Unité d'Enseignement *
         </label>
         <select
@@ -124,10 +117,7 @@ export default function CourseForm({
       {/* Code and Name */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label
-            htmlFor="code"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="code" className="block text-sm font-medium text-zinc-700 mb-2">
             Code *
           </label>
           <input
@@ -143,10 +133,7 @@ export default function CourseForm({
         </div>
 
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-zinc-700 mb-2">
             Nom *
           </label>
           <input
@@ -164,16 +151,13 @@ export default function CourseForm({
 
       {/* Description */}
       <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-zinc-700 mb-2"
-        >
+        <label htmlFor="description" className="block text-sm font-medium text-zinc-700 mb-2">
           Description
         </label>
         <textarea
           id="description"
           name="description"
-          value={formData.description || ''}
+          value={formData.description || ""}
           onChange={handleChange}
           rows={3}
           placeholder="Description du cours..."
@@ -184,10 +168,7 @@ export default function CourseForm({
       {/* Credits and Coefficient */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label
-            htmlFor="credits"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="credits" className="block text-sm font-medium text-zinc-700 mb-2">
             Crédits *
           </label>
           <input
@@ -203,10 +184,7 @@ export default function CourseForm({
         </div>
 
         <div>
-          <label
-            htmlFor="coefficient"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="coefficient" className="block text-sm font-medium text-zinc-700 mb-2">
             Coefficient
           </label>
           <input
@@ -225,10 +203,7 @@ export default function CourseForm({
       {/* Hours */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
-          <label
-            htmlFor="hours_lecture"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="hours_lecture" className="block text-sm font-medium text-zinc-700 mb-2">
             Heures CM
           </label>
           <input
@@ -243,10 +218,7 @@ export default function CourseForm({
         </div>
 
         <div>
-          <label
-            htmlFor="hours_td"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="hours_td" className="block text-sm font-medium text-zinc-700 mb-2">
             Heures TD
           </label>
           <input
@@ -261,10 +233,7 @@ export default function CourseForm({
         </div>
 
         <div>
-          <label
-            htmlFor="hours_tp"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="hours_tp" className="block text-sm font-medium text-zinc-700 mb-2">
             Heures TP
           </label>
           <input
@@ -289,10 +258,7 @@ export default function CourseForm({
           onChange={handleChange}
           className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
         />
-        <label
-          htmlFor="is_active"
-          className="ml-3 text-sm font-medium text-zinc-700"
-        >
+        <label htmlFor="is_active" className="ml-3 text-sm font-medium text-zinc-700">
           Cours actif
         </label>
       </div>
@@ -311,7 +277,7 @@ export default function CourseForm({
           disabled={isLoading}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+          {isLoading ? "Enregistrement..." : "Enregistrer"}
         </button>
       </div>
     </form>

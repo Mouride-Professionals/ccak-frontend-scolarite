@@ -23,7 +23,11 @@ export default function DeliberationDetailPage() {
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [showStatusMenu, setShowStatusMenu] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -115,9 +119,7 @@ export default function DeliberationDetailPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement de la session...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement de la session...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -157,9 +159,7 @@ export default function DeliberationDetailPage() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-zinc-900">
-              {session.session_name}
-            </h2>
+            <h2 className="text-2xl font-semibold text-zinc-900">{session.session_name}</h2>
             <p className="mt-1 text-sm text-zinc-500">
               Session créée le {new Date(session.created_at).toLocaleDateString("fr-FR")}
             </p>
@@ -203,7 +203,9 @@ export default function DeliberationDetailPage() {
                 <div className="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-zinc-200 bg-white shadow-lg">
                   <div className="border-b border-zinc-200 px-4 py-3">
                     <p className="text-sm font-medium text-zinc-900">Changer le statut</p>
-                    <p className="mt-1 text-xs text-zinc-500">Statut actuel : {getStatusLabel(session.status)}</p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Statut actuel : {getStatusLabel(session.status)}
+                    </p>
                   </div>
                   <div className="py-2">
                     {Object.values(DeliberationStatus).map((status) => (
@@ -217,19 +219,29 @@ export default function DeliberationDetailPage() {
                             : "text-zinc-700 hover:bg-zinc-50"
                         }`}
                       >
-                        <span className={`h-2 w-2 rounded-full ${
-                          status === DeliberationStatus.SCHEDULED
-                            ? "bg-blue-500"
-                            : status === DeliberationStatus.IN_PROGRESS
-                            ? "bg-amber-500"
-                            : status === DeliberationStatus.COMPLETED
-                            ? "bg-green-500"
-                            : "bg-zinc-500"
-                        }`}></span>
+                        <span
+                          className={`h-2 w-2 rounded-full ${
+                            status === DeliberationStatus.SCHEDULED
+                              ? "bg-blue-500"
+                              : status === DeliberationStatus.IN_PROGRESS
+                                ? "bg-amber-500"
+                                : status === DeliberationStatus.COMPLETED
+                                  ? "bg-green-500"
+                                  : "bg-zinc-500"
+                          }`}
+                        ></span>
                         {getStatusLabel(status)}
                         {status === session.status && (
-                          <svg className="ml-auto h-4 w-4 text-zinc-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            className="ml-auto h-4 w-4 text-zinc-400"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         )}
                       </button>
@@ -348,9 +360,7 @@ export default function DeliberationDetailPage() {
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00365F] text-xs font-semibold text-white">
                           {index + 1}
                         </span>
-                        <span className="text-sm text-zinc-900">
-                          Membre {memberId}
-                        </span>
+                        <span className="text-sm text-zinc-900">Membre {memberId}</span>
                       </div>
                     ))}
                   </div>

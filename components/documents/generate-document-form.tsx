@@ -70,10 +70,7 @@ export default function GenerateDocumentForm({
       {type === DocType.TRANSCRIPT && (
         <>
           <div>
-            <label
-              htmlFor="academic_year"
-              className="block text-sm font-medium text-zinc-700 mb-2"
-            >
+            <label htmlFor="academic_year" className="block text-sm font-medium text-zinc-700 mb-2">
               Année académique (optionnel)
             </label>
             <input
@@ -93,9 +90,7 @@ export default function GenerateDocumentForm({
                 onChange={(e) => handleChange("include_all", e.target.checked)}
                 className="rounded border-zinc-300 text-[#00365F] focus:ring-[#00365F]"
               />
-              <span className="text-sm text-zinc-700">
-                Inclure tous les semestres
-              </span>
+              <span className="text-sm text-zinc-700">Inclure tous les semestres</span>
             </label>
           </div>
         </>
@@ -105,10 +100,7 @@ export default function GenerateDocumentForm({
       {type === DocType.CERTIFICATE && (
         <>
           <div>
-            <label
-              htmlFor="purpose"
-              className="block text-sm font-medium text-zinc-700 mb-2"
-            >
+            <label htmlFor="purpose" className="block text-sm font-medium text-zinc-700 mb-2">
               Objet (optionnel)
             </label>
             <input
@@ -121,10 +113,7 @@ export default function GenerateDocumentForm({
             />
           </div>
           <div>
-            <label
-              htmlFor="academic_year"
-              className="block text-sm font-medium text-zinc-700 mb-2"
-            >
+            <label htmlFor="academic_year" className="block text-sm font-medium text-zinc-700 mb-2">
               Année académique (optionnel)
             </label>
             <input
@@ -143,10 +132,7 @@ export default function GenerateDocumentForm({
       {type === DocType.DIPLOMA && (
         <>
           <div>
-            <label
-              htmlFor="degree"
-              className="block text-sm font-medium text-zinc-700 mb-2"
-            >
+            <label htmlFor="degree" className="block text-sm font-medium text-zinc-700 mb-2">
               Diplôme (optionnel)
             </label>
             <input
@@ -174,10 +160,7 @@ export default function GenerateDocumentForm({
             />
           </div>
           <div>
-            <label
-              htmlFor="honors"
-              className="block text-sm font-medium text-zinc-700 mb-2"
-            >
+            <label htmlFor="honors" className="block text-sm font-medium text-zinc-700 mb-2">
               Mention (optionnel)
             </label>
             <select
@@ -199,10 +182,7 @@ export default function GenerateDocumentForm({
       {/* Attestation Fields */}
       {type === DocType.ATTESTATION && (
         <div>
-          <label
-            htmlFor="custom_text"
-            className="block text-sm font-medium text-zinc-700 mb-2"
-          >
+          <label htmlFor="custom_text" className="block text-sm font-medium text-zinc-700 mb-2">
             Texte personnalisé <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -218,9 +198,7 @@ export default function GenerateDocumentForm({
                 : "border-zinc-300 focus:border-[#00365F] focus:ring-[#00365F]"
             }`}
           />
-          {errors.custom_text && (
-            <p className="mt-1 text-xs text-red-600">{errors.custom_text}</p>
-          )}
+          {errors.custom_text && <p className="mt-1 text-xs text-red-600">{errors.custom_text}</p>}
         </div>
       )}
 
@@ -252,11 +230,7 @@ export default function GenerateDocumentForm({
         >
           {isLoading ? (
             <span className="flex items-center gap-2">
-              <svg
-                className="h-4 w-4 animate-spin"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -281,4 +255,3 @@ export default function GenerateDocumentForm({
     </form>
   );
 }
-

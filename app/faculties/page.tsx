@@ -49,10 +49,7 @@ export default function FacultiesPage() {
     search: searchQuery || undefined,
     is_active: statusFilter === "" ? undefined : statusFilter === "true",
   });
-  const { data: facultyToEdit } = useFaculty(
-    editFacultyId || "",
-    !!editFacultyId
-  );
+  const { data: facultyToEdit } = useFaculty(editFacultyId || "", !!editFacultyId);
   const deleteMutation = useDeleteFaculty();
   const createMutation = useCreateFaculty();
   const updateMutation = useUpdateFaculty();
@@ -133,8 +130,18 @@ export default function FacultiesPage() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg className="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    className="h-5 w-5 text-zinc-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                 </div>
                 <input
@@ -154,11 +161,18 @@ export default function FacultiesPage() {
                 }`}
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
                 </svg>
                 Filtres
                 {statusFilter && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">1</span>
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
+                    1
+                  </span>
                 )}
               </button>
             </div>
@@ -167,7 +181,12 @@ export default function FacultiesPage() {
               className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Nouvelle Faculté
             </button>
@@ -209,12 +228,9 @@ export default function FacultiesPage() {
           )}
 
           <div className="space-y-4">
-
             {isLoading ? (
               <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-                <p className="text-sm text-zinc-500">
-                  Chargement des facultés...
-                </p>
+                <p className="text-sm text-zinc-500">Chargement des facultés...</p>
               </div>
             ) : (
               <FacultiesTable
@@ -223,9 +239,7 @@ export default function FacultiesPage() {
                   setIsCreateModalOpen(false);
                   setEditFacultyId(id);
                 }}
-                onDelete={(id) =>
-                  setDeleteConfirm({ isOpen: true, facultyId: id })
-                }
+                onDelete={(id) => setDeleteConfirm({ isOpen: true, facultyId: id })}
               />
             )}
           </div>
@@ -236,10 +250,7 @@ export default function FacultiesPage() {
             onClose={() => setIsCreateModalOpen(false)}
             title="Créer une Nouvelle Faculté"
           >
-            <FacultyForm
-              onSuccess={() => setIsCreateModalOpen(false)}
-              faculty={undefined}
-            />
+            <FacultyForm onSuccess={() => setIsCreateModalOpen(false)} faculty={undefined} />
           </Modal>
 
           {/* Edit Modal */}
@@ -249,10 +260,7 @@ export default function FacultiesPage() {
             title="Modifier la Faculté"
           >
             {facultyToEdit ? (
-              <FacultyForm
-                onSuccess={() => setEditFacultyId(null)}
-                faculty={facultyToEdit}
-              />
+              <FacultyForm onSuccess={() => setEditFacultyId(null)} faculty={facultyToEdit} />
             ) : (
               <p>Chargement...</p>
             )}
@@ -261,9 +269,7 @@ export default function FacultiesPage() {
           {/* Delete Confirmation Dialog */}
           <ConfirmDialog
             isOpen={deleteConfirm.isOpen}
-            onClose={() =>
-              setDeleteConfirm({ isOpen: false, facultyId: null })
-            }
+            onClose={() => setDeleteConfirm({ isOpen: false, facultyId: null })}
             onConfirm={handleDeleteConfirm}
             title="Supprimer la Faculté"
             message={`Êtes-vous sûr de vouloir supprimer cette faculté ? Cette action est irréversible.`}

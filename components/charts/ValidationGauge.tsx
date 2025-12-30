@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { PieChart, Pie, Cell } from 'recharts';
-import Card from '@/components/ui/card';
+import { PieChart, Pie, Cell } from "recharts";
+import { Card } from "@/components/ui/Card";
 
 const data = [
-  { name: 'Validé', value: 82 },
-  { name: 'Ajourné', value: 18 },
+  { name: "Validé", value: 82 },
+  { name: "Ajourné", value: 18 },
 ];
 
-const COLORS = ['#0A8F3D', '#E11D48'];
+const COLORS = ["#0A8F3D", "#E11D48"];
 
 export default function ValidationGauge() {
   return (

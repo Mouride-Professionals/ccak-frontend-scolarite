@@ -224,9 +224,7 @@ export default function DeliberationForm({
                 </option>
               ))}
             </select>
-            {errors.semester && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>
-            )}
+            {errors.semester && <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>}
           </div>
         </div>
       </div>
@@ -266,7 +264,8 @@ export default function DeliberationForm({
             <label className="mb-2 block text-sm text-zinc-900">
               Membres du jury <span className="text-red-500">*</span>
               <span className="ml-2 font-normal text-zinc-500">
-                ({formData.jury_members.length} sélectionné{formData.jury_members.length > 1 ? "s" : ""})
+                ({formData.jury_members.length} sélectionné
+                {formData.jury_members.length > 1 ? "s" : ""})
               </span>
             </label>
             <div className="max-h-56 space-y-2 overflow-y-auto rounded-md border border-zinc-300 bg-white p-4">
@@ -320,9 +319,12 @@ export default function DeliberationForm({
           disabled={isLoading}
         >
           {isLoading
-            ? (initialData ? "Modification en cours..." : "Création en cours...")
-            : (initialData ? "Modifier la session" : "Créer la session")
-          }
+            ? initialData
+              ? "Modification en cours..."
+              : "Création en cours..."
+            : initialData
+              ? "Modifier la session"
+              : "Créer la session"}
         </button>
       </div>
     </form>

@@ -4,12 +4,7 @@
  */
 
 import { api } from "@/lib/api-client";
-import type {
-  Guardian,
-  GuardiansResponse,
-  CreateGuardianInput,
-  UpdateGuardianInput,
-} from "@/types/student";
+import type { Guardian, CreateGuardianInput, UpdateGuardianInput } from "@/types/student";
 import { mockGuardians } from "./mock-data";
 
 // Flag to toggle between mock data and real API

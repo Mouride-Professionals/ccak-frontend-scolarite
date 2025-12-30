@@ -15,7 +15,11 @@ export default function CourseDetailPage() {
   const courseId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -65,9 +69,7 @@ export default function CourseDetailPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement du cours...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement du cours...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -86,11 +88,9 @@ export default function CourseDetailPage() {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-zinc-900">
-                {course.name}
-              </h2>
+              <h2 className="text-2xl font-semibold text-zinc-900">{course.name}</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                {course.created_at 
+                {course.created_at
                   ? `Cours créé le ${new Date(course.created_at).toLocaleDateString("fr-FR")}`
                   : "Cours"}
               </p>
@@ -162,9 +162,7 @@ export default function CourseDetailPage() {
                   <div className="mt-1">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                        course.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                        course.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                       }`}
                     >
                       {course.is_active ? "Actif" : "Inactif"}
@@ -182,21 +180,15 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Cours magistral (CM)</p>
-                  <p className="mt-1 text-2xl font-bold text-zinc-900">
-                    {course.hours_lecture}h
-                  </p>
+                  <p className="mt-1 text-2xl font-bold text-zinc-900">{course.hours_lecture}h</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Travaux dirigés (TD)</p>
-                  <p className="mt-1 text-2xl font-bold text-[#00365F]">
-                    {course.hours_td}h
-                  </p>
+                  <p className="mt-1 text-2xl font-bold text-[#00365F]">{course.hours_td}h</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Travaux pratiques (TP)</p>
-                  <p className="mt-1 text-2xl font-bold text-[#008D36]">
-                    {course.hours_tp}h
-                  </p>
+                  <p className="mt-1 text-2xl font-bold text-[#008D36]">{course.hours_tp}h</p>
                 </div>
               </div>
             </div>
@@ -207,9 +199,7 @@ export default function CourseDetailPage() {
                 <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
                   Prérequis
                 </h3>
-                <p className="text-sm text-zinc-900">
-                  {course.prerequisites}
-                </p>
+                <p className="text-sm text-zinc-900">{course.prerequisites}</p>
               </div>
             )}
 

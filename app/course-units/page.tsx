@@ -20,7 +20,7 @@ import {
 import type { CourseUnit } from "@/types/course-unit";
 import type { CreateCourseUnitInput, CourseUnitFilters } from "@/types/course-unit";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 function CourseUnitsPageContent() {
   const searchParams = useSearchParams();
@@ -32,11 +32,18 @@ function CourseUnitsPageContent() {
   const [editCourseUnitId, setEditCourseUnitId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; courseUnitId: string | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    courseUnitId: string | null;
+  }>({
     isOpen: false,
     courseUnitId: null,
   });
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -203,7 +210,11 @@ function CourseUnitsPageContent() {
               Filtres
               {(filters.academicProgramId || filters.type || filters.isActive !== undefined) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {[filters.academicProgramId, filters.type, filters.isActive].filter((v) => v !== undefined && v !== "").length}
+                  {
+                    [filters.academicProgramId, filters.type, filters.isActive].filter(
+                      (v) => v !== undefined && v !== ""
+                    ).length
+                  }
                 </span>
               )}
             </button>
@@ -262,10 +273,7 @@ function CourseUnitsPageContent() {
 
               {/* Type Filter */}
               <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-2">
                   Type
                 </label>
                 <select
@@ -282,10 +290,7 @@ function CourseUnitsPageContent() {
 
               {/* Active Status Filter */}
               <div>
-                <label
-                  htmlFor="active"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="active" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
@@ -314,9 +319,7 @@ function CourseUnitsPageContent() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement des unités d'enseignement...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement des unités d'enseignement...</p>
             </div>
           </div>
         ) : (
@@ -443,20 +446,20 @@ function CourseUnitsPageContent() {
 
 export default function CourseUnitsPage() {
   return (
-    <Suspense fallback={
-      <ProtectedRoute>
-        <DashboardLayout title="Unités d'Enseignement">
-          <div className="flex min-h-[400px] items-center justify-center">
-            <div className="text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement...
-              </p>
+    <Suspense
+      fallback={
+        <ProtectedRoute>
+          <DashboardLayout title="Unités d'Enseignement">
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="text-center">
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+                <p className="mt-3 text-sm text-zinc-500">Chargement...</p>
+              </div>
             </div>
-          </div>
-        </DashboardLayout>
-      </ProtectedRoute>
-    }>
+          </DashboardLayout>
+        </ProtectedRoute>
+      }
+    >
       <CourseUnitsPageContent />
     </Suspense>
   );

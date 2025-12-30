@@ -1,21 +1,21 @@
-import Card from '@/components/ui/card';
-import { BarChart3, Calendar, ChevronRight, FileText, UserPlus } from 'lucide-react';
+import Card from "@/components/ui/Card";
+import { BarChart3, Calendar, ChevronRight, FileText, UserPlus } from "lucide-react";
 
 const actions = [
   {
-    label: 'Inscrire un Étudiant',
+    label: "Inscrire un Étudiant",
     icon: UserPlus,
   },
   {
-    label: 'Créer une Maquette',
+    label: "Créer une Maquette",
     icon: FileText,
   },
   {
-    label: 'Parcours UE',
+    label: "Parcours UE",
     icon: BarChart3,
   },
   {
-    label: 'Examen & Planning',
+    label: "Examen & Planning",
     icon: Calendar,
   },
 ];
@@ -44,9 +44,7 @@ export default function QuickActions() {
                 <span className="w-9 h-9 flex items-center justify-center rounded-md bg-slate-100">
                   <Icon size={18} className="text-slate-600" />
                 </span>
-                <span className="text-sm font-medium text-slate-700">
-                  {action.label}
-                </span>
+                <span className="text-sm font-medium text-slate-700">{action.label}</span>
               </div>
 
               <ChevronRight size={18} className="text-slate-400" />

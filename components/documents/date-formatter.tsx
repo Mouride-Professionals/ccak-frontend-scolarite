@@ -18,7 +18,7 @@ export default function DateFormatter({
   useEffect(() => {
     // Format date only on client side to avoid hydration mismatch
     const dateObj = typeof date === "string" ? new Date(date) : date;
-    
+
     if (isNaN(dateObj.getTime())) {
       setFormattedDate("-");
       return;
@@ -58,5 +58,3 @@ export default function DateFormatter({
 
   return <span className={className}>{formattedDate}</span>;
 }
-
-

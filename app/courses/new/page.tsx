@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import ProtectedRoute from '@/components/auth/protected-route';
-import DashboardLayout from '@/components/layout/dashboard-layout';
-import CourseForm from '@/components/courses/course-form';
-import { useCreateCourse, useCourseUnits } from '@/hooks/use-courses';
-import type { CreateCourseInput } from '@/types/course';
+import { useRouter } from "next/navigation";
+import ProtectedRoute from "@/components/auth/protected-route";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import CourseForm from "@/components/courses/course-form";
+import { useCreateCourse, useCourseUnits } from "@/hooks/use-courses";
+import type { CreateCourseInput } from "@/types/course";
 
 export default function NewCoursePage() {
   const router = useRouter();
@@ -17,10 +17,10 @@ export default function NewCoursePage() {
   const handleSubmit = async (data: CreateCourseInput) => {
     try {
       await createMutation.mutateAsync(data);
-      router.push('/courses');
+      router.push("/courses");
     } catch (error) {
-      console.error('Error creating course:', error);
-      alert('Erreur lors de la création du cours. Veuillez réessayer.');
+      console.error("Error creating course:", error);
+      alert("Erreur lors de la création du cours. Veuillez réessayer.");
     }
   };
 
@@ -29,9 +29,7 @@ export default function NewCoursePage() {
       <DashboardLayout title="Nouveau Cours">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
-            <p className="text-sm text-zinc-600">
-              Créez un nouveau cours
-            </p>
+            <p className="text-sm text-zinc-600">Créez un nouveau cours</p>
           </div>
 
           {/* Form */}
@@ -48,7 +46,7 @@ export default function NewCoursePage() {
             ) : (
               <CourseForm
                 onSubmit={handleSubmit}
-                onCancel={() => router.push('/courses')}
+                onCancel={() => router.push("/courses")}
                 courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
                 isLoading={createMutation.isPending}
               />

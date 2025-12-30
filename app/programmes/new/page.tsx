@@ -29,9 +29,7 @@ export default function NewProgrammePage() {
       <DashboardLayout title="Nouveau Programme Académique">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
-            <p className="text-sm text-zinc-600">
-              Créez un nouveau programme académique
-            </p>
+            <p className="text-sm text-zinc-600">Créez un nouveau programme académique</p>
           </div>
 
           {/* Form */}

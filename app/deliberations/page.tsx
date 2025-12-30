@@ -18,7 +18,10 @@ import {
   useAcademicYears,
   useFacultyMembers,
 } from "@/hooks/use-deliberations";
-import type { DeliberationSessionFilters, CreateDeliberationSessionInput } from "@/types/deliberation";
+import type {
+  DeliberationSessionFilters,
+  CreateDeliberationSessionInput,
+} from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
 
 export default function DeliberationsPage() {
@@ -30,11 +33,17 @@ export default function DeliberationsPage() {
   const [editSessionId, setEditSessionId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sessionId: string | null }>({
-    isOpen: false,
-    sessionId: null,
-  });
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sessionId: string | null }>(
+    {
+      isOpen: false,
+      sessionId: null,
+    }
+  );
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -192,9 +201,19 @@ export default function DeliberationsPage() {
                 />
               </svg>
               Filtres
-              {(filters.status || filters.semester || filters.academic_year_id || filters.academic_program_id) && (
+              {(filters.status ||
+                filters.semester ||
+                filters.academic_year_id ||
+                filters.academic_program_id) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {[filters.status, filters.semester, filters.academic_year_id, filters.academic_program_id].filter(Boolean).length}
+                  {
+                    [
+                      filters.status,
+                      filters.semester,
+                      filters.academic_year_id,
+                      filters.academic_program_id,
+                    ].filter(Boolean).length
+                  }
                 </span>
               )}
             </button>
@@ -230,10 +249,7 @@ export default function DeliberationsPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               {/* Status Filter */}
               <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="status" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
@@ -252,10 +268,7 @@ export default function DeliberationsPage() {
 
               {/* Semester Filter */}
               <div>
-                <label
-                  htmlFor="semester"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="semester" className="block text-sm font-medium text-zinc-700 mb-2">
                   Semestre
                 </label>
                 <select
@@ -275,10 +288,7 @@ export default function DeliberationsPage() {
 
               {/* Academic Year Filter */}
               <div>
-                <label
-                  htmlFor="year"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="year" className="block text-sm font-medium text-zinc-700 mb-2">
                   Année académique
                 </label>
                 <select
@@ -288,11 +298,12 @@ export default function DeliberationsPage() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Toutes les années</option>
-                  {Array.isArray(years) && years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.name} {year.is_current && "(Actuelle)"}
-                    </option>
-                  ))}
+                  {Array.isArray(years) &&
+                    years.map((year) => (
+                      <option key={year.id} value={year.id}>
+                        {year.name} {year.is_current && "(Actuelle)"}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
@@ -310,9 +321,7 @@ export default function DeliberationsPage() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement des sessions...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement des sessions...</p>
             </div>
           </div>
         ) : (
@@ -327,7 +336,8 @@ export default function DeliberationsPage() {
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
               <div className="flex items-center gap-4">
                 <p className="text-sm text-zinc-500">
-                  Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} sessions
+                  Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
+                  sessions
                 </p>
                 <div className="flex items-center gap-2">
                   <label htmlFor="perPage" className="text-sm text-zinc-600">
@@ -336,7 +346,9 @@ export default function DeliberationsPage() {
                   <select
                     id="perPage"
                     value={filters.limit ?? 10}
-                    onChange={(e) => setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))
+                    }
                     className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 transition-colors focus:border-[#008D36] focus:outline-none focus:ring-2 focus:ring-[#008D36]/20"
                   >
                     <option value="5">5</option>

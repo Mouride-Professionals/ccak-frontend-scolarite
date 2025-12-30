@@ -9,7 +9,7 @@ export interface CourseUnit {
   name: string;
   semesterNumber: number;
   credits: number;
-  type: 'OBLIGATOIRE' | 'OPTIONNEL';
+  type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -21,7 +21,7 @@ export interface CreateCourseUnitInput {
   name: string;
   semesterNumber: number;
   credits: number;
-  type: 'OBLIGATOIRE' | 'OPTIONNEL';
+  type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive?: boolean;
 }
 
@@ -34,7 +34,7 @@ export interface CourseUnitFilters {
   limit?: number;
   search?: string;
   academicProgramId?: string;
-  type?: 'OBLIGATOIRE' | 'OPTIONNEL';
+  type?: "OBLIGATOIRE" | "OPTIONNEL";
   isActive?: boolean;
 }
 

@@ -29,7 +29,7 @@ export default function CourseEnrollmentForm({
     course_id: initialData?.course_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
     semester: initialData?.semester ?? 1,
-    enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split('T')[0],
+    enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
     status: initialData?.status ?? CourseEnrollmentStatus.ENROLLED,
   });
 
@@ -101,11 +101,13 @@ export default function CourseEnrollmentForm({
               disabled={isLoading}
             >
               <option value="">| Sélectionner une inscription</option>
-              {Array.isArray(enrollments) && enrollments.map((enrollment) => (
-                <option key={enrollment.id} value={enrollment.id}>
-                  {enrollment.student?.student_number} - {enrollment.student?.full_name} ({enrollment.academic_program?.name})
-                </option>
-              ))}
+              {Array.isArray(enrollments) &&
+                enrollments.map((enrollment) => (
+                  <option key={enrollment.id} value={enrollment.id}>
+                    {enrollment.student?.student_number} - {enrollment.student?.full_name} (
+                    {enrollment.academic_program?.name})
+                  </option>
+                ))}
             </select>
             {errors.enrollment_id && (
               <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_id}</p>
@@ -125,15 +127,14 @@ export default function CourseEnrollmentForm({
               disabled={isLoading}
             >
               <option value="">| Sélectionner un cours</option>
-              {Array.isArray(courses) && courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.code} - {course.name} ({course.credits} crédits)
-                </option>
-              ))}
+              {Array.isArray(courses) &&
+                courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.code} - {course.name} ({course.credits} crédits)
+                  </option>
+                ))}
             </select>
-            {errors.course_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.course_id}</p>
-            )}
+            {errors.course_id && <p className="mt-1.5 text-xs text-red-600">{errors.course_id}</p>}
           </div>
 
           {/* Academic Year */}
@@ -149,11 +150,12 @@ export default function CourseEnrollmentForm({
               disabled={isLoading}
             >
               <option value="">| Sélectionner une année</option>
-              {Array.isArray(years) && years.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_current && "(Actuelle)"}
-                </option>
-              ))}
+              {Array.isArray(years) &&
+                years.map((year) => (
+                  <option key={year.id} value={year.id}>
+                    {year.name} {year.is_current && "(Actuelle)"}
+                  </option>
+                ))}
             </select>
             {errors.academic_year_id && (
               <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id}</p>
@@ -178,9 +180,7 @@ export default function CourseEnrollmentForm({
                 </option>
               ))}
             </select>
-            {errors.semester && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>
-            )}
+            {errors.semester && <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>}
           </div>
 
           {/* Enrollment Date */}

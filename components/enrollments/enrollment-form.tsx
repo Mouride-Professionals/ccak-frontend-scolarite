@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { CreateEnrollmentInput, Student, AcademicProgram, AcademicYear } from "@/types/enrollment";
+import type {
+  CreateEnrollmentInput,
+  Student,
+  AcademicProgram,
+  AcademicYear,
+} from "@/types/enrollment";
 import { EnrollmentStatus } from "@/types/enrollment";
 
 interface EnrollmentFormProps {
@@ -28,7 +33,7 @@ export default function EnrollmentForm({
     academic_program_id: initialData?.academic_program_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
     current_semester: initialData?.current_semester ?? 1,
-    enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split('T')[0],
+    enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
     registration_fee_paid: initialData?.registration_fee_paid ?? 0,
     is_scholarship: initialData?.is_scholarship ?? false,
     status: initialData?.status ?? EnrollmentStatus.PENDING,
@@ -63,7 +68,11 @@ export default function EnrollmentForm({
       newErrors.academic_year_id = "L'année académique est requise";
     }
 
-    if (!formData.current_semester || formData.current_semester < 1 || formData.current_semester > 10) {
+    if (
+      !formData.current_semester ||
+      formData.current_semester < 1 ||
+      formData.current_semester > 10
+    ) {
       newErrors.current_semester = "Le semestre doit être entre 1 et 10";
     }
 
@@ -244,7 +253,9 @@ export default function EnrollmentForm({
               type="number"
               id="registration_fee_paid"
               value={formData.registration_fee_paid}
-              onChange={(e) => handleChange("registration_fee_paid", parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                handleChange("registration_fee_paid", parseFloat(e.target.value) || 0)
+              }
               placeholder="| Saisir"
               min="0"
               step="1000"

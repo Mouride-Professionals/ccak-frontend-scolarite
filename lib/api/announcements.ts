@@ -114,9 +114,7 @@ export const announcementsApi = {
   },
 
   // Publish announcement (admin only)
-  publishAnnouncement: async (
-    id: string
-  ): Promise<{ data: Announcement }> => {
+  publishAnnouncement: async (id: string): Promise<{ data: Announcement }> => {
     const response = await authFetch(`/announcements/${id}/publish`, {
       method: "POST",
     });

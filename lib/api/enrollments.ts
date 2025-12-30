@@ -14,7 +14,7 @@ import type {
   AcademicProgram,
   AcademicYear,
 } from "@/types/enrollment";
-import { EnrollmentStatus } from "@/types/enrollment";
+import { EnrollmentStatus, Gender, StudentStatus } from "@/types/enrollment";
 
 // Mock data
 const mockStudents: Student[] = [
@@ -23,7 +23,7 @@ const mockStudents: Student[] = [
     user_id: "user-1",
     student_number: "UCAK2024001",
     full_name: "Aminata Diallo",
-    gender: "F" as const,
+    gender: Gender.F,
     date_of_birth: "2002-05-15",
     place_of_birth: "Dakar",
     nationality: "Sénégalaise",
@@ -32,7 +32,7 @@ const mockStudents: Student[] = [
     emergency_contact_phone: "+221 77 234 5678",
     address: "Liberté 6, Dakar",
     photo_url: null,
-    status: "ACTIVE" as const,
+    status: StudentStatus.ACTIVE,
     created_at: "2024-09-01T10:00:00Z",
     updated_at: "2024-09-01T10:00:00Z",
   },
@@ -41,7 +41,7 @@ const mockStudents: Student[] = [
     user_id: "user-2",
     student_number: "UCAK2024002",
     full_name: "Ibrahima Sarr",
-    gender: "M" as const,
+    gender: Gender.M,
     date_of_birth: "2003-03-20",
     place_of_birth: "Thiès",
     nationality: "Sénégalais",
@@ -50,7 +50,7 @@ const mockStudents: Student[] = [
     emergency_contact_phone: "+221 78 234 5678",
     address: "Plateau, Dakar",
     photo_url: null,
-    status: "ACTIVE" as const,
+    status: StudentStatus.ACTIVE,
     created_at: "2024-09-01T10:00:00Z",
     updated_at: "2024-09-01T10:00:00Z",
   },
@@ -59,7 +59,7 @@ const mockStudents: Student[] = [
     user_id: "user-3",
     student_number: "UCAK2024003",
     full_name: "Fatou Ndiaye",
-    gender: "F" as const,
+    gender: Gender.F,
     date_of_birth: "2002-08-10",
     place_of_birth: "Saint-Louis",
     nationality: "Sénégalaise",
@@ -68,7 +68,7 @@ const mockStudents: Student[] = [
     emergency_contact_phone: "+221 77 456 7890",
     address: "Parcelles Assainies, Dakar",
     photo_url: null,
-    status: "ACTIVE" as const,
+    status: StudentStatus.ACTIVE,
     created_at: "2024-09-01T10:00:00Z",
     updated_at: "2024-09-01T10:00:00Z",
   },
@@ -77,7 +77,7 @@ const mockStudents: Student[] = [
     user_id: "user-4",
     student_number: "UCAK2024004",
     full_name: "Moussa Kane",
-    gender: "M" as const,
+    gender: Gender.M,
     date_of_birth: "2003-01-25",
     place_of_birth: "Kaolack",
     nationality: "Sénégalais",
@@ -86,7 +86,7 @@ const mockStudents: Student[] = [
     emergency_contact_phone: "+221 76 345 6789",
     address: "Médina, Dakar",
     photo_url: null,
-    status: "ACTIVE" as const,
+    status: StudentStatus.ACTIVE,
     created_at: "2024-09-01T10:00:00Z",
     updated_at: "2024-09-01T10:00:00Z",
   },
@@ -210,9 +210,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * NOTE: In production, backend will return simplified EnrollmentListItem[] for list view
  * and full Enrollment for detail view
  */
-export async function getEnrollments(
-  filters?: EnrollmentFilters
-): Promise<EnrollmentsResponse> {
+export async function getEnrollments(filters?: EnrollmentFilters): Promise<EnrollmentsResponse> {
   if (USE_MOCK_DATA) {
     await delay(500); // Simulate network delay
 
@@ -269,7 +267,8 @@ export async function getEnrollments(
   if (filters?.academic_program_id)
     queryParams.set("academic_program_id", filters.academic_program_id);
   if (filters?.academic_year_id) queryParams.set("academic_year_id", filters.academic_year_id);
-  if (filters?.current_semester) queryParams.set("current_semester", filters.current_semester.toString());
+  if (filters?.current_semester)
+    queryParams.set("current_semester", filters.current_semester.toString());
   if (filters?.status) queryParams.set("status", filters.status);
   if (filters?.search) queryParams.set("search", filters.search);
   if (filters?.page) queryParams.set("page", filters.page.toString());
@@ -298,9 +297,7 @@ export async function getEnrollment(id: string): Promise<Enrollment> {
 /**
  * Create a new enrollment
  */
-export async function createEnrollment(
-  input: CreateEnrollmentInput
-): Promise<Enrollment> {
+export async function createEnrollment(input: CreateEnrollmentInput): Promise<Enrollment> {
   if (USE_MOCK_DATA) {
     await delay(800);
 

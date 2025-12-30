@@ -99,9 +99,7 @@ export default function DocumentUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          isDragOver
-            ? "border-[#008D36] bg-[#008D36]/5"
-            : "border-zinc-300 hover:border-zinc-400"
+          isDragOver ? "border-[#008D36] bg-[#008D36]/5" : "border-zinc-300 hover:border-zinc-400"
         } ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
       >
         <input
@@ -159,7 +157,12 @@ export default function DocumentUploader({
               >
                 <div className="flex items-center gap-3">
                   <div className="h-8 w-8 bg-zinc-200 rounded flex items-center justify-center">
-                    <svg className="h-4 w-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="h-4 w-4 text-zinc-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -177,7 +180,7 @@ export default function DocumentUploader({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setSelectedFiles(files => files.filter((_, i) => i !== index))}
+                  onClick={() => setSelectedFiles((files) => files.filter((_, i) => i !== index))}
                   className="text-zinc-400 hover:text-red-600 transition-colors"
                   disabled={isLoading}
                 >

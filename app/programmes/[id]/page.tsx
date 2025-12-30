@@ -16,7 +16,11 @@ export default function ProgrammeDetailPage() {
   const programmeId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -108,9 +112,7 @@ export default function ProgrammeDetailPage() {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-zinc-900">
-                {programme.name}
-              </h2>
+              <h2 className="text-2xl font-semibold text-zinc-900">{programme.name}</h2>
               <p className="mt-1 text-sm text-zinc-500">
                 Programme créé le {new Date(programme.created_at).toLocaleDateString("fr-FR")}
               </p>
@@ -229,26 +231,26 @@ export default function ProgrammeDetailPage() {
                 Informations temporelles
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium text-zinc-500">Date de création</dt>
-                <dd className="mt-1 text-sm text-zinc-900">
-                  {new Date(programme.created_at).toLocaleDateString("fr-FR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-zinc-500">Dernière modification</dt>
-                <dd className="mt-1 text-sm text-zinc-900">
-                  {new Date(programme.updated_at).toLocaleDateString("fr-FR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </dd>
-              </div>
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">Date de création</dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {new Date(programme.created_at).toLocaleDateString("fr-FR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">Dernière modification</dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {new Date(programme.updated_at).toLocaleDateString("fr-FR", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </dd>
+                </div>
               </div>
             </div>
 

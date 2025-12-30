@@ -9,11 +9,7 @@ interface DepartmentsTableProps {
   onDelete?: (id: string) => void;
 }
 
-export default function DepartmentsTable({
-  departments,
-  onEdit,
-  onDelete,
-}: DepartmentsTableProps) {
+export default function DepartmentsTable({ departments, onEdit, onDelete }: DepartmentsTableProps) {
   if (departments.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -50,14 +46,9 @@ export default function DepartmentsTable({
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {departments.map((department) => (
-              <tr
-                key={department.id}
-                className="bg-white transition-colors hover:bg-zinc-50/50"
-              >
+              <tr key={department.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {department.name}
-                  </div>
+                  <div className="text-sm font-medium text-zinc-900">{department.name}</div>
                 </td>
                 <td className="px-6 py-5">
                   <span className="inline-flex rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
@@ -65,15 +56,11 @@ export default function DepartmentsTable({
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-zinc-700">
-                    {department.faculty?.name || "-"}
-                  </div>
+                  <div className="text-sm text-zinc-700">{department.faculty?.name || "-"}</div>
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm text-zinc-700">
-                    {department.head?.name || (
-                      <span className="text-zinc-400">Non assigné</span>
-                    )}
+                    {department.head?.name || <span className="text-zinc-400">Non assigné</span>}
                   </div>
                 </td>
                 <td className="px-6 py-5">

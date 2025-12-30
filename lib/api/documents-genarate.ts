@@ -131,9 +131,7 @@ export async function generateCertificate(
 /**
  * Generate an ID card document
  */
-export async function generateIdCard(
-  input: GenerateIdCardInput
-): Promise<GeneratedDocument> {
+export async function generateIdCard(input: GenerateIdCardInput): Promise<GeneratedDocument> {
   if (USE_MOCK_DATA) {
     await delay(800);
 
@@ -177,9 +175,7 @@ export async function generateIdCard(
 /**
  * Generate a diploma document
  */
-export async function generateDiploma(
-  input: GenerateDiplomaInput
-): Promise<GeneratedDocument> {
+export async function generateDiploma(input: GenerateDiplomaInput): Promise<GeneratedDocument> {
   if (USE_MOCK_DATA) {
     await delay(1200);
 
@@ -411,38 +407,39 @@ export async function downloadDocument(documentId: string): Promise<Blob> {
 
     // For mock mode, fetch a real PDF from the public folder
     const document = mockGeneratedDocuments.find((doc) => doc.id === documentId);
-    
+
     // Use different PDFs based on document type
-    let pdfPath = '/pdf/cert d\'inscription.pdf'; // Default certificate
-    
+    let pdfPath = "/pdf/cert d'inscription.pdf"; // Default certificate
+
     if (document) {
       switch (document.type) {
         case DocumentType.CERTIFICATE:
-          pdfPath = '/pdf/cert d\'inscription.pdf';
+          pdfPath = "/pdf/cert d'inscription.pdf";
           break;
         case DocumentType.ATTESTATION:
-          pdfPath = '/pdf/NDEYE_ARAME_BEYE_attestation.pdf';
+          pdfPath = "/pdf/NDEYE_ARAME_BEYE_attestation.pdf";
           break;
         case DocumentType.TRANSCRIPT:
-          pdfPath = '/pdf/cert d\'inscription.pdf'; // Use certificate as fallback
+          pdfPath = "/pdf/cert d'inscription.pdf"; // Use certificate as fallback
           break;
         default:
-          pdfPath = '/pdf/cert d\'inscription.pdf';
+          pdfPath = "/pdf/cert d'inscription.pdf";
       }
     }
 
     try {
       const response = await fetch(pdfPath);
       if (!response.ok) {
-        throw new Error('Failed to fetch PDF');
+        throw new Error("Failed to fetch PDF");
       }
       const blob = await response.blob();
       return blob;
     } catch (error) {
-      console.error('Error fetching mock PDF:', error);
+      console.error("Error fetching mock PDF:", error);
       // Fallback to a simple PDF if files are not found
-      const fallbackPdf = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> >>\nendobj\n4 0 obj\n<< /Length 80 >>\nstream\nBT\n/F1 18 Tf\n50 700 Td\n(Document non disponible en mode test) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f\n0000000015 00000 n\n0000000068 00000 n\n0000000131 00000 n\n0000000329 00000 n\ntrailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n459\n%%EOF';
-      return new Blob([fallbackPdf], { type: 'application/pdf' });
+      const fallbackPdf =
+        "%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> >>\nendobj\n4 0 obj\n<< /Length 80 >>\nstream\nBT\n/F1 18 Tf\n50 700 Td\n(Document non disponible en mode test) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f\n0000000015 00000 n\n0000000068 00000 n\n0000000131 00000 n\n0000000329 00000 n\ntrailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n459\n%%EOF";
+      return new Blob([fallbackPdf], { type: "application/pdf" });
     }
   }
 
@@ -550,7 +547,8 @@ export async function verifyDocument(
     await delay(300);
 
     const document = mockGeneratedDocuments.find(
-      (doc: GeneratedDocument) => doc.document_number === documentNumber && doc.status === DocumentStatus.ISSUED
+      (doc: GeneratedDocument) =>
+        doc.document_number === documentNumber && doc.status === DocumentStatus.ISSUED
     );
 
     if (!document) {
@@ -594,4 +592,3 @@ export async function verifyDocument(
 
   return response;
 }
-
