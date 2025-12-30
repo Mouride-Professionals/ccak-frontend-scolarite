@@ -1,4 +1,4 @@
-import { Card } from "../ui/Card";
+import { Card } from "../ui/card";
 
 const statusStyles = {
   green: "bg-green-100 text-green-700",

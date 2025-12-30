@@ -1,8 +1,8 @@
 "use client";
 
 import { PieChart, Pie, Cell } from "recharts";
-import { Card } from "@/components/ui/Card";
-
+import Card from "../ui/card";
+  
 const data = [
   { name: "Validé", value: 82 },
   { name: "Ajourné", value: 18 },

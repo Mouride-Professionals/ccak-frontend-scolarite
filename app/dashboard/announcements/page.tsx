@@ -118,13 +118,13 @@ export default function AnnouncementsPage() {
   return (
     <DashboardLayout title="Gestion des Annonces">
       <div className="p-6">
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Gestion des Annonces</h1>
             <p className="mt-1 text-sm text-gray-500">
               Créer et gérer les annonces pour les utilisateurs
             </p>
+          </div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -189,6 +189,7 @@ export default function AnnouncementsPage() {
             Nouvelle annonce
           </button>
         </div>
+        
 
         {/* Filters Panel */}
         {showFilters && (
