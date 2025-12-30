@@ -38,10 +38,7 @@ const statusConfig = {
   },
 };
 
-export default function StudentStatusBadge({
-  status,
-  className = "",
-}: StudentStatusBadgeProps) {
+export default function StudentStatusBadge({ status, className = "" }: StudentStatusBadgeProps) {
   const config = statusConfig[status];
 
   return (

@@ -16,9 +16,7 @@ export default function NotFound() {
         </div>
 
         {/* Message */}
-        <h2 className="mb-3 text-2xl font-semibold text-[#00365F]">
-          Page introuvable
-        </h2>
+        <h2 className="mb-3 text-2xl font-semibold text-[#00365F]">Page introuvable</h2>
         <p className="mb-8 text-zinc-600">
           Désolé, la page que vous recherchez n&apos;existe pas ou a été déplacée.
         </p>
@@ -35,7 +33,8 @@ export default function NotFound() {
 
         {/* Additional info */}
         <p className="mt-8 text-sm text-zinc-500">
-          Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, veuillez contacter l&apos;administrateur.
+          Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, veuillez contacter
+          l&apos;administrateur.
         </p>
       </div>
     </div>

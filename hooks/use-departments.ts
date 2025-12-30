@@ -20,8 +20,7 @@ import * as departmentsApi from "@/lib/api/departments";
 export const departmentKeys = {
   all: ["departments"] as const,
   lists: () => [...departmentKeys.all, "list"] as const,
-  list: (filters?: DepartmentFilters) =>
-    [...departmentKeys.lists(), filters] as const,
+  list: (filters?: DepartmentFilters) => [...departmentKeys.lists(), filters] as const,
   details: () => [...departmentKeys.all, "detail"] as const,
   detail: (id: string) => [...departmentKeys.details(), id] as const,
 };
@@ -64,8 +63,7 @@ export function useCreateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateDepartmentInput) =>
-      departmentsApi.createDepartment(input),
+    mutationFn: (input: CreateDepartmentInput) => departmentsApi.createDepartment(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
@@ -79,8 +77,7 @@ export function useUpdateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateDepartmentInput) =>
-      departmentsApi.updateDepartment(input),
+    mutationFn: (input: UpdateDepartmentInput) => departmentsApi.updateDepartment(input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
       queryClient.invalidateQueries({ queryKey: departmentKeys.detail(data.id) });

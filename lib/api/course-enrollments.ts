@@ -280,7 +280,10 @@ export async function createCourseEnrollment(
     return newEnrollment;
   }
 
-  return api.post<CourseEnrollment>("/course-enrollments", input as unknown as Record<string, unknown>);
+  return api.post<CourseEnrollment>(
+    "/course-enrollments",
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**
@@ -308,7 +311,10 @@ export async function updateCourseEnrollment(
     return updated;
   }
 
-  return api.put<CourseEnrollment>(`/course-enrollments/${id}`, input as unknown as Record<string, unknown>);
+  return api.put<CourseEnrollment>(
+    `/course-enrollments/${id}`,
+    input as unknown as Record<string, unknown>
+  );
 }
 
 /**

@@ -24,9 +24,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
  * Get all departments with optional filters
  */
-export async function getDepartments(
-  filters?: DepartmentFilters
-): Promise<DepartmentsResponse> {
+export async function getDepartments(filters?: DepartmentFilters): Promise<DepartmentsResponse> {
   if (USE_MOCK_DATA) {
     await delay(500);
 
@@ -43,8 +41,7 @@ export async function getDepartments(
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(
         (d) =>
-          d.name.toLowerCase().includes(searchLower) ||
-          d.code.toLowerCase().includes(searchLower)
+          d.name.toLowerCase().includes(searchLower) || d.code.toLowerCase().includes(searchLower)
       );
     }
 
@@ -68,8 +65,7 @@ export async function getDepartments(
   if (filters?.page) params.append("page", filters.page.toString());
   if (filters?.limit) params.append("limit", filters.limit.toString());
   if (filters?.faculty_id) params.append("faculty_id", filters.faculty_id);
-  if (filters?.is_active !== undefined)
-    params.append("is_active", filters.is_active.toString());
+  if (filters?.is_active !== undefined) params.append("is_active", filters.is_active.toString());
   if (filters?.search) params.append("search", filters.search);
 
   return api.get<DepartmentsResponse>(`/departments?${params}`);
@@ -94,9 +90,7 @@ export async function getDepartment(id: string): Promise<Department | null> {
 /**
  * Create a new department
  */
-export async function createDepartment(
-  input: CreateDepartmentInput
-): Promise<Department> {
+export async function createDepartment(input: CreateDepartmentInput): Promise<Department> {
   if (USE_MOCK_DATA) {
     await delay(500);
     const newDepartment: Department = {
@@ -115,10 +109,7 @@ export async function createDepartment(
 /**
  * Update an existing department
  */
-export async function updateDepartment({
-  id,
-  input,
-}: UpdateDepartmentInput): Promise<Department> {
+export async function updateDepartment({ id, input }: UpdateDepartmentInput): Promise<Department> {
   if (USE_MOCK_DATA) {
     await delay(500);
     const index = mockDepartments.findIndex((d) => d.id === id);

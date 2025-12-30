@@ -3,14 +3,23 @@
  * This file contains static data for testing while backend is being developed
  */
 
-import type { AcademicYear, AcademicProgram, FacultyMember, Department } from "@/types/academic";
+import type { AcademicYear, AcademicProgram, FacultyMember } from "@/types/academic";
 import { AcademicLevel, FacultyRank } from "@/types/academic";
 import type { DeliberationSession } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
 import type { GeneratedDocument } from "@/types/document";
-import { DocumentType as DocDocumentType, DocumentStatus as DocDocumentStatus } from "@/types/document";
-import type { Student, Guardian, Document, Admin } from "@/types/student";
-import { Gender, StudentStatus, GuardianRelationship, DocumentType, DocumentStatus } from "@/types/student";
+import {
+  DocumentType as DocDocumentType,
+  DocumentStatus as DocDocumentStatus,
+} from "@/types/document";
+import type { Student, Guardian, Document, Admin, SemesterResult } from "@/types/student";
+import {
+  Gender,
+  StudentStatus,
+  GuardianRelationship,
+  DocumentType,
+  DocumentStatus,
+} from "@/types/student";
 import type { Faculty } from "@/types/faculty";
 import type { Department as DepartmentType } from "@/types/department";
 
@@ -305,7 +314,7 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-1",
     student_id: "student-1",
-    type: DocDocumentStatus.TRANSCRIPT,
+    type: DocDocumentType.TRANSCRIPT,
     document_number: "TRS-2025-1234-AB",
     file_path: "documents/TRANSCRIPT/2025/12/TRS-2025-1234-AB.pdf",
     status: DocDocumentStatus.ISSUED,
@@ -445,7 +454,8 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
     generated_at: "2025-12-12T13:45:00Z",
     issued_at: "2025-12-12T13:50:00Z",
     metadata: {
-      custom_text: "Je soussigné(e), certifie que l'étudiant(e) est régulièrement inscrit(e) à l'UCAK pour l'année académique 2024-2025.",
+      custom_text:
+        "Je soussigné(e), certifie que l'étudiant(e) est régulièrement inscrit(e) à l'UCAK pour l'année académique 2024-2025.",
       with_watermark: true,
       with_qr_code: true,
     },
@@ -464,10 +474,10 @@ export const mockGeneratedDocuments: GeneratedDocument[] = [
   {
     id: "doc-7",
     student_id: "student-1",
-    type: DocumentType.ATTESTATION,
-    document_number: "ATT-2025-1357-MN",
-    file_path: "documents/ATTESTATION/2025/11/ATT-2025-1357-MN.pdf",
-    status: DocumentStatus.REVOKED,
+    type: DocDocumentType.TRANSCRIPT,
+    document_number: "TRS-2025-1357-MN",
+    file_path: "documents/TRANSCRIPT/2025/11/TRS-2025-1357-MN.pdf",
+    status: DocDocumentStatus.REVOKED,
     generated_at: "2025-11-20T10:00:00Z",
     issued_at: "2025-11-20T10:05:00Z",
     revoked_at: "2025-12-05T14:00:00Z",
@@ -774,13 +784,6 @@ export const mockGuardians: Guardian[] = [
     created_at: "2024-09-01T00:00:00Z",
     updated_at: "2024-09-01T00:00:00Z",
   },
-];
-
-// =====================
-// DOCUMENTS
-// =====================
-
-export const mockDocuments: Document[] = [
   {
     id: "guardian-3",
     student_id: "stud-2",
@@ -896,164 +899,175 @@ export const mockDocuments: Document[] = [
     },
   },
 ];
-
 // =====================
-// ADMINS
+// SEMESTER RESULTS
 // =====================
 
-export const mockAdmins: Admin[] = [
+export const mockSemesterResults: SemesterResult[] = [
   {
-    id: "admin-1",
-    full_name: "Dr. Marie Diop",
-  },
-  {
-    id: "admin-2",
-    full_name: "M. Jean-Pierre Niang",
-  },
-];
-
-// =====================
-// GUARDIANS
-// =====================
-
-export const mockGuardians: Guardian[] = [
-  {
-    id: "guardian-1",
+    id: "sr-1",
     student_id: "stud-1",
-    full_name: "Mamadou Diallo Sr.",
-    relationship: GuardianRelationship.FATHER,
-    phone: "+221771234560",
-    email: "mamadou.diallo.sr@email.com",
-    address: "123 Rue de la Paix, Dakar, Sénégal",
-    occupation: "Ingénieur",
-    created_at: "2024-09-01T00:00:00Z",
-    updated_at: "2024-09-01T00:00:00Z",
+    academic_year_id: "ay-1",
+    semester: 1,
+    total_credits_enrolled: 30,
+    total_credits_earned: 30,
+    semester_average: 12.4,
+    semester_gpa: 2.8,
+    decision: "ADMITTED",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-01-18T00:00:00Z",
+    updated_at: "2025-01-18T00:00:00Z",
   },
   {
-    id: "guardian-2",
-    student_id: "stud-1",
-    full_name: "Fatou Diallo",
-    relationship: GuardianRelationship.MOTHER,
-    phone: "+221772345671",
-    email: "fatou.diallo@email.com",
-    address: "123 Rue de la Paix, Dakar, Sénégal",
-    occupation: "Enseignante",
-    created_at: "2024-09-01T00:00:00Z",
-    updated_at: "2024-09-01T00:00:00Z",
-  },
-  {
-    id: "guardian-3",
+    id: "sr-2",
     student_id: "stud-2",
-    full_name: "Moussa Sow",
-    relationship: GuardianRelationship.FATHER,
-    phone: "+221773456782",
-    email: "moussa.sow@email.com",
-    address: "456 Avenue Léopold Sédar Senghor, Saint-Louis, Sénégal",
-    occupation: "Commerçant",
-    created_at: "2024-09-01T00:00:00Z",
-    updated_at: "2024-09-01T00:00:00Z",
+    academic_year_id: "ay-1",
+    semester: 1,
+    total_credits_enrolled: 30,
+    total_credits_earned: 24,
+    semester_average: 9.2,
+    semester_gpa: 2.0,
+    decision: "RESIT",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-01-18T00:00:00Z",
+    updated_at: "2025-01-18T00:00:00Z",
   },
   {
-    id: "guardian-4",
+    id: "sr-3",
     student_id: "stud-3",
-    full_name: "Marie Ndiaye",
-    relationship: GuardianRelationship.MOTHER,
-    phone: "+221774567893",
-    email: "marie.ndiaye@email.com",
-    address: "789 Boulevard Général de Gaulle, Thiès, Sénégal",
-    occupation: "Médecin",
-    created_at: "2024-09-01T00:00:00Z",
-    updated_at: "2024-09-01T00:00:00Z",
+    academic_year_id: "ay-1",
+    semester: 1,
+    total_credits_enrolled: 30,
+    total_credits_earned: 18,
+    semester_average: 7.4,
+    semester_gpa: 1.6,
+    decision: "FAILED",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-01-18T00:00:00Z",
+    updated_at: "2025-01-18T00:00:00Z",
   },
-];
-
-// =====================
-// DOCUMENTS
-// =====================
-
-export const mockDocuments: Document[] = [
   {
-    id: "doc-1",
+    id: "sr-4",
+    student_id: "stud-4",
+    academic_year_id: "ay-1",
+    semester: 1,
+    total_credits_enrolled: 30,
+    total_credits_earned: 30,
+    semester_average: 14.1,
+    semester_gpa: 3.1,
+    decision: "ADMITTED",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-01-18T00:00:00Z",
+    updated_at: "2025-01-18T00:00:00Z",
+  },
+  {
+    id: "sr-5",
     student_id: "stud-1",
-    type: DocumentType.CNI,
-    file_path: "/uploads/students/stud-1/cni.pdf",
-    file_name: "cni_mamadou_diallo.pdf",
-    status: DocumentStatus.APPROVED,
-    reviewed_by: "admin-1",
-    notes: "Document valide",
-    uploaded_at: "2024-09-01T10:00:00Z",
-    reviewed_at: "2024-09-02T14:30:00Z",
-    created_at: "2024-09-01T10:00:00Z",
-    updated_at: "2024-09-02T14:30:00Z",
-    reviewer: {
-      id: "admin-1",
-      full_name: "Dr. Marie Diop",
-    },
+    academic_year_id: "ay-1",
+    semester: 2,
+    total_credits_enrolled: 30,
+    total_credits_earned: 30,
+    semester_average: 13.0,
+    semester_gpa: 2.9,
+    decision: "ADMITTED",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-06-22T00:00:00Z",
+    updated_at: "2025-06-22T00:00:00Z",
   },
   {
-    id: "doc-2",
-    student_id: "stud-1",
-    type: DocumentType.BIRTH_CERT,
-    file_path: "/uploads/students/stud-1/birth_cert.pdf",
-    file_name: "acte_naissance_mamadou_diallo.pdf",
-    status: DocumentStatus.APPROVED,
-    reviewed_by: "admin-1",
-    notes: "Certificat de naissance authentique",
-    uploaded_at: "2024-09-01T10:15:00Z",
-    reviewed_at: "2024-09-02T14:35:00Z",
-    created_at: "2024-09-01T10:15:00Z",
-    updated_at: "2024-09-02T14:35:00Z",
-    reviewer: {
-      id: "admin-1",
-      full_name: "Dr. Marie Diop",
-    },
-  },
-  {
-    id: "doc-3",
-    student_id: "stud-1",
-    type: DocumentType.PHOTO,
-    file_path: "/uploads/students/stud-1/photo.jpg",
-    file_name: "photo_mamadou_diallo.jpg",
-    status: DocumentStatus.PENDING,
-    uploaded_at: "2024-09-01T10:30:00Z",
-    created_at: "2024-09-01T10:30:00Z",
-    updated_at: "2024-09-01T10:30:00Z",
-  },
-  {
-    id: "doc-4",
+    id: "sr-6",
     student_id: "stud-2",
-    type: DocumentType.CNI,
-    file_path: "/uploads/students/stud-2/cni.pdf",
-    file_name: "cni_amidata_sow.pdf",
-    status: DocumentStatus.REJECTED,
-    reviewed_by: "admin-2",
-    notes: "Document expiré - Veuillez fournir une CNI valide",
-    uploaded_at: "2024-09-01T11:00:00Z",
-    reviewed_at: "2024-09-03T09:15:00Z",
-    created_at: "2024-09-01T11:00:00Z",
-    updated_at: "2024-09-03T09:15:00Z",
-    reviewer: {
-      id: "admin-2",
-      full_name: "M. Jean-Pierre Niang",
-    },
+    academic_year_id: "ay-1",
+    semester: 2,
+    total_credits_enrolled: 30,
+    total_credits_earned: 27,
+    semester_average: 10.4,
+    semester_gpa: 2.4,
+    decision: "ADMITTED",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-06-22T00:00:00Z",
+    updated_at: "2025-06-22T00:00:00Z",
   },
   {
-    id: "doc-5",
-    student_id: "stud-2",
-    type: DocumentType.BAC_DIPLOMA,
-    file_path: "/uploads/students/stud-2/bac.pdf",
-    file_name: "bac_amidata_sow.pdf",
-    status: DocumentStatus.APPROVED,
-    reviewed_by: "admin-1",
-    notes: "Diplôme du BAC validé",
-    uploaded_at: "2024-09-01T11:15:00Z",
-    reviewed_at: "2024-09-02T16:00:00Z",
-    created_at: "2024-09-01T11:15:00Z",
-    updated_at: "2024-09-02T16:00:00Z",
-    reviewer: {
-      id: "admin-1",
-      full_name: "Dr. Marie Diop",
-    },
+    id: "sr-7",
+    student_id: "stud-3",
+    academic_year_id: "ay-1",
+    semester: 2,
+    total_credits_enrolled: 30,
+    total_credits_earned: 21,
+    semester_average: 8.6,
+    semester_gpa: 1.9,
+    decision: "RESIT",
+    calculated_by: null,
+    calculated_at: null,
+    created_at: "2025-06-22T00:00:00Z",
+    updated_at: "2025-06-22T00:00:00Z",
+  },
+  {
+    id: "sr-8",
+    student_id: "stud-5",
+    academic_year_id: "ay-2",
+    semester: 4,
+    total_credits_enrolled: 30,
+    total_credits_earned: 30,
+    semester_average: 15.2,
+    semester_gpa: 3.5,
+    decision: "ADMITTED",
+    calculated_by: "staff-1",
+    calculated_at: "2024-06-26T00:00:00Z",
+    created_at: "2024-06-26T00:00:00Z",
+    updated_at: "2024-06-26T00:00:00Z",
+  },
+  {
+    id: "sr-9",
+    student_id: "stud-6",
+    academic_year_id: "ay-2",
+    semester: 4,
+    total_credits_enrolled: 30,
+    total_credits_earned: 30,
+    semester_average: 16.8,
+    semester_gpa: 3.9,
+    decision: "ADMITTED",
+    calculated_by: "staff-1",
+    calculated_at: "2024-06-26T00:00:00Z",
+    created_at: "2024-06-26T00:00:00Z",
+    updated_at: "2024-06-26T00:00:00Z",
+  },
+  {
+    id: "sr-10",
+    student_id: "stud-7",
+    academic_year_id: "ay-2",
+    semester: 6,
+    total_credits_enrolled: 30,
+    total_credits_earned: 24,
+    semester_average: 9.4,
+    semester_gpa: 2.1,
+    decision: "RESIT",
+    calculated_by: "staff-1",
+    calculated_at: "2024-09-12T00:00:00Z",
+    created_at: "2024-09-12T00:00:00Z",
+    updated_at: "2024-09-12T00:00:00Z",
+  },
+  {
+    id: "sr-11",
+    student_id: "stud-8",
+    academic_year_id: "ay-2",
+    semester: 6,
+    total_credits_enrolled: 30,
+    total_credits_earned: 18,
+    semester_average: 7.9,
+    semester_gpa: 1.7,
+    decision: "FAILED",
+    calculated_by: "staff-1",
+    calculated_at: "2024-09-12T00:00:00Z",
+    created_at: "2024-09-12T00:00:00Z",
+    updated_at: "2024-09-12T00:00:00Z",
   },
 ];
 
@@ -1214,5 +1228,5 @@ console.log("Mock data loaded:", {
   mockDepartments: mockDepartments.length,
   mockAcademicYears: mockAcademicYears.length,
   mockFacultyMembers: mockFacultyMembers.length,
-  mockDeliberationSessions: mockDeliberationSessions.length
+  mockDeliberationSessions: mockDeliberationSessions.length,
 });

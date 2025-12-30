@@ -38,8 +38,7 @@ export async function getFaculties(filters?: FacultyFilters): Promise<FacultiesR
       const searchLower = filters.search.toLowerCase();
       filtered = filtered.filter(
         (f) =>
-          f.name.toLowerCase().includes(searchLower) ||
-          f.code.toLowerCase().includes(searchLower)
+          f.name.toLowerCase().includes(searchLower) || f.code.toLowerCase().includes(searchLower)
       );
     }
 
@@ -106,10 +105,7 @@ export async function createFaculty(input: CreateFacultyInput): Promise<Faculty>
 /**
  * Update an existing faculty
  */
-export async function updateFaculty({
-  id,
-  input,
-}: UpdateFacultyInput): Promise<Faculty> {
+export async function updateFaculty({ id, input }: UpdateFacultyInput): Promise<Faculty> {
   if (USE_MOCK_DATA) {
     await delay(500);
     const index = mockFaculties.findIndex((f) => f.id === id);

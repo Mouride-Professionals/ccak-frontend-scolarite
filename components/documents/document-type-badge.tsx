@@ -38,12 +38,7 @@ const typeConfig = {
           strokeWidth={2}
           d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
         />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 14v7M5 12h14"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14v7M5 12h14" />
       </svg>
     ),
     bgColor: "bg-purple-50",
@@ -100,10 +95,7 @@ const typeConfig = {
   },
 };
 
-export default function DocumentTypeBadge({
-  type,
-  className = "",
-}: DocumentTypeBadgeProps) {
+export default function DocumentTypeBadge({ type, className = "" }: DocumentTypeBadgeProps) {
   const config = typeConfig[type];
 
   return (
@@ -115,4 +107,3 @@ export default function DocumentTypeBadge({
     </span>
   );
 }
-

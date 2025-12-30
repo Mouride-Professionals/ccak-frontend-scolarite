@@ -31,11 +31,18 @@ function ProgrammesPageContent() {
   const [editProgrammeId, setEditProgrammeId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; programmeId: string | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    programmeId: string | null;
+  }>({
     isOpen: false,
     programmeId: null,
   });
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
@@ -202,7 +209,11 @@ function ProgrammesPageContent() {
               Filtres
               {(filters.department_id || filters.level || filters.is_active !== undefined) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {[filters.department_id, filters.level, filters.is_active].filter((v) => v !== undefined && v !== "").length}
+                  {
+                    [filters.department_id, filters.level, filters.is_active].filter(
+                      (v) => v !== undefined && v !== ""
+                    ).length
+                  }
                 </span>
               )}
             </button>
@@ -262,10 +273,7 @@ function ProgrammesPageContent() {
 
               {/* Level Filter */}
               <div>
-                <label
-                  htmlFor="level"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="level" className="block text-sm font-medium text-zinc-700 mb-2">
                   Niveau
                 </label>
                 <select
@@ -283,10 +291,7 @@ function ProgrammesPageContent() {
 
               {/* Active Status Filter */}
               <div>
-                <label
-                  htmlFor="active"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="active" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut
                 </label>
                 <select
@@ -315,9 +320,7 @@ function ProgrammesPageContent() {
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement des programmes...
-              </p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement des programmes...</p>
             </div>
           </div>
         ) : (
@@ -331,7 +334,8 @@ function ProgrammesPageContent() {
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
               <p className="text-sm text-zinc-500">
-                Affichage de {data ? ((data.page - 1) * data.limit) + 1 : 0} sur {data?.total ?? 0} sessions
+                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
+                sessions
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -445,20 +449,20 @@ function ProgrammesPageContent() {
 
 export default function ProgrammesPage() {
   return (
-    <Suspense fallback={
-      <ProtectedRoute>
-        <DashboardLayout title="Programmes Académiques">
-          <div className="flex min-h-[400px] items-center justify-center">
-            <div className="text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">
-                Chargement...
-              </p>
+    <Suspense
+      fallback={
+        <ProtectedRoute>
+          <DashboardLayout title="Programmes Académiques">
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="text-center">
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+                <p className="mt-3 text-sm text-zinc-500">Chargement...</p>
+              </div>
             </div>
-          </div>
-        </DashboardLayout>
-      </ProtectedRoute>
-    }>
+          </DashboardLayout>
+        </ProtectedRoute>
+      }
+    >
       <ProgrammesPageContent />
     </Suspense>
   );

@@ -37,9 +37,7 @@ export default function AnnouncementCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {announcement.title}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">{announcement.title}</h3>
             <div className="flex gap-2 flex-wrap">
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${
@@ -62,27 +60,24 @@ export default function AnnouncementCard({
         </div>
 
         {/* Content */}
-        <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-          {announcement.content}
-        </p>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-3">{announcement.content}</p>
 
         {/* Target Audience */}
-        {announcement.target_audience?.roles &&
-          announcement.target_audience.roles.length > 0 && (
-            <div className="mb-3">
-              <p className="text-xs text-gray-500 mb-1">Public cible:</p>
-              <div className="flex gap-1 flex-wrap">
-                {announcement.target_audience.roles.map((role) => (
-                  <span
-                    key={role}
-                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
-                  >
-                    {role}
-                  </span>
-                ))}
-              </div>
+        {announcement.target_audience?.roles && announcement.target_audience.roles.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs text-gray-500 mb-1">Public cible:</p>
+            <div className="flex gap-1 flex-wrap">
+              {announcement.target_audience.roles.map((role) => (
+                <span
+                  key={role}
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                >
+                  {role}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
         {/* Dates */}
         <div className="text-xs text-gray-500 space-y-1 mb-3">
@@ -116,12 +111,7 @@ export default function AnnouncementCard({
             onClick={() => onEdit(announcement)}
             className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -137,12 +127,7 @@ export default function AnnouncementCard({
               onClick={() => onPublish(announcement.id)}
               className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -162,12 +147,7 @@ export default function AnnouncementCard({
             }}
             className="px-3 py-1.5 text-xs font-medium text-red-700 bg-white border border-red-300 rounded hover:bg-red-50"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

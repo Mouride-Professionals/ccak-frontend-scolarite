@@ -33,10 +33,7 @@ export default function NewStudentPage() {
 
           {/* Form */}
           <div className="rounded-lg border border-zinc-200 bg-white p-6">
-            <StudentForm
-              onSubmit={handleSubmit}
-              isLoading={createMutation.isPending}
-            />
+            <StudentForm onSubmit={handleSubmit} isLoading={createMutation.isPending} />
           </div>
         </div>
       </DashboardLayout>

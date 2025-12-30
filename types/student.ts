@@ -133,11 +133,11 @@ export interface UpdateStudentInput extends Partial<CreateStudentInput> {
 // =====================
 
 export interface StudentFilters {
- status?: StudentStatus;
- gender?: Gender;
- search?: string;
- page?: number;
- limit?: number;
+  status?: StudentStatus;
+  gender?: Gender;
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 // =====================

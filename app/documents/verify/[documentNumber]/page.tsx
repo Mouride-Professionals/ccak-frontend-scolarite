@@ -11,11 +11,11 @@ export default function VerifyDocumentPage() {
   const documentNumber = params.documentNumber as string;
   const [studentId, setStudentId] = useState<string>("");
 
-  const { data: verification, isLoading, error } = useVerifyDocument(
-    documentNumber,
-    studentId || undefined,
-    !!documentNumber
-  );
+  const {
+    data: verification,
+    isLoading,
+    error,
+  } = useVerifyDocument(documentNumber, studentId || undefined, !!documentNumber);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#00365F] to-[#005A8F] py-12 px-4 sm:px-6 lg:px-8">
@@ -52,10 +52,7 @@ export default function VerifyDocumentPage() {
           <div className="p-6">
             {/* Optional Student ID Input */}
             <div className="mb-6">
-              <label
-                htmlFor="studentId"
-                className="block text-sm font-medium text-zinc-700 mb-2"
-              >
+              <label htmlFor="studentId" className="block text-sm font-medium text-zinc-700 mb-2">
                 ID Étudiant (optionnel - pour vérification renforcée)
               </label>
               <input
@@ -175,7 +172,8 @@ export default function VerifyDocumentPage() {
                       <div>
                         <dt className="text-sm font-medium text-zinc-500">Étudiant</dt>
                         <dd className="mt-1 text-sm text-zinc-900">
-                          {verification.document.student.full_name || verification.document.student.email}
+                          {verification.document.student.full_name ||
+                            verification.document.student.email}
                         </dd>
                       </div>
                     )}
@@ -199,9 +197,7 @@ export default function VerifyDocumentPage() {
                       />
                     </svg>
                     <div>
-                      <p className="text-sm font-medium text-amber-900">
-                        Note de sécurité
-                      </p>
+                      <p className="text-sm font-medium text-amber-900">Note de sécurité</p>
                       <p className="mt-1 text-xs text-amber-700">
                         Cette vérification confirme l'authenticité du document dans notre système.
                         Pour une vérification complète, contactez directement l'administration UCAK.
@@ -216,9 +212,7 @@ export default function VerifyDocumentPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-white/80">
-            Système de vérification de documents UCAK
-          </p>
+          <p className="text-sm text-white/80">Système de vérification de documents UCAK</p>
           <a
             href="/"
             className="mt-2 inline-block text-sm text-white underline hover:text-white/80"
@@ -230,4 +224,3 @@ export default function VerifyDocumentPage() {
     </div>
   );
 }
-

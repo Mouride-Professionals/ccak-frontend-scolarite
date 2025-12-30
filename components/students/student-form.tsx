@@ -104,7 +104,8 @@ export default function StudentForm({
     if (!formData.emergency_contact_phone.trim()) {
       newErrors.emergency_contact_phone = "Le téléphone du contact d'urgence est requis";
     } else if (!/^\+221\d{9}$/.test(formData.emergency_contact_phone.trim())) {
-      newErrors.emergency_contact_phone = "Le numéro de téléphone doit être au format +221XXXXXXXXX";
+      newErrors.emergency_contact_phone =
+        "Le numéro de téléphone doit être au format +221XXXXXXXXX";
     }
 
     if (!formData.address.trim()) {
@@ -149,9 +150,7 @@ export default function StudentForm({
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             />
-            {errors.full_name && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.full_name}</p>
-            )}
+            {errors.full_name && <p className="mt-1.5 text-xs text-red-600">{errors.full_name}</p>}
           </div>
 
           {/* Gender */}
@@ -249,9 +248,7 @@ export default function StudentForm({
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             />
-            {errors.phone && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.phone}</p>
-            )}
+            {errors.phone && <p className="mt-1.5 text-xs text-red-600">{errors.phone}</p>}
           </div>
 
           {/* Address */}
@@ -268,9 +265,7 @@ export default function StudentForm({
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             />
-            {errors.address && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.address}</p>
-            )}
+            {errors.address && <p className="mt-1.5 text-xs text-red-600">{errors.address}</p>}
           </div>
         </div>
       </div>
@@ -332,9 +327,7 @@ export default function StudentForm({
           isLoading={isLoading}
           acceptedTypes=".pdf,.jpg,.jpeg,.png"
         />
-        {errors.documents && (
-          <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
-        )}
+        {errors.documents && <p className="mt-2 text-xs text-red-600">{errors.documents}</p>}
       </div>
 
       {/* Footer */}
@@ -355,9 +348,12 @@ export default function StudentForm({
           disabled={isLoading}
         >
           {isLoading
-            ? (initialData ? "Modification en cours..." : "Création en cours...")
-            : (initialData ? "Modifier l'étudiant" : "Créer l'étudiant")
-          }
+            ? initialData
+              ? "Modification en cours..."
+              : "Création en cours..."
+            : initialData
+              ? "Modifier l'étudiant"
+              : "Créer l'étudiant"}
         </button>
       </div>
     </form>

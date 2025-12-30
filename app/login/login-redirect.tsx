@@ -21,9 +21,7 @@ export default function LoginRedirect({ callbackUrl }: LoginRedirectProps) {
             <img src="/logo.svg" alt="CCAK Logo" className="h-full w-full" />
           </div>
           <h1 className="text-2xl font-bold text-[#00365F]">CCAK - Back Office</h1>
-          <p className="mt-2 text-sm text-zinc-600">
-            Gestion académique et administrative
-          </p>
+          <p className="mt-2 text-sm text-zinc-600">Gestion académique et administrative</p>
         </div>
 
         {/* Content */}
@@ -31,9 +29,7 @@ export default function LoginRedirect({ callbackUrl }: LoginRedirectProps) {
           <div className="mb-6">
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
           </div>
-          <h2 className="text-lg font-semibold text-zinc-900">
-            Redirection vers Keycloak...
-          </h2>
+          <h2 className="text-lg font-semibold text-zinc-900">Redirection vers Keycloak...</h2>
           <p className="mt-2 text-sm text-zinc-600">
             Vous allez être redirigé vers la page de connexion.
           </p>

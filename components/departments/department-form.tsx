@@ -4,10 +4,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Department, CreateDepartmentInput } from "@/types/department";
-import {
-  useCreateDepartment,
-  useUpdateDepartment,
-} from "@/hooks/use-departments";
+import { useCreateDepartment, useUpdateDepartment } from "@/hooks/use-departments";
 import { useFaculties } from "@/hooks/use-faculties";
 import { toast } from "sonner";
 
@@ -28,15 +25,9 @@ const DepartmentSchema = z.object({
 
 type DepartmentFormData = z.input<typeof DepartmentSchema>;
 
-export function DepartmentForm({
-  department,
-  onSuccess,
-  onCancel,
-}: DepartmentFormProps) {
-  const { mutate: createDepartment, isPending: isCreating } =
-    useCreateDepartment();
-  const { mutate: updateDepartment, isPending: isUpdating } =
-    useUpdateDepartment();
+export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFormProps) {
+  const { mutate: createDepartment, isPending: isCreating } = useCreateDepartment();
+  const { mutate: updateDepartment, isPending: isUpdating } = useUpdateDepartment();
   const { data: facultiesData } = useFaculties();
 
   const {
@@ -134,9 +125,7 @@ export function DepartmentForm({
           {...register("name")}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.name ? "border-red-300" : "border-zinc-300"}`}
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
       </div>
 
       {/* Code */}
@@ -151,9 +140,7 @@ export function DepartmentForm({
           {...register("code")}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.code ? "border-red-300" : "border-zinc-300"}`}
         />
-        {errors.code && (
-          <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
-        )}
+        {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>}
       </div>
 
       {/* Head */}
@@ -203,7 +190,13 @@ export function DepartmentForm({
           disabled={isPending}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isPending ? (department ? "Mise à jour..." : "Création...") : department ? "Mettre à jour" : "Créer"}
+          {isPending
+            ? department
+              ? "Mise à jour..."
+              : "Création..."
+            : department
+              ? "Mettre à jour"
+              : "Créer"}
         </button>
       </div>
     </form>

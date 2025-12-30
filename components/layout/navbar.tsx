@@ -8,7 +8,6 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 // 👇 1. On importe ton composant ici
 import NotificationPopup from "@/components/notifications/NotificationPopup";
 
-
 interface NavbarProps {
   title: string;
 }
@@ -76,12 +75,10 @@ export default function Navbar({ title }: NavbarProps) {
 
         {/* User Info & Notifications */}
         <div className="flex items-center gap-4">
-
           {/* 👇 2. LA GREFFE EST ICI ! */}
           {/* J'ai supprimé l'ancien <button> avec le SVG statique */}
           {/* Et j'ai mis ton composant intelligent à la place */}
           <NotificationPopup />
-
 
           {/* User Profile */}
           <div className="relative" ref={menuRef}>

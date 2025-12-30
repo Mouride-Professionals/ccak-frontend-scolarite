@@ -4,10 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Faculty, CreateFacultyInput } from "@/types/faculty";
-import {
-  useCreateFaculty,
-  useUpdateFaculty,
-} from "@/hooks/use-faculties";
+import { useCreateFaculty, useUpdateFaculty } from "@/hooks/use-faculties";
 import { toast } from "sonner";
 import { useFacultyMembers } from "@/hooks/use-faculty-members";
 
@@ -29,26 +26,29 @@ type FacultyFormData = z.input<typeof FacultySchema>;
 export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) {
   const { mutate: createFaculty, isPending: isCreating } = useCreateFaculty();
   const { mutate: updateFaculty, isPending: isUpdating } = useUpdateFaculty();
-  
+
   // Placeholder: Replace with proper user/dean query when available
   const deanOptions = [
     { id: "user-1", name: "Dr. Mamadou Diallo" },
     { id: "user-2", name: "Dr. Aminata Sow" },
   ];
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FacultyFormData>(
-    {
-      resolver: zodResolver(FacultySchema),
-      defaultValues: faculty
-        ? {
-            name: faculty.name,
-            code: faculty.code,
-            dean_id: faculty.dean_id,
-            is_active: faculty.is_active,
-          }
-        : { is_active: true },
-    }
-  );
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FacultyFormData>({
+    resolver: zodResolver(FacultySchema),
+    defaultValues: faculty
+      ? {
+          name: faculty.name,
+          code: faculty.code,
+          dean_id: faculty.dean_id,
+          is_active: faculty.is_active,
+        }
+      : { is_active: true },
+  });
 
   const onSubmit = async (data: FacultyFormData) => {
     const input: CreateFacultyInput = {
@@ -168,7 +168,13 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
           disabled={isPending}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isPending ? (faculty ? "Mise à jour..." : "Création...") : faculty ? "Mettre à jour" : "Créer"}
+          {isPending
+            ? faculty
+              ? "Mise à jour..."
+              : "Création..."
+            : faculty
+              ? "Mettre à jour"
+              : "Créer"}
         </button>
       </div>
     </form>

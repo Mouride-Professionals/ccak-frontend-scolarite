@@ -55,8 +55,7 @@ export const announcementsApi = {
     if (params?.dismissed !== undefined)
       queryParams.append("dismissed", params.dismissed.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.per_page)
-      queryParams.append("per_page", params.per_page.toString());
+    if (params?.per_page) queryParams.append("per_page", params.per_page.toString());
 
     const url = `/announcements${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);
@@ -109,9 +108,7 @@ export const announcementsApi = {
   },
 
   // Publish announcement (admin only)
-  publishAnnouncement: async (
-    id: string
-  ): Promise<{ data: Announcement }> => {
+  publishAnnouncement: async (id: string): Promise<{ data: Announcement }> => {
     const response = await authFetch(`/announcements/${id}/publish`, {
       method: "POST",
     });

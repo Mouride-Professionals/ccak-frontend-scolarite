@@ -92,7 +92,10 @@ export async function updateDocument(id: string, input: UpdateDocumentInput): Pr
     const updated: Document = {
       ...mockDocuments[index],
       ...input,
-      reviewed_at: input.status && input.status !== "PENDING" ? new Date().toISOString() : mockDocuments[index].reviewed_at,
+      reviewed_at:
+        input.status && input.status !== "PENDING"
+          ? new Date().toISOString()
+          : mockDocuments[index].reviewed_at,
       updated_at: new Date().toISOString(),
     };
 
@@ -125,7 +128,11 @@ export async function deleteDocument(id: string): Promise<void> {
 /**
  * Approve a document
  */
-export async function approveDocument(id: string, reviewedBy: string, notes?: string): Promise<Document> {
+export async function approveDocument(
+  id: string,
+  reviewedBy: string,
+  notes?: string
+): Promise<Document> {
   return updateDocument(id, {
     status: DocumentStatus.APPROVED,
     reviewed_by: reviewedBy,
@@ -136,7 +143,11 @@ export async function approveDocument(id: string, reviewedBy: string, notes?: st
 /**
  * Reject a document
  */
-export async function rejectDocument(id: string, reviewedBy: string, notes: string): Promise<Document> {
+export async function rejectDocument(
+  id: string,
+  reviewedBy: string,
+  notes: string
+): Promise<Document> {
   return updateDocument(id, {
     status: DocumentStatus.REJECTED,
     reviewed_by: reviewedBy,
