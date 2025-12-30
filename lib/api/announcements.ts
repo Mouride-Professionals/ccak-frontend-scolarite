@@ -46,16 +46,22 @@ export const announcementsApi = {
   // Get announcements
   getAnnouncements: async (params?: {
     priority?: string;
+    is_draft?: boolean;
     dismissed?: boolean;
     page?: number;
     per_page?: number;
+    search?: string;
   }): Promise<AnnouncementListResponse> => {
     const queryParams = new URLSearchParams();
     if (params?.priority) queryParams.append("priority", params.priority);
+    if (params?.is_draft !== undefined)
+      queryParams.append("is_draft", params.is_draft.toString());
     if (params?.dismissed !== undefined)
       queryParams.append("dismissed", params.dismissed.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.per_page) queryParams.append("per_page", params.per_page.toString());
+    if (params?.per_page)
+      queryParams.append("per_page", params.per_page.toString());
+    if (params?.search) queryParams.append("search", params.search);
 
     const url = `/announcements${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);

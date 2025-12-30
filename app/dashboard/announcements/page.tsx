@@ -11,14 +11,29 @@ import {
 import CreateAnnouncementModal from "@/components/announcements/CreateAnnouncementModal";
 import AnnouncementCard from "@/components/announcements/AnnouncementCard";
 
+interface AnnouncementFilters {
+  priority?: string;
+  is_draft?: boolean;
+  page?: number;
+  per_page?: number;
+  search?: string;
+}
+
 export default function AnnouncementsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
+  const [editingAnnouncement, setEditingAnnouncement] =
+    useState<Announcement | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<AnnouncementFilters>({
+    page: 1,
+    per_page: 15,
+  });
   const queryClient = useQueryClient();
 
   const { data: announcements, isLoading } = useQuery({
-    queryKey: ["admin-announcements"],
-    queryFn: () => announcementsApi.getAnnouncements({ per_page: 50 }),
+    queryKey: ["admin-announcements", filters],
+    queryFn: () => announcementsApi.getAnnouncements(filters),
   });
 
   const createMutation = useMutation({
@@ -73,22 +88,95 @@ export default function AnnouncementsPage() {
     setIsModalOpen(true);
   };
 
-  const publishedCount = announcements?.data?.filter((a) => !a.is_draft).length || 0;
-  const draftCount = announcements?.data?.filter((a) => a.is_draft).length || 0;
+  const handleFilterChange = (key: keyof AnnouncementFilters, value: string | boolean) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value || undefined,
+      page: 1,
+    }));
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setFilters((prev) => ({
+      ...prev,
+      search: value || undefined,
+      page: 1,
+    }));
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setFilters({ page: 1, per_page: 15 });
+  };
+
+  const publishedCount =
+    announcements?.data?.filter((a) => !a.is_draft).length || 0;
+  const draftCount =
+    announcements?.data?.filter((a) => a.is_draft).length || 0;
 
   return (
     <DashboardLayout title="Gestion des Annonces">
       <div className="p-6">
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Gestion des Annonces</h1>
             <p className="mt-1 text-sm text-gray-500">
               Créer et gérer les annonces pour les utilisateurs
             </p>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg
+                  className="h-5 w-5 text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Rechercher une annonce..."
+                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              />
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                showFilters
+                  ? "border-[#00365F] bg-[#00365F]/10 text-[#00365F]"
+                  : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+              }`}
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
+              </svg>
+              Filtres
+              {(filters.priority || filters.is_draft !== undefined) && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00365F] text-xs font-semibold text-white">
+                  {[filters.priority, filters.is_draft !== undefined].filter(Boolean).length}
+                </span>
+              )}
+            </button>
           </div>
           <button
             onClick={handleNewClick}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white hover:bg-[#00365F]/90 transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -101,6 +189,64 @@ export default function AnnouncementsPage() {
             Nouvelle annonce
           </button>
         </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mb-6 animate-in slide-in-from-top-2 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#00365F]">Filtres avancés</h3>
+              <button
+                onClick={handleClearFilters}
+                className="text-sm text-zinc-500 hover:text-[#00365F] transition-colors"
+              >
+                Réinitialiser tout
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Priority Filter */}
+              <div>
+                <label
+                  htmlFor="priority"
+                  className="block text-sm font-medium text-zinc-700 mb-2"
+                >
+                  Priorité
+                </label>
+                <select
+                  id="priority"
+                  value={filters.priority ?? ""}
+                  onChange={(e) => handleFilterChange("priority", e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+                >
+                  <option value="">Toutes les priorités</option>
+                  <option value="low">Faible</option>
+                  <option value="medium">Moyenne</option>
+                  <option value="high">Haute</option>
+                  <option value="critical">Critique</option>
+                </select>
+              </div>
+
+              {/* Draft Status Filter */}
+              <div>
+                <label
+                  htmlFor="is_draft"
+                  className="block text-sm font-medium text-zinc-700 mb-2"
+                >
+                  Statut de publication
+                </label>
+                <select
+                  id="is_draft"
+                  value={filters.is_draft === undefined ? "" : filters.is_draft.toString()}
+                  onChange={(e) => handleFilterChange("is_draft", e.target.value === "true")}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+                >
+                  <option value="">Toutes</option>
+                  <option value="true">Brouillons</option>
+                  <option value="false">Publiées</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-4 mb-6">
@@ -249,6 +395,34 @@ export default function AnnouncementsPage() {
             )}
           </div>
         </div>
+
+        {/* Pagination */}
+        {announcements && announcements.meta.total > 0 && (
+          <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4 rounded-lg">
+            <p className="text-sm text-zinc-500">
+              Affichage de {((announcements.meta.current_page - 1) * announcements.meta.per_page) + 1} à {Math.min(announcements.meta.current_page * announcements.meta.per_page, announcements.meta.total)} sur {announcements.meta.total} annonces
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
+                disabled={announcements.meta.current_page === 1}
+                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Précédent
+              </button>
+              <button className="rounded-lg bg-[#00365F] px-4 py-2 text-sm font-semibold text-white shadow-sm">
+                {announcements.meta.current_page}
+              </button>
+              <button
+                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
+                disabled={announcements.meta.current_page >= announcements.meta.last_page}
+                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Create/Edit Announcement Modal */}
         <CreateAnnouncementModal
