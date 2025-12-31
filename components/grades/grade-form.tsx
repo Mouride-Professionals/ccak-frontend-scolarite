@@ -283,8 +283,9 @@ export default function GradeForm({
               disabled={isLoading}
             >
               <option value={GradeStatus.DRAFT}>Brouillon</option>
-              <option value={GradeStatus.PENDING}>En attente</option>
+              <option value={GradeStatus.SUBMITTED}>Soumise</option>
               <option value={GradeStatus.VALIDATED}>Validée</option>
+              <option value={GradeStatus.PUBLISHED}>Publiée</option>
             </select>
           </div>
         </div>

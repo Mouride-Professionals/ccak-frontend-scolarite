@@ -7,21 +7,17 @@
 // =====================
 
 export enum GradeStatus {
-  DRAFT = "draft",
-  PENDING = "pending",
-  VALIDATED = "validated",
-  REJECTED = "rejected",
+  DRAFT = "DRAFT",
+  SUBMITTED = "SUBMITTED",
+  VALIDATED = "VALIDATED",
+  PUBLISHED = "PUBLISHED",
 }
 
 export enum EvaluationType {
-  EXAM = "exam",
-  QUIZ = "quiz",
-  HOMEWORK = "homework",
-  PROJECT = "project",
-  PRESENTATION = "presentation",
-  LAB = "lab",
-  MIDTERM = "midterm",
-  FINAL = "final",
+  CC = "CC",
+  EXAM = "EXAM",
+  TP = "TP",
+  ORAL = "ORAL",
 }
 
 // =====================
@@ -36,7 +32,22 @@ export interface Grade {
   score: number;
   max_score: number;
   weight: number;
-  entered_by: string;
+  entered_by:
+    | string
+    | {
+        id: string;
+        email: string;
+        full_name?: string | null;
+        is_active?: boolean;
+        email_verified_at?: string | null;
+        last_login_at?: string | null;
+        created_at?: string;
+        updated_at?: string;
+        keycloak_id?: string | null;
+        notification_preferences?: Record<string, unknown> | null;
+        email_frequency?: string | null;
+        enable_digest?: boolean;
+      };
   status: string;
   entered_at: string;
   validated_at: string | null;

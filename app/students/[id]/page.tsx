@@ -117,14 +117,11 @@ export default function StudentDetailPage() {
 
   const handleDocumentUpload = async (files: File[], type: DocumentType) => {
     try {
-      // In a real app, you'd upload files to a server first
-      // For now, we'll simulate creating document records
       for (const file of files) {
         await createDocumentMutation.mutateAsync({
           student_id: studentId,
           type,
-          file_path: `/uploads/students/${studentId}/${file.name}`,
-          file_name: file.name,
+          document: file,
         });
       }
       setToast({
@@ -146,7 +143,6 @@ export default function StudentDetailPage() {
     try {
       await approveDocumentMutation.mutateAsync({
         id: documentId,
-        reviewedBy: "admin-1", // In real app, get from current user
         notes,
       });
       setToast({
@@ -168,7 +164,6 @@ export default function StudentDetailPage() {
     try {
       await rejectDocumentMutation.mutateAsync({
         id: documentId,
-        reviewedBy: "admin-1", // In real app, get from current user
         notes,
       });
       setToast({

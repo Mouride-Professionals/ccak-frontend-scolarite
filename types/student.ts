@@ -230,8 +230,7 @@ export interface Document {
 export interface CreateDocumentInput {
   student_id: string;
   type: DocumentType;
-  file_path: string;
-  file_name: string;
+  document: File;
   [key: string]: unknown;
 }
 

@@ -145,10 +145,7 @@ export default function NotificationsPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Type Filter */}
               <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-2">
                   Type de notification
                 </label>
                 <select
@@ -169,10 +166,7 @@ export default function NotificationsPage() {
 
               {/* Read Status Filter */}
               <div>
-                <label
-                  htmlFor="is_read"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="is_read" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut de lecture
                 </label>
                 <select
@@ -303,7 +297,13 @@ export default function NotificationsPage() {
         {notifications && notifications.meta.total > 0 && (
           <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4 rounded-lg">
             <p className="text-sm text-zinc-500">
-              Affichage de {((notifications.meta.current_page - 1) * notifications.meta.per_page) + 1} à {Math.min(notifications.meta.current_page * notifications.meta.per_page, notifications.meta.total)} sur {notifications.meta.total} notifications
+              Affichage de {(notifications.meta.current_page - 1) * notifications.meta.per_page + 1}{" "}
+              à{" "}
+              {Math.min(
+                notifications.meta.current_page * notifications.meta.per_page,
+                notifications.meta.total
+              )}{" "}
+              sur {notifications.meta.total} notifications
             </p>
             <div className="flex items-center gap-2">
               <button

@@ -19,6 +19,7 @@ import {
   useEvaluationTypes,
 } from "@/hooks/use-grades";
 import type { GradeFilters, CreateGradeInput, Grade } from "@/types/grade";
+import { GradeStatus } from "@/types/grade";
 
 export default function GradesPage() {
   const [filters, setFilters] = useState<GradeFilters>({
@@ -242,9 +243,10 @@ export default function GradesPage() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les statuts</option>
-                  <option value="validated">Validée</option>
-                  <option value="pending">En attente</option>
-                  <option value="draft">Brouillon</option>
+                  <option value={GradeStatus.VALIDATED}>Validée</option>
+                  <option value={GradeStatus.SUBMITTED}>Soumise</option>
+                  <option value={GradeStatus.PUBLISHED}>Publiée</option>
+                  <option value={GradeStatus.DRAFT}>Brouillon</option>
                 </select>
               </div>
 

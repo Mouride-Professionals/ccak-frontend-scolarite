@@ -19,6 +19,18 @@ export default function GradesTable({ grades, onEdit, onDelete }: GradesTablePro
     );
   }
 
+  const getEnteredByLabel = (grade: Grade) => {
+    if (grade.entered_by_user?.full_name) {
+      return grade.entered_by_user.full_name;
+    }
+
+    if (typeof grade.entered_by === "string") {
+      return grade.entered_by;
+    }
+
+    return grade.entered_by?.full_name || grade.entered_by?.email || "N/A";
+  };
+
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -87,7 +99,7 @@ export default function GradesTable({ grades, onEdit, onDelete }: GradesTablePro
                 </td>
                 <td className="px-6 py-5">
                   <div className="text-sm text-zinc-700">
-                    {grade.entered_by_user?.full_name || grade.entered_by}
+                    {getEnteredByLabel(grade)}
                   </div>
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">

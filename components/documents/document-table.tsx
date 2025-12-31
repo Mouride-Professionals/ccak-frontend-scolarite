@@ -63,8 +63,11 @@ export default function DocumentTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {documents.map((document) => (
-              <tr key={document.id} className="bg-white transition-colors hover:bg-zinc-50/50">
+            {documents.map((document, index) => (
+              <tr
+                key={`${document.id ?? document.document_number ?? "document"}-${index}`}
+                className="bg-white transition-colors hover:bg-zinc-50/50"
+              >
                 <td className="px-6 py-5">
                   <DocumentTypeBadge type={document.type} />
                 </td>

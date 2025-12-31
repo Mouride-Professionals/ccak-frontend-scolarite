@@ -21,8 +21,7 @@ interface AnnouncementFilters {
 
 export default function AnnouncementsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] =
-    useState<Announcement | null>(null);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<AnnouncementFilters>({
@@ -110,14 +109,13 @@ export default function AnnouncementsPage() {
     setFilters({ page: 1, per_page: 15 });
   };
 
-  const publishedCount =
-    announcements?.data?.filter((a) => !a.is_draft).length || 0;
-  const draftCount =
-    announcements?.data?.filter((a) => a.is_draft).length || 0;
+  const publishedCount = announcements?.data?.filter((a) => !a.is_draft).length || 0;
+  const draftCount = announcements?.data?.filter((a) => a.is_draft).length || 0;
 
   return (
     <DashboardLayout title="Gestion des Annonces">
       <div className="p-6">
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Gestion des Annonces</h1>
@@ -189,7 +187,6 @@ export default function AnnouncementsPage() {
             Nouvelle annonce
           </button>
         </div>
-        
 
         {/* Filters Panel */}
         {showFilters && (
@@ -206,10 +203,7 @@ export default function AnnouncementsPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Priority Filter */}
               <div>
-                <label
-                  htmlFor="priority"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="priority" className="block text-sm font-medium text-zinc-700 mb-2">
                   Priorité
                 </label>
                 <select
@@ -228,10 +222,7 @@ export default function AnnouncementsPage() {
 
               {/* Draft Status Filter */}
               <div>
-                <label
-                  htmlFor="is_draft"
-                  className="block text-sm font-medium text-zinc-700 mb-2"
-                >
+                <label htmlFor="is_draft" className="block text-sm font-medium text-zinc-700 mb-2">
                   Statut de publication
                 </label>
                 <select
@@ -401,7 +392,13 @@ export default function AnnouncementsPage() {
         {announcements && announcements.meta.total > 0 && (
           <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4 rounded-lg">
             <p className="text-sm text-zinc-500">
-              Affichage de {((announcements.meta.current_page - 1) * announcements.meta.per_page) + 1} à {Math.min(announcements.meta.current_page * announcements.meta.per_page, announcements.meta.total)} sur {announcements.meta.total} annonces
+              Affichage de {(announcements.meta.current_page - 1) * announcements.meta.per_page + 1}{" "}
+              à{" "}
+              {Math.min(
+                announcements.meta.current_page * announcements.meta.per_page,
+                announcements.meta.total
+              )}{" "}
+              sur {announcements.meta.total} annonces
             </p>
             <div className="flex items-center gap-2">
               <button

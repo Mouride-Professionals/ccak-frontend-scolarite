@@ -36,7 +36,6 @@ export default function DocumentsPage() {
   const router = useRouter();
   // View mode: "all" for admin (all documents) or "student" for specific student
   const [viewMode, setViewMode] = useState<"all" | "student">("all");
-  // For testing with mock data, use one of: "student-1", "student-2", "student-3"
   // TODO: Get from auth context or URL params when student module is available
   const [studentId, setStudentId] = useState<string>(""); // Empty = all documents
   const [filters, setFilters] = useState<DocumentFilters & { student_id?: string }>({

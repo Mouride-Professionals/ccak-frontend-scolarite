@@ -1,3 +1,5 @@
+import { api } from "@/lib/api-client";
+import { unwrapData } from "@/lib/api/api-response";
 import {
   CourseUnit,
   CreateCourseUnitInput,
@@ -5,137 +7,79 @@ import {
   AcademicProgram,
 } from "@/types/course-unit";
 
-// Mock data for development
-const mockCourseUnits: CourseUnit[] = [
-  {
-    id: "1",
-    academicProgramId: "1",
-    academicProgram: {
-      id: "1",
-      name: "Informatique de Gestion",
-    },
-    code: "UE001",
-    name: "Algorithmique et Programmation",
-    semesterNumber: 1,
-    credits: 6,
-    type: "OBLIGATOIRE",
-    isActive: true,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "2",
-    academicProgramId: "1",
-    academicProgram: {
-      id: "1",
-      name: "Informatique de Gestion",
-    },
-    code: "UE002",
-    name: "Bases de Données",
-    semesterNumber: 2,
-    credits: 5,
-    type: "OBLIGATOIRE",
-    isActive: true,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "3",
-    academicProgramId: "2",
-    academicProgram: {
-      id: "2",
-      name: "Génie Civil",
-    },
-    code: "UE003",
-    name: "Résistance des Matériaux",
-    semesterNumber: 1,
-    credits: 4,
-    type: "OPTIONNEL",
-    isActive: true,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  },
-];
+type ApiCourseUnit = {
+  id: string;
+  academic_program_id: string;
+  code: string;
+  name: string;
+  semester_number: number;
+  credits: number;
+  type: "OBLIGATOIRE" | "OPTIONNEL";
+  is_active: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  academic_program?: {
+    id: string;
+    name: string;
+  };
+};
 
-const mockAcademicPrograms: AcademicProgram[] = [
-  {
-    id: "1",
-    name: "Informatique de Gestion",
-  },
-  {
-    id: "2",
-    name: "Génie Civil",
-  },
-  {
-    id: "3",
-    name: "Économie",
-  },
-];
+const mapCourseUnit = (unit: ApiCourseUnit): CourseUnit => ({
+  id: unit.id,
+  academicProgramId: unit.academic_program_id,
+  academicProgram: unit.academic_program
+    ? { id: unit.academic_program.id, name: unit.academic_program.name }
+    : undefined,
+  code: unit.code,
+  name: unit.name,
+  semesterNumber: unit.semester_number,
+  credits: unit.credits,
+  type: unit.type,
+  isActive: unit.is_active,
+  createdAt: unit.created_at ?? "",
+  updatedAt: unit.updated_at ?? "",
+});
 
-// API functions
+const mapCourseUnitInput = (input: CreateCourseUnitInput | UpdateCourseUnitInput) => ({
+  academic_program_id: input.academicProgramId,
+  code: input.code,
+  name: input.name,
+  semester_number: input.semesterNumber,
+  credits: input.credits,
+  type: input.type,
+  is_active: input.isActive ?? true,
+});
+
 export const getCourseUnits = async (): Promise<CourseUnit[]> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return mockCourseUnits;
+  const response = await api.get("/course-units");
+  const data = unwrapData<ApiCourseUnit[]>(response);
+  return data.map(mapCourseUnit);
 };
 
 export const getCourseUnit = async (id: string): Promise<CourseUnit | null> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockCourseUnits.find((courseUnit) => courseUnit.id === id) || null;
+  try {
+    const response = await api.get(`/course-units/${id}`);
+    return mapCourseUnit(unwrapData<ApiCourseUnit>(response));
+  } catch {
+    return null;
+  }
 };
 
 export const createCourseUnit = async (data: CreateCourseUnitInput): Promise<CourseUnit> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  const newCourseUnit: CourseUnit = {
-    id: Date.now().toString(),
-    ...data,
-    isActive: data.isActive ?? true,
-    academicProgram: mockAcademicPrograms.find((p) => p.id === data.academicProgramId),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  mockCourseUnits.push(newCourseUnit);
-  return newCourseUnit;
+  const response = await api.post("/course-units", mapCourseUnitInput(data));
+  return mapCourseUnit(unwrapData<ApiCourseUnit>(response));
 };
 
 export const updateCourseUnit = async (data: UpdateCourseUnitInput): Promise<CourseUnit> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  const index = mockCourseUnits.findIndex((courseUnit) => courseUnit.id === data.id);
-  if (index === -1) {
-    throw new Error("Course unit not found");
-  }
-
-  const updatedCourseUnit: CourseUnit = {
-    ...mockCourseUnits[index],
-    ...data,
-    academicProgram: mockAcademicPrograms.find((p) => p.id === data.academicProgramId),
-    updatedAt: new Date().toISOString(),
-  };
-
-  mockCourseUnits[index] = updatedCourseUnit;
-  return updatedCourseUnit;
+  const response = await api.put(`/course-units/${data.id}`, mapCourseUnitInput(data));
+  return mapCourseUnit(unwrapData<ApiCourseUnit>(response));
 };
 
 export const deleteCourseUnit = async (id: string): Promise<void> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  const index = mockCourseUnits.findIndex((courseUnit) => courseUnit.id === id);
-  if (index === -1) {
-    throw new Error("Course unit not found");
-  }
-
-  mockCourseUnits.splice(index, 1);
+  await api.del(`/course-units/${id}`);
 };
 
 export const getAcademicPrograms = async (): Promise<AcademicProgram[]> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockAcademicPrograms;
+  const response = await api.get("/academic-programs");
+  return unwrapData<AcademicProgram[]>(response);
 };

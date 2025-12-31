@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell } from "recharts";
 import Card from "../ui/card";
-  
+
 const data = [
   { name: "Validé", value: 82 },
   { name: "Ajourné", value: 18 },
