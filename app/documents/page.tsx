@@ -8,6 +8,7 @@ import DocumentTable from "@/components/documents/document-table";
 import GenerateDocumentForm from "@/components/documents/generate-document-form";
 import Modal from "@/components/ui/modal";
 import Toast from "@/components/ui/toast";
+import Pagination from "@/components/ui/pagination";
 import {
   useStudentDocuments,
   useAllDocuments,
@@ -65,6 +66,7 @@ export default function DocumentsPage() {
     isLoading,
     error,
   } = viewMode === "all" ? allDocumentsQuery : studentDocumentsQuery;
+  const documentRows = documents?.data ?? [];
   const downloadMutation = useDownloadDocument();
   const issueMutation = useIssueDocument();
   const revokeMutation = useRevokeDocument();
@@ -140,7 +142,7 @@ export default function DocumentsPage() {
     setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,
-      page: 1, // Reset to first page when filter changes
+      page: key === "page" ? Number(value) || 1 : 1,
     }));
 
     // Update studentId when filtering by student
@@ -216,7 +218,7 @@ export default function DocumentsPage() {
       <DashboardLayout title="Documents">
         <div className="space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-[#00365F]">Documents</h1>
               <p className="mt-1 text-sm text-zinc-600">
@@ -224,10 +226,10 @@ export default function DocumentsPage() {
               </p>
             </div>
             {studentId && (
-              <div className="flex items-center gap-2">
+              <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
                 <button
                   onClick={() => handleGenerateClick(DocType.TRANSCRIPT)}
-                  className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] md:w-auto"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -244,7 +246,7 @@ export default function DocumentsPage() {
           </div>
 
           {/* Filters */}
-          <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {/* Student Filter */}
               <div>
@@ -333,7 +335,7 @@ export default function DocumentsPage() {
             </div>
           ) : (
             <DocumentTable
-              documents={documents || []}
+              documents={documentRows}
               onDownload={handleDownload}
               onPreview={handlePreview}
               onIssue={handleIssue}
@@ -343,6 +345,16 @@ export default function DocumentsPage() {
               showStudent={viewMode === "all"}
             />
           )}
+
+          <Pagination
+            page={documents?.page ?? 1}
+            totalPages={documents?.total_pages ?? 1}
+            totalItems={documents?.total ?? 0}
+            perPage={documents?.limit ?? filters.limit ?? 10}
+            itemLabel="documents"
+            onPageChange={(nextPage) => handleFilterChange("page", nextPage)}
+            onPerPageChange={(nextLimit) => handleFilterChange("limit", nextLimit)}
+          />
 
           {/* Generate Document Modal */}
           {generateType && (

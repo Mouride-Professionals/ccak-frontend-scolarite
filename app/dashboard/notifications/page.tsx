@@ -6,6 +6,8 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import { notificationsApi, type SendNotificationPayload } from "@/lib/api/notifications";
 import SendNotificationModal from "@/components/notifications/SendNotificationModal";
 import NotificationList from "@/components/notifications/NotificationListAdmin";
+import ListHeader from "@/components/ui/list-header";
+import Pagination from "@/components/ui/pagination";
 
 interface NotificationFilters {
   type?: string;
@@ -63,72 +65,19 @@ export default function NotificationsPage() {
   return (
     <DashboardLayout title="Gestion des Notifications">
       <div className="p-6">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-zinc-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Rechercher une notification..."
-                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              />
-            </div>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-                showFilters
-                  ? "border-[#00365F] bg-[#00365F]/10 text-[#00365F]"
-                  : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
-              }`}
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              Filtres
-              {(filters.type || filters.is_read !== undefined) && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00365F] text-xs font-semibold text-white">
-                  {[filters.type, filters.is_read !== undefined].filter(Boolean).length}
-                </span>
-              )}
-            </button>
-          </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Nouvelle notification
-          </button>
-        </div>
+        <ListHeader
+          searchValue={searchQuery}
+          onSearchChange={handleSearch}
+          searchPlaceholder="Rechercher une notification..."
+          onToggleFilters={() => setShowFilters(!showFilters)}
+          isFiltersOpen={showFilters}
+          filtersCount={[
+            filters.type,
+            filters.is_read !== undefined ? "read" : "",
+          ].filter(Boolean).length}
+          actionLabel="Nouvelle notification"
+          onAction={() => setIsModalOpen(true)}
+        />
 
         {/* Filters Panel */}
         {showFilters && (
@@ -294,37 +243,18 @@ export default function NotificationsPage() {
         </div>
 
         {/* Pagination */}
-        {notifications && notifications.meta.total > 0 && (
-          <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4 rounded-lg">
-            <p className="text-sm text-zinc-500">
-              Affichage de {(notifications.meta.current_page - 1) * notifications.meta.per_page + 1}{" "}
-              à{" "}
-              {Math.min(
-                notifications.meta.current_page * notifications.meta.per_page,
-                notifications.meta.total
-              )}{" "}
-              sur {notifications.meta.total} notifications
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
-                disabled={notifications.meta.current_page === 1}
-                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Précédent
-              </button>
-              <button className="rounded-lg bg-[#00365F] px-4 py-2 text-sm font-semibold text-white shadow-sm">
-                {notifications.meta.current_page}
-              </button>
-              <button
-                onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
-                disabled={notifications.meta.current_page >= notifications.meta.last_page}
-                className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Suivant
-              </button>
-            </div>
-          </div>
+        {notifications && (
+          <Pagination
+            page={notifications.meta.current_page}
+            totalPages={notifications.meta.last_page}
+            totalItems={notifications.meta.total}
+            perPage={notifications.meta.per_page}
+            itemLabel="notifications"
+            onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
+            onPerPageChange={(nextPerPage) =>
+              setFilters((prev) => ({ ...prev, per_page: nextPerPage, page: 1 }))
+            }
+          />
         )}
 
         {/* Send Notification Modal */}

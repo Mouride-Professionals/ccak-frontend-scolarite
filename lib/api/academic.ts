@@ -28,12 +28,13 @@ export async function getAcademicPrograms(
   filters?: AcademicProgramFilters
 ): Promise<ProgrammesResponse> {
   const queryParams = new URLSearchParams();
-  if (filters?.department_id) queryParams.set("department_id", filters.department_id);
-  if (filters?.level) queryParams.set("level", filters.level);
-  if (filters?.is_active !== undefined) queryParams.set("is_active", filters.is_active.toString());
-  if (filters?.search) queryParams.set("search", filters.search);
+  if (filters?.department_id) queryParams.set("filter[department_id]", filters.department_id);
+  if (filters?.level) queryParams.set("filter[level]", filters.level);
+  if (filters?.is_active !== undefined)
+    queryParams.set("filter[is_active]", filters.is_active.toString());
+  if (filters?.search) queryParams.set("filter[search]", filters.search);
   if (filters?.page) queryParams.set("page", filters.page.toString());
-  if (filters?.limit) queryParams.set("limit", filters.limit.toString());
+  if (filters?.limit) queryParams.set("per_page", filters.limit.toString());
 
   const response = await api.get(`/academic-programs?${queryParams.toString()}`);
   return toPaginated<AcademicProgram>(response);

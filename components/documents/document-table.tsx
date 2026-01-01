@@ -37,27 +37,27 @@ export default function DocumentTable({
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-200 bg-[#00365F]/10">
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Type
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Numéro
               </th>
               {showStudent && (
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
                   Étudiant
                 </th>
               )}
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 md:table-cell">
                 Date de génération
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 xl:table-cell">
                 Date d&apos;émission
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Actions
               </th>
             </tr>
@@ -68,16 +68,21 @@ export default function DocumentTable({
                 key={`${document.id ?? document.document_number ?? "document"}-${index}`}
                 className="bg-white transition-colors hover:bg-zinc-50/50"
               >
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <DocumentTypeBadge type={document.type} />
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="text-sm font-mono font-medium text-zinc-900">
                     {document.document_number}
                   </div>
+                  {showStudent && (
+                    <div className="mt-1 text-xs text-zinc-500 lg:hidden">
+                      {document.student?.full_name || "N/A"}
+                    </div>
+                  )}
                 </td>
                 {showStudent && (
-                  <td className="px-6 py-5 text-sm text-zinc-600">
+                  <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
                     <div>
                       <div className="font-medium text-zinc-900">
                         {document.student?.full_name || "N/A"}
@@ -88,17 +93,17 @@ export default function DocumentTable({
                     </div>
                   </td>
                 )}
-                <td className="px-6 py-5 text-sm text-zinc-600">
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 md:table-cell">
                   <DateFormatter date={document.generated_at} format="datetime" />
                 </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 xl:table-cell">
                   {document.issued_at ? (
                     <DateFormatter date={document.issued_at} format="short" />
                   ) : (
                     "-"
                   )}
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex justify-end">
                     <DocumentActions
                       document={document}

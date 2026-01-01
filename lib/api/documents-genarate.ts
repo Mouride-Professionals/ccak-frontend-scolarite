@@ -4,7 +4,7 @@
  */
 
 import { api } from "@/lib/api-client";
-import { unwrapData } from "@/lib/api/api-response";
+import { toPaginated, unwrapData, type PaginatedResponse } from "@/lib/api/api-response";
 import type {
   GeneratedDocument,
   GenerateTranscriptInput,
@@ -155,71 +155,32 @@ export async function generateAttestation(
 export async function getStudentDocuments(
   studentId: string,
   filters?: DocumentFilters
-): Promise<GeneratedDocument[]> {
-  const response = await api.get("/generated-documents");
-  const payload = unwrapData<{ data: GeneratedDocument[] }>(response);
-  let documents = Array.isArray(payload?.data) ? payload.data : [];
+): Promise<PaginatedResponse<GeneratedDocument>> {
+  const params = new URLSearchParams();
+  params.append("filter[student_id]", studentId);
+  if (filters?.page) params.append("page", filters.page.toString());
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.type) params.append("filter[type]", filters.type);
+  if (filters?.status) params.append("filter[status]", filters.status);
+  if (filters?.search) params.append("filter[search]", filters.search);
 
-  documents = documents.filter((doc) => doc.student_id === studentId);
-
-  if (filters?.type) {
-    documents = documents.filter((doc) => doc.type === filters.type);
-  }
-  if (filters?.status) {
-    documents = documents.filter((doc) => doc.status === filters.status);
-  }
-  if (filters?.search) {
-    const searchLower = filters.search.toLowerCase();
-    documents = documents.filter(
-      (doc) =>
-        doc.document_number.toLowerCase().includes(searchLower) ||
-        doc.student?.full_name?.toLowerCase().includes(searchLower) ||
-        doc.student?.student_number?.toLowerCase().includes(searchLower)
-    );
-  }
-
-  if (filters?.page && filters?.limit) {
-    const start = (filters.page - 1) * filters.limit;
-    const end = start + filters.limit;
-    documents = documents.slice(start, end);
-  }
-
-  return documents;
+  const response = await api.get(`/generated-documents?${params.toString()}`);
+  return toPaginated<GeneratedDocument>(response);
 }
 
 export async function getAllDocuments(
   filters?: DocumentFilters & { student_id?: string }
-): Promise<GeneratedDocument[]> {
-  const response = await api.get("/generated-documents");
-  const payload = unwrapData<{ data: GeneratedDocument[] }>(response);
-  let documents = Array.isArray(payload?.data) ? payload.data : [];
+): Promise<PaginatedResponse<GeneratedDocument>> {
+  const params = new URLSearchParams();
+  if (filters?.student_id) params.append("filter[student_id]", filters.student_id);
+  if (filters?.page) params.append("page", filters.page.toString());
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.type) params.append("filter[type]", filters.type);
+  if (filters?.status) params.append("filter[status]", filters.status);
+  if (filters?.search) params.append("filter[search]", filters.search);
 
-  if (filters?.student_id) {
-    documents = documents.filter((doc) => doc.student_id === filters.student_id);
-  }
-  if (filters?.type) {
-    documents = documents.filter((doc) => doc.type === filters.type);
-  }
-  if (filters?.status) {
-    documents = documents.filter((doc) => doc.status === filters.status);
-  }
-  if (filters?.search) {
-    const searchLower = filters.search.toLowerCase();
-    documents = documents.filter(
-      (doc) =>
-        doc.document_number.toLowerCase().includes(searchLower) ||
-        doc.student?.full_name?.toLowerCase().includes(searchLower) ||
-        doc.student?.student_number?.toLowerCase().includes(searchLower)
-    );
-  }
-
-  if (filters?.page && filters?.limit) {
-    const start = (filters.page - 1) * filters.limit;
-    const end = start + filters.limit;
-    documents = documents.slice(start, end);
-  }
-
-  return documents;
+  const response = await api.get(`/generated-documents${params.toString() ? `?${params}` : ""}`);
+  return toPaginated<GeneratedDocument>(response);
 }
 
 export async function downloadDocument(documentId: string): Promise<Blob> {

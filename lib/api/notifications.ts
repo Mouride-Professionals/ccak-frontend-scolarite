@@ -43,11 +43,12 @@ export const notificationsApi = {
     search?: string;
   }): Promise<NotificationListResponse> => {
     const queryParams = new URLSearchParams();
-    if (params?.type) queryParams.append("type", params.type);
-    if (params?.is_read !== undefined) queryParams.append("is_read", params.is_read.toString());
+    if (params?.type) queryParams.append("filter[type]", params.type);
+    if (params?.is_read !== undefined)
+      queryParams.append("filter[is_read]", params.is_read.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.per_page) queryParams.append("per_page", params.per_page.toString());
-    if (params?.search) queryParams.append("search", params.search);
+    if (params?.search) queryParams.append("filter[search]", params.search);
 
     const url = `/notifications${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);

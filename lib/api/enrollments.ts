@@ -23,16 +23,17 @@ import type {
  */
 export async function getEnrollments(filters?: EnrollmentFilters): Promise<EnrollmentsResponse> {
   const queryParams = new URLSearchParams();
-  if (filters?.student_id) queryParams.set("student_id", filters.student_id);
+  if (filters?.student_id) queryParams.set("filter[student_id]", filters.student_id);
   if (filters?.academic_program_id)
-    queryParams.set("academic_program_id", filters.academic_program_id);
-  if (filters?.academic_year_id) queryParams.set("academic_year_id", filters.academic_year_id);
+    queryParams.set("filter[academic_program_id]", filters.academic_program_id);
+  if (filters?.academic_year_id)
+    queryParams.set("filter[academic_year_id]", filters.academic_year_id);
   if (filters?.current_semester)
-    queryParams.set("current_semester", filters.current_semester.toString());
-  if (filters?.status) queryParams.set("status", filters.status);
-  if (filters?.search) queryParams.set("search", filters.search);
+    queryParams.set("filter[current_semester]", filters.current_semester.toString());
+  if (filters?.status) queryParams.set("filter[status]", filters.status);
+  if (filters?.search) queryParams.set("filter[search]", filters.search);
   if (filters?.page) queryParams.set("page", filters.page.toString());
-  if (filters?.limit) queryParams.set("limit", filters.limit.toString());
+  if (filters?.limit) queryParams.set("per_page", filters.limit.toString());
 
   const response = await api.get(`/enrollments?${queryParams.toString()}`);
   return toPaginated<Enrollment>(response);

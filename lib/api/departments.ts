@@ -18,10 +18,11 @@ import type {
 export async function getDepartments(filters?: DepartmentFilters): Promise<DepartmentsResponse> {
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
-  if (filters?.limit) params.append("limit", filters.limit.toString());
-  if (filters?.faculty_id) params.append("faculty_id", filters.faculty_id);
-  if (filters?.is_active !== undefined) params.append("is_active", filters.is_active.toString());
-  if (filters?.search) params.append("search", filters.search);
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.faculty_id) params.append("filter[faculty_id]", filters.faculty_id);
+  if (filters?.is_active !== undefined)
+    params.append("filter[is_active]", filters.is_active.toString());
+  if (filters?.search) params.append("filter[search]", filters.search);
 
   const response = await api.get(`/departments?${params}`);
   return toPaginated<Department>(response);

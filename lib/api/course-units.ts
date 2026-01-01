@@ -1,10 +1,12 @@
 import { api } from "@/lib/api-client";
-import { unwrapData } from "@/lib/api/api-response";
+import { toPaginated, unwrapData } from "@/lib/api/api-response";
 import {
   CourseUnit,
   CreateCourseUnitInput,
   UpdateCourseUnitInput,
   AcademicProgram,
+  CourseUnitFilters,
+  CourseUnitsResponse,
 } from "@/types/course-unit";
 
 type ApiCourseUnit = {
@@ -50,10 +52,26 @@ const mapCourseUnitInput = (input: CreateCourseUnitInput | UpdateCourseUnitInput
   is_active: input.isActive ?? true,
 });
 
-export const getCourseUnits = async (): Promise<CourseUnit[]> => {
-  const response = await api.get("/course-units");
-  const data = unwrapData<ApiCourseUnit[]>(response);
-  return data.map(mapCourseUnit);
+export const getCourseUnits = async (
+  filters?: CourseUnitFilters
+): Promise<CourseUnitsResponse> => {
+  const params = new URLSearchParams();
+  if (filters?.page) params.append("page", filters.page.toString());
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.search) params.append("filter[search]", filters.search);
+  if (filters?.academicProgramId)
+    params.append("filter[academic_program_id]", filters.academicProgramId);
+  if (filters?.type) params.append("filter[type]", filters.type);
+  if (filters?.isActive !== undefined)
+    params.append("filter[is_active]", filters.isActive.toString());
+
+  const query = params.toString();
+  const response = await api.get(`/course-units${query ? `?${query}` : ""}`);
+  const paginated = toPaginated<ApiCourseUnit>(response);
+  return {
+    ...paginated,
+    data: paginated.data.map(mapCourseUnit),
+  };
 };
 
 export const getCourseUnit = async (id: string): Promise<CourseUnit | null> => {

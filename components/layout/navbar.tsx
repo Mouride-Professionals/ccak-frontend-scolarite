@@ -2,8 +2,6 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import NotificationList from "@/components/notifications/NotificationList";
-
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 // 👇 1. On importe ton composant ici
@@ -11,9 +9,11 @@ import NotificationPopup from "@/components/notifications/NotificationPopup";
 
 interface NavbarProps {
   title: string;
+  onMenuToggle?: () => void;
+  isSidebarOpen?: boolean;
 }
 
-export default function Navbar({ title }: NavbarProps) {
+export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarProps) {
   const { data: session } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -74,13 +74,26 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed left-[230px] right-0 top-0 z-30 h-16 border-b border-zinc-200 bg-white">
-      <div className="flex h-full items-center justify-between px-8">
+    <nav className="fixed left-0 right-0 top-0 z-30 h-16 border-b border-zinc-200 bg-white md:left-[230px]">
+      <div className="flex h-full items-center justify-between px-4 md:px-8">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-[#00365F]">{title}</h1>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded={isSidebarOpen ?? false}
+            onClick={onMenuToggle}
+            className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white p-2 text-[#00365F] shadow-sm transition hover:bg-zinc-50 md:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 className="text-lg font-semibold text-[#00365F] md:text-2xl">{title}</h1>
+        </div>
 
         {/* User Info & Notifications */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Notification Popup */}
           <NotificationPopup />
 
@@ -88,13 +101,13 @@ export default function Navbar({ title }: NavbarProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-3 rounded-lg transition-colors hover:bg-zinc-50 px-2 py-1"
+              className="flex items-center gap-3 rounded-lg px-2 py-1 transition-colors hover:bg-zinc-50"
             >
-              <div className="text-right">
+              <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium text-[#00365F]">{userName}</p>
                 <p className="text-xs text-zinc-500">{userEmail}</p>
               </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#00365F] text-sm font-semibold text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#00365F] text-sm font-semibold text-white sm:h-10 sm:w-10">
                 {userInitials}
               </div>
             </button>

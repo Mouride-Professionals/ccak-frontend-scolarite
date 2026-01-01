@@ -10,11 +10,12 @@ import {
 
 export const getCourses = async (filters?: CourseFilters): Promise<CoursesResponse> => {
   const params = new URLSearchParams();
-  if (filters?.search) params.append("search", filters.search);
-  if (filters?.course_unit_id) params.append("course_unit_id", filters.course_unit_id);
-  if (filters?.is_active !== undefined) params.append("is_active", filters.is_active.toString());
+  if (filters?.search) params.append("filter[search]", filters.search);
+  if (filters?.course_unit_id) params.append("filter[course_unit_id]", filters.course_unit_id);
+  if (filters?.is_active !== undefined)
+    params.append("filter[is_active]", filters.is_active.toString());
   if (filters?.page) params.append("page", filters.page.toString());
-  if (filters?.limit) params.append("limit", filters.limit.toString());
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
 
   const response = await api.get(`/courses?${params.toString()}`);
   return toPaginated<Course>(response);

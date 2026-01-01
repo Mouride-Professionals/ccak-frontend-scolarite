@@ -18,9 +18,10 @@ import type {
 export async function getFaculties(filters?: FacultyFilters): Promise<FacultiesResponse> {
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
-  if (filters?.limit) params.append("limit", filters.limit.toString());
-  if (filters?.is_active !== undefined) params.append("is_active", filters.is_active.toString());
-  if (filters?.search) params.append("search", filters.search);
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.is_active !== undefined)
+    params.append("filter[is_active]", filters.is_active.toString());
+  if (filters?.search) params.append("filter[search]", filters.search);
 
   const response = await api.get(`/faculties?${params}`);
   return toPaginated<Faculty>(response);

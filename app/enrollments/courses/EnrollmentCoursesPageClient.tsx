@@ -10,6 +10,7 @@ import CourseEnrollmentForm from "@/components/course-enrollments/course-enrollm
 import Modal from "@/components/ui/modal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
+import Pagination from "@/components/ui/pagination";
 import {
   useCourseEnrollments,
   useDeleteCourseEnrollment,
@@ -198,32 +199,17 @@ export default function EnrollmentCoursesPageClient() {
               onDelete={handleDeleteClick}
             />
 
-            {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
-              <p className="text-sm text-zinc-500">
-                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
-                cours
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
-                  disabled={!data || data.page === 1}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Précédent
-                </button>
-                <button className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white shadow-sm">
-                  {data?.page ?? 1}
-                </button>
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
-                  disabled={!data || data.page >= data.total_pages}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Suivant
-                </button>
-              </div>
-            </div>
+            <Pagination
+              page={data?.page ?? 1}
+              totalPages={data?.total_pages ?? 1}
+              totalItems={data?.total ?? 0}
+              perPage={data?.limit ?? filters.limit ?? 10}
+              itemLabel="cours"
+              onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
+              onPerPageChange={(nextLimit) =>
+                setFilters((prev) => ({ ...prev, limit: nextLimit, page: 1 }))
+              }
+            />
           </>
         )}
 

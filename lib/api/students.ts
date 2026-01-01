@@ -45,11 +45,11 @@ const uploadStudentDocument = async (studentId: string, file: File, type: Docume
  */
 export async function getStudents(filters?: StudentFilters): Promise<StudentsResponse> {
   const queryParams = new URLSearchParams();
-  if (filters?.status) queryParams.set("status", filters.status);
-  if (filters?.gender) queryParams.set("gender", filters.gender);
-  if (filters?.search) queryParams.set("search", filters.search);
+  if (filters?.status) queryParams.set("filter[status]", filters.status);
+  if (filters?.gender) queryParams.set("filter[gender]", filters.gender);
+  if (filters?.search) queryParams.set("filter[search]", filters.search);
   if (filters?.page) queryParams.set("page", filters.page.toString());
-  if (filters?.limit) queryParams.set("limit", filters.limit.toString());
+  if (filters?.limit) queryParams.set("per_page", filters.limit.toString());
 
   const response = await api.get(`/students?${queryParams.toString()}`);
   return toPaginated<Student>(response);

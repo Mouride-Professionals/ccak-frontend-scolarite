@@ -26,17 +26,18 @@ const evaluationTypes: EvaluationTypeOption[] = [
 export async function getGrades(filters?: GradeFilters): Promise<GradesPaginatedResponse> {
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
-  if (filters?.limit) params.append("limit", filters.limit.toString());
-  if (filters?.search) params.append("search", filters.search);
-  if (filters?.student_id) params.append("student_id", filters.student_id);
-  if (filters?.course_id) params.append("course_id", filters.course_id);
-  if (filters?.status) params.append("status", filters.status);
-  if (filters?.type) params.append("type", filters.type);
-  if (filters?.semester) params.append("semester", filters.semester.toString());
-  if (filters?.academic_year_id) params.append("academic_year_id", filters.academic_year_id);
-  if (filters?.entered_by) params.append("entered_by", filters.entered_by);
-  if (filters?.date_from) params.append("date_from", filters.date_from);
-  if (filters?.date_to) params.append("date_to", filters.date_to);
+  if (filters?.limit) params.append("per_page", filters.limit.toString());
+  if (filters?.search) params.append("filter[search]", filters.search);
+  if (filters?.student_id) params.append("filter[student_id]", filters.student_id);
+  if (filters?.course_id) params.append("filter[course_id]", filters.course_id);
+  if (filters?.status) params.append("filter[status]", filters.status);
+  if (filters?.type) params.append("filter[type]", filters.type);
+  if (filters?.semester) params.append("filter[semester]", filters.semester.toString());
+  if (filters?.academic_year_id)
+    params.append("filter[academic_year_id]", filters.academic_year_id);
+  if (filters?.entered_by) params.append("filter[entered_by]", filters.entered_by);
+  if (filters?.date_from) params.append("filter[date_from]", filters.date_from);
+  if (filters?.date_to) params.append("filter[date_to]", filters.date_to);
 
   const response = await api.get(`/grades?${params.toString()}`);
   return toPaginated<Grade>(response);

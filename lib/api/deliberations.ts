@@ -24,13 +24,14 @@ export async function getDeliberationSessions(
 ): Promise<DeliberationSessionsResponse> {
   const queryParams = new URLSearchParams();
   if (filters?.academic_program_id)
-    queryParams.set("academic_program_id", filters.academic_program_id);
-  if (filters?.academic_year_id) queryParams.set("academic_year_id", filters.academic_year_id);
-  if (filters?.semester) queryParams.set("semester", filters.semester.toString());
-  if (filters?.status) queryParams.set("status", filters.status);
-  if (filters?.search) queryParams.set("search", filters.search);
+    queryParams.set("filter[academic_program_id]", filters.academic_program_id);
+  if (filters?.academic_year_id)
+    queryParams.set("filter[academic_year_id]", filters.academic_year_id);
+  if (filters?.semester) queryParams.set("filter[semester]", filters.semester.toString());
+  if (filters?.status) queryParams.set("filter[status]", filters.status);
+  if (filters?.search) queryParams.set("filter[search]", filters.search);
   if (filters?.page) queryParams.set("page", filters.page.toString());
-  if (filters?.limit) queryParams.set("limit", filters.limit.toString());
+  if (filters?.limit) queryParams.set("per_page", filters.limit.toString());
 
   const response = await api.get(`/deliberation-sessions?${queryParams.toString()}`);
   return toPaginated<DeliberationSession>(response);

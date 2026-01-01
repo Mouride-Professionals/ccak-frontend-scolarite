@@ -179,14 +179,17 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(["scolarite"]);
 
   const toggleExpanded = (itemId: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
-    );
+    setExpandedItems((prev) => (prev.includes(itemId) ? [] : [itemId]));
   };
 
   const isActive = (href?: string) => {
@@ -195,11 +198,15 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-[230px] bg-white shadow-sm">
+    <aside
+      className={`fixed left-0 top-0 z-40 h-screen w-[230px] bg-white shadow-sm transition-transform duration-300 ease-out ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      } md:translate-x-0`}
+    >
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-center  px-4 pt-2">
-          <img src="/logo.svg" alt="CCAK" className="h-28 w-28" />
+        <div className="flex h-16 items-center justify-center px-4 pt-2">
+          <img src="/logo.svg" alt="CCAK" className="h-20 w-20 md:h-28 md:w-28" />
         </div>
 
         {/* Menu Items */}
@@ -245,6 +252,7 @@ export default function Sidebar() {
                           <li key={child.id}>
                             <Link
                               href={child.href || "#"}
+                              onClick={onClose}
                               className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
                                 isActive(child.href)
                                   ? "font-medium text-[#008D36]"
@@ -262,10 +270,11 @@ export default function Sidebar() {
                   // Simple link
                   <Link
                     href={item.href || "#"}
+                    onClick={onClose}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive(item.href)
                         ? "bg-[#00365F]/10 text-[#00365F]"
-                        : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
+                      : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
                     }`}
                   >
                     {item.icon}

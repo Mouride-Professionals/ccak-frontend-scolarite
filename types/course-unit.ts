@@ -38,6 +38,14 @@ export interface CourseUnitFilters {
   isActive?: boolean;
 }
 
+export interface CourseUnitsResponse {
+  data: CourseUnit[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
 export interface AcademicProgram {
   id: string;
   name: string;
