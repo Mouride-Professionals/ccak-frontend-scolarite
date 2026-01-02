@@ -79,9 +79,21 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
+        id: "faculty-members",
+        label: "Enseignants",
+        href: "/faculty-members",
+        icon: null as any,
+      },
+      {
         id: "deliberations",
         label: "Délibérations",
         href: "/deliberations",
+        icon: null as any,
+      },
+      {
+        id: "teaching-assignments",
+        label: "Affectations",
+        href: "/teaching-assignments",
         icon: null as any,
       },
       {
@@ -114,6 +126,58 @@ const menuItems: MenuItem[] = [
     ),
   },
   {
+    id: "attendance",
+    label: "Assiduité",
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+    children: [
+      {
+        id: "course-logs-new",
+        label: "Nouveau cahier",
+        href: "/course-logs/new",
+        icon: null as any,
+      },
+      {
+        id: "course-logs",
+        label: "Historique cahier",
+        href: "/course-logs",
+        icon: null as any,
+      },
+      {
+        id: "attendance-mark",
+        label: "Pointage",
+        href: "/attendance/mark",
+        icon: null as any,
+      },
+      {
+        id: "attendance-student",
+        label: "Présences étudiant",
+        href: "/attendance/student",
+        icon: null as any,
+      },
+      {
+        id: "attendance-course",
+        label: "Rapport cours",
+        href: "/attendance/course",
+        icon: null as any,
+      },
+      {
+        id: "attendance-dispensations",
+        label: "Dispensations",
+        href: "/attendance/dispensations",
+        icon: null as any,
+      },
+    ],
+  },
+  {
     id: "stats",
     label: "Statistiques",
     href: "/stats",
@@ -131,7 +195,6 @@ const menuItems: MenuItem[] = [
   {
     id: "calendar",
     label: "Calendrier",
-    href: "/calendar",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -142,6 +205,62 @@ const menuItems: MenuItem[] = [
         />
       </svg>
     ),
+    children: [
+      {
+        id: "calendar-home",
+        label: "Vue d'ensemble",
+        href: "/calendar",
+        icon: null as any,
+      },
+      {
+        id: "calendar-setup",
+        label: "Configuration",
+        href: "/calendar/setup",
+        icon: null as any,
+      },
+      {
+        id: "calendar-holidays",
+        label: "Jours fériés",
+        href: "/calendar/holidays",
+        icon: null as any,
+      },
+      {
+        id: "calendar-rooms",
+        label: "Salles",
+        href: "/calendar/rooms",
+        icon: null as any,
+      },
+      {
+        id: "calendar-schedules",
+        label: "Création EDT",
+        href: "/calendar/schedules",
+        icon: null as any,
+      },
+      {
+        id: "calendar-student",
+        label: "EDT étudiant",
+        href: "/calendar/student",
+        icon: null as any,
+      },
+      {
+        id: "calendar-faculty",
+        label: "EDT enseignant",
+        href: "/calendar/faculty",
+        icon: null as any,
+      },
+      {
+        id: "calendar-program",
+        label: "EDT programme",
+        href: "/calendar/program",
+        icon: null as any,
+      },
+      {
+        id: "calendar-availability",
+        label: "Disponibilités",
+        href: "/calendar/availability",
+        icon: null as any,
+      },
+    ],
   },
   {
     id: "communication",

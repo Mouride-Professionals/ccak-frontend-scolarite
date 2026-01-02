@@ -28,6 +28,31 @@ export enum FacultyRank {
   VACATAIRE = "VACATAIRE",
 }
 
+export enum FacultyContractType {
+  PERMANENT = "PERMANENT",
+  TEMPORARY = "TEMPORARY",
+  VACATAIRE = "VACATAIRE",
+}
+
+export enum FacultyDocumentType {
+  CV = "CV",
+  DIPLOMA = "DIPLOMA",
+  CNI = "CNI",
+  OTHER = "OTHER",
+}
+
+export enum FacultyDocumentStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+export enum FacultyContractStatus {
+  DRAFT = "DRAFT",
+  ACTIVE = "ACTIVE",
+  EXPIRED = "EXPIRED",
+}
+
 // =====================
 // INTERFACES
 // =====================
@@ -91,7 +116,7 @@ export interface FacultyMember {
   address: string;
   department_id: string;
   rank: FacultyRank;
-  contract_type: string;
+  contract_type: FacultyContractType | string;
   hire_date: string;
   is_active: boolean;
   created_at: string;
@@ -99,6 +124,47 @@ export interface FacultyMember {
 
   // Relations
   department?: Department;
+}
+
+export interface FacultyDocument {
+  id: string;
+  faculty_member_id: string;
+  type: FacultyDocumentType;
+  status: FacultyDocumentStatus;
+  file_path: string;
+  reviewed_by?: string | null;
+  created_at: string;
+}
+
+export interface FacultyContract {
+  id: string;
+  faculty_member_id: string;
+  contract_type: FacultyContractType | string;
+  start_date: string;
+  end_date?: string | null;
+  salary?: number | null;
+  status: FacultyContractStatus;
+  is_current: boolean;
+  file_path?: string | null;
+  created_at: string;
+}
+
+export interface FacultyMemberFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  department_id?: string;
+  rank?: FacultyRank;
+  contract_type?: FacultyContractType | string;
+  is_active?: boolean;
+}
+
+export interface FacultyMembersResponse {
+  data: FacultyMember[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
 }
 
 /**
