@@ -20,10 +20,7 @@ export async function getStudentAttendance(
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
   if (filters?.limit) params.append("per_page", filters.limit.toString());
-  if (filters?.course_id) params.append("filter[course_id]", filters.course_id);
-  if (filters?.status) params.append("filter[status]", filters.status);
-  if (filters?.date_from) params.append("filter[date_from]", filters.date_from);
-  if (filters?.date_to) params.append("filter[date_to]", filters.date_to);
+  if (filters?.course_id) params.append("course_id", filters.course_id);
 
   const response = await api.get(
     `/students/${studentId}/attendance${params.toString() ? `?${params}` : ""}`
@@ -38,9 +35,7 @@ export async function getCourseAttendance(
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
   if (filters?.limit) params.append("per_page", filters.limit.toString());
-  if (filters?.status) params.append("filter[status]", filters.status);
-  if (filters?.date_from) params.append("filter[date_from]", filters.date_from);
-  if (filters?.date_to) params.append("filter[date_to]", filters.date_to);
+  if (filters?.session_date) params.append("session_date", filters.session_date);
 
   const response = await api.get(
     `/courses/${courseId}/attendance${params.toString() ? `?${params}` : ""}`

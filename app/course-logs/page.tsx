@@ -10,8 +10,8 @@ import { useCourses } from "@/hooks/use-courses";
 import { useCourseLogsForCourse, useUpdateCourseLog } from "@/hooks/use-course-logs";
 import type { CourseLog } from "@/types/course-log";
 
-const formatTopics = (topics: CourseLog["topics"]) =>
-  Array.isArray(topics) ? topics.join(", ") : topics;
+const formatList = (items?: string[]) => (items?.length ? items.join(", ") : "");
+const formatTopics = (topics?: string[]) => formatList(topics);
 
 export default function CourseLogHistoryPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
@@ -59,8 +59,8 @@ export default function CourseLogHistoryPage() {
     setEditingLog(log);
     setEditForm({
       topics: formatTopics(log.topics),
-      chapters: log.chapters ?? "",
-      objectives: log.objectives ?? "",
+      chapters: formatList(log.chapters),
+      objectives: formatList(log.objectives),
       notes: log.notes ?? "",
     });
   };
@@ -72,8 +72,12 @@ export default function CourseLogHistoryPage() {
         id: editingLog.id,
         input: {
           topics: editForm.topics.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean),
-          chapters: editForm.chapters || undefined,
-          objectives: editForm.objectives || undefined,
+          chapters: editForm.chapters
+            ? editForm.chapters.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean)
+            : undefined,
+          objectives: editForm.objectives
+            ? editForm.objectives.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean)
+            : undefined,
           notes: editForm.notes || undefined,
         },
       });
@@ -163,7 +167,7 @@ export default function CourseLogHistoryPage() {
                       {filteredLogs.map((log) => (
                         <tr key={log.id}>
                           <td className="px-4 py-3">
-                            {new Date(log.date).toLocaleDateString("fr-FR")}
+                            {new Date(log.session_date).toLocaleDateString("fr-FR")}
                           </td>
                           <td className="px-4 py-3">{formatTopics(log.topics)}</td>
                           <td className="px-4 py-3 text-zinc-500">{log.notes || "—"}</td>

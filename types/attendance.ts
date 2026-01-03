@@ -1,4 +1,4 @@
-export type AttendanceStatus = "present" | "absent" | "late" | "excused";
+export type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
 
 export interface AttendanceRecord {
   id: string;
@@ -24,11 +24,8 @@ export interface AttendanceFilters {
   page?: number;
   limit?: number;
   course_id?: string;
-  course_log_id?: string;
   student_id?: string;
-  status?: AttendanceStatus;
-  date_from?: string;
-  date_to?: string;
+  session_date?: string;
 }
 
 export interface CreateAttendanceInput {

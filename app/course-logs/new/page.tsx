@@ -20,18 +20,24 @@ const dayLabels: Record<string, string> = {
 
 const formatTime = (value?: string) => (value ? value.slice(0, 5) : "");
 
-const parseTopics = (value: string) =>
+const parseList = (value: string) =>
   value
     .split(/\n|,/)
     .map((entry) => entry.trim())
     .filter(Boolean);
+
+const toIsoDateTime = (value: string) => {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00`);
+  return date.toISOString();
+};
 
 export default function CourseLogEntryPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
   const [form, setForm] = useState({
     course_id: "",
     schedule_id: "",
-    date: "",
+    session_date: "",
     topics: "",
     chapters: "",
     objectives: "",
@@ -54,24 +60,24 @@ export default function CourseLogEntryPage() {
   const scheduleOptions = useMemo(() => schedulesQuery.data?.data ?? [], [schedulesQuery.data]);
 
   const handleSubmit = async () => {
-    if (!form.schedule_id || !form.date || !form.topics.trim()) {
+    if (!form.schedule_id || !form.session_date || !form.topics.trim()) {
       setToast({ isOpen: true, message: "Veuillez remplir les champs requis.", type: "error" });
       return;
     }
     try {
       await createLog.mutateAsync({
         schedule_id: form.schedule_id,
-        date: form.date,
-        topics: parseTopics(form.topics),
-        chapters: form.chapters || undefined,
-        objectives: form.objectives || undefined,
+        session_date: toIsoDateTime(form.session_date),
+        topics: parseList(form.topics),
+        chapters: form.chapters ? parseList(form.chapters) : undefined,
+        objectives: form.objectives ? parseList(form.objectives) : undefined,
         notes: form.notes || undefined,
       });
       setToast({ isOpen: true, message: "Cahier de texte enregistré.", type: "success" });
       setForm((prev) => ({
         ...prev,
         schedule_id: "",
-        date: "",
+        session_date: "",
         topics: "",
         chapters: "",
         objectives: "",
@@ -135,8 +141,10 @@ export default function CourseLogEntryPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Date</label>
                 <input
                   type="date"
-                  value={form.date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                  value={form.session_date}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, session_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>
@@ -160,11 +168,12 @@ export default function CourseLogEntryPage() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Chapitres</label>
-                <input
+                <textarea
                   value={form.chapters}
                   onChange={(event) =>
                     setForm((prev) => ({ ...prev, chapters: event.target.value }))
                   }
+                  rows={2}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>

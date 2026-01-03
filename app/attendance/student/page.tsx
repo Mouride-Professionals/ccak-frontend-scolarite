@@ -17,8 +17,6 @@ export default function StudentAttendancePage() {
     page: 1,
     limit: 10,
     course_id: "",
-    date_from: "",
-    date_to: "",
   });
 
   const { data: students } = useStudents({ search: search || undefined, page: 1, limit: 15 });
@@ -27,8 +25,6 @@ export default function StudentAttendancePage() {
     page: filters.page,
     limit: filters.limit,
     course_id: filters.course_id || undefined,
-    date_from: filters.date_from || undefined,
-    date_to: filters.date_to || undefined,
   });
 
   return (
@@ -38,26 +34,6 @@ export default function StudentAttendancePage() {
           searchValue={search}
           onSearchChange={setSearch}
           searchPlaceholder="Rechercher un étudiant..."
-          rightSlot={
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                type="date"
-                value={filters.date_from}
-                onChange={(event) =>
-                  setFilters((prev) => ({ ...prev, date_from: event.target.value, page: 1 }))
-                }
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
-              />
-              <input
-                type="date"
-                value={filters.date_to}
-                onChange={(event) =>
-                  setFilters((prev) => ({ ...prev, date_to: event.target.value, page: 1 }))
-                }
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
-              />
-            </div>
-          }
         />
 
         <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">

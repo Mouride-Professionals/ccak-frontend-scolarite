@@ -8,14 +8,6 @@ import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import { useCourses } from "@/hooks/use-courses";
 import { useCourseAttendance } from "@/hooks/use-attendance";
-import type { AttendanceStatus } from "@/types/attendance";
-
-const statusOptions: Array<{ value: AttendanceStatus; label: string }> = [
-  { value: "present", label: "Présent" },
-  { value: "absent", label: "Absent" },
-  { value: "late", label: "En retard" },
-  { value: "excused", label: "Excusé" },
-];
 
 export default function CourseAttendanceReportPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
@@ -23,17 +15,13 @@ export default function CourseAttendanceReportPage() {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    status: "" as "" | AttendanceStatus,
-    date_from: "",
-    date_to: "",
+    session_date: "",
   });
 
   const { data: attendance, isLoading } = useCourseAttendance(courseId, {
     page: filters.page,
     limit: filters.limit,
-    status: filters.status || undefined,
-    date_from: filters.date_from || undefined,
-    date_to: filters.date_to || undefined,
+    session_date: filters.session_date || undefined,
   });
 
   const handleExport = () => {
@@ -69,38 +57,12 @@ export default function CourseAttendanceReportPage() {
             <div className="flex flex-wrap items-center gap-2">
               <input
                 type="date"
-                value={filters.date_from}
+                value={filters.session_date}
                 onChange={(event) =>
-                  setFilters((prev) => ({ ...prev, date_from: event.target.value, page: 1 }))
+                  setFilters((prev) => ({ ...prev, session_date: event.target.value, page: 1 }))
                 }
                 className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               />
-              <input
-                type="date"
-                value={filters.date_to}
-                onChange={(event) =>
-                  setFilters((prev) => ({ ...prev, date_to: event.target.value, page: 1 }))
-                }
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
-              />
-              <select
-                value={filters.status}
-                onChange={(event) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    status: event.target.value as AttendanceStatus,
-                    page: 1,
-                  }))
-                }
-                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
-              >
-                <option value="">Tous les statuts</option>
-                {statusOptions.map((status) => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
               <button
                 type="button"
                 onClick={handleExport}

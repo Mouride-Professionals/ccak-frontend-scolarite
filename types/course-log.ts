@@ -3,10 +3,10 @@ export interface CourseLog {
   schedule_id: string;
   course_id?: string;
   faculty_member_id?: string;
-  date: string;
-  topics: string[] | string;
-  chapters?: string;
-  objectives?: string;
+  session_date: string;
+  topics?: string[];
+  chapters?: string[];
+  objectives?: string[];
   notes?: string;
   created_at?: string;
   updated_at?: string;
@@ -40,10 +40,10 @@ export interface CourseLogFilters {
 
 export interface CreateCourseLogInput {
   schedule_id: string;
-  date: string;
-  topics: string[] | string;
-  chapters?: string;
-  objectives?: string;
+  session_date: string;
+  topics?: string[];
+  chapters?: string[];
+  objectives?: string[];
   notes?: string;
 }
 

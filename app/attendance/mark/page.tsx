@@ -12,10 +12,10 @@ import { useCreateAttendance } from "@/hooks/use-attendance";
 import type { AttendanceStatus } from "@/types/attendance";
 
 const statusOptions: Array<{ value: AttendanceStatus; label: string }> = [
-  { value: "present", label: "Présent" },
-  { value: "absent", label: "Absent" },
-  { value: "late", label: "En retard" },
-  { value: "excused", label: "Excusé" },
+  { value: "PRESENT", label: "Présent" },
+  { value: "ABSENT", label: "Absent" },
+  { value: "LATE", label: "En retard" },
+  { value: "EXCUSED", label: "Excusé" },
 ];
 
 export default function AttendanceMarkingPage() {
@@ -46,7 +46,7 @@ export default function AttendanceMarkingPage() {
     setRecords((prev) => {
       const next = { ...prev };
       students.forEach((student) => {
-        if (!next[student!.id]) next[student!.id] = "present";
+        if (!next[student!.id]) next[student!.id] = "PRESENT";
       });
       return next;
     });
@@ -59,7 +59,7 @@ export default function AttendanceMarkingPage() {
     }
     const payload = students.map((student) => ({
       student_id: student!.id,
-      status: records[student!.id] ?? "present",
+      status: records[student!.id] ?? "PRESENT",
     }));
     try {
       await createAttendance.mutateAsync({ course_log_id: courseLogId, records: payload });
@@ -112,7 +112,7 @@ export default function AttendanceMarkingPage() {
                 <option value="">Sélectionner</option>
                 {(logs?.data ?? []).map((log) => (
                   <option key={log.id} value={log.id}>
-                    {new Date(log.date).toLocaleDateString("fr-FR")} ·{" "}
+                    {new Date(log.session_date).toLocaleDateString("fr-FR")} ·{" "}
                     {log.course?.name ?? log.course_id}
                   </option>
                 ))}
@@ -135,14 +135,14 @@ export default function AttendanceMarkingPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => markAll("present")}
+              onClick={() => markAll("PRESENT")}
               className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700"
             >
               Tout présent
             </button>
             <button
               type="button"
-              onClick={() => markAll("absent")}
+              onClick={() => markAll("ABSENT")}
               className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700"
             >
               Tout absent
@@ -178,11 +178,11 @@ export default function AttendanceMarkingPage() {
                         <div className="text-xs text-zinc-500">{student!.student_number}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <AttendanceStatusBadge status={records[student!.id] ?? "present"} />
+                        <AttendanceStatusBadge status={records[student!.id] ?? "PRESENT"} />
                       </td>
                       <td className="px-4 py-3 text-right">
                         <select
-                          value={records[student!.id] ?? "present"}
+                          value={records[student!.id] ?? "PRESENT"}
                           onChange={(event) =>
                             setRecords((prev) => ({
                               ...prev,
