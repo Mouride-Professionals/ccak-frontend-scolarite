@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface MenuItem {
   id: string;
@@ -211,21 +211,21 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  {
-    id: "stats",
-    label: "Statistiques",
-    href: "/stats",
-    icon: (
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        />
-      </svg>
-    ),
-  },
+  // {
+  //   id: "stats",
+  //   label: "Statistiques",
+  //   href: "/stats",
+  //   icon: (
+  //     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  //       <path
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //         strokeWidth={2}
+  //         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+  //       />
+  //     </svg>
+  //   ),
+  // },
   {
     id: "calendar",
     label: "Calendrier",
@@ -350,6 +350,15 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     return pathname === href || pathname.startsWith(href + "/");
   };
 
+  useEffect(() => {
+    const activeParent = menuItems.find((item) =>
+      item.children?.some((child) => isActive(child.href))
+    );
+    if (activeParent) {
+      setExpandedItems([activeParent.id]);
+    }
+  }, [pathname]);
+
   return (
     <aside
       className={`fixed left-0 top-0 z-40 h-screen w-[230px] bg-white shadow-sm transition-transform duration-300 ease-out ${
@@ -427,7 +436,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive(item.href)
                         ? "bg-[#00365F]/10 text-[#00365F]"
-                      : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
+                        : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
                     }`}
                   >
                     {item.icon}

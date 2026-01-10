@@ -13,6 +13,9 @@ export default function StudentEvaluationsPage() {
   const [studentId, setStudentId] = useState("");
   const { data: students } = useStudents({ search: search || undefined, page: 1, limit: 15 });
   const { data: evaluations, isLoading } = useStudentEvaluations(studentId);
+  const evaluationList = Array.isArray(evaluations)
+    ? evaluations
+    : (evaluations as { data?: typeof evaluations })?.data ?? [];
 
   return (
     <ProtectedRoute>
@@ -42,11 +45,11 @@ export default function StudentEvaluationsPage() {
             {studentId ? (
               isLoading ? (
                 <p className="text-sm text-zinc-500">Chargement...</p>
-              ) : (evaluations ?? []).length === 0 ? (
+              ) : evaluationList.length === 0 ? (
                 <p className="text-sm text-zinc-500">Aucune évaluation disponible.</p>
               ) : (
                 <ul className="space-y-3">
-                  {(evaluations ?? []).map((evaluation) => (
+                  {evaluationList.map((evaluation) => (
                     <li
                       key={evaluation.id}
                       className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-200 p-4"
@@ -56,7 +59,8 @@ export default function StudentEvaluationsPage() {
                           {evaluation.course?.name ?? evaluation.course_id}
                         </div>
                         <div className="text-xs text-zinc-500">
-                          Enseignant: {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
+                          Enseignant:{" "}
+                          {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
                         </div>
                         <div className="text-xs text-zinc-500">
                           Date limite:{" "}

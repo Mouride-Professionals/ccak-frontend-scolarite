@@ -171,11 +171,13 @@ function CourseUnitsPageContent() {
           searchPlaceholder="Rechercher une unité d'enseignement..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.academicProgramId,
-            filters.type,
-            filters.isActive !== undefined ? "active" : "",
-          ].filter(Boolean).length}
+          filtersCount={
+            [
+              filters.academicProgramId,
+              filters.type,
+              filters.isActive !== undefined ? "active" : "",
+            ].filter(Boolean).length
+          }
           actionLabel="Nouvelle Unité"
           onAction={() => setIsCreateModalOpen(true)}
         />

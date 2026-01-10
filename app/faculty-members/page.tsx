@@ -76,12 +76,14 @@ export default function FacultyMembersPage() {
           searchPlaceholder="Rechercher par nom ou matricule..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.department_id,
-            filters.rank,
-            filters.contract_type,
-            statusFilter !== "" ? "status" : "",
-          ].filter(Boolean).length}
+          filtersCount={
+            [
+              filters.department_id,
+              filters.rank,
+              filters.contract_type,
+              statusFilter !== "" ? "status" : "",
+            ].filter(Boolean).length
+          }
           rightSlot={
             <>
               <button
@@ -131,7 +133,10 @@ export default function FacultyMembersPage() {
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label htmlFor="department" className="mb-2 block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="department"
+                  className="mb-2 block text-sm font-medium text-zinc-700"
+                >
                   Département
                 </label>
                 <select

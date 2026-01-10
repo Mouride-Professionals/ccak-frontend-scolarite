@@ -5,11 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
-import {
-  FacultyContractStatus,
-  FacultyContractType,
-  type FacultyContract,
-} from "@/types/academic";
+import { FacultyContractStatus, FacultyContractType, type FacultyContract } from "@/types/academic";
 
 const statusStyles: Record<FacultyContractStatus, string> = {
   [FacultyContractStatus.DRAFT]: "bg-zinc-100 text-zinc-800",

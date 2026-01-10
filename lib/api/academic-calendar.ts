@@ -2,7 +2,9 @@ import { api } from "@/lib/api-client";
 import { unwrapData } from "@/lib/api/api-response";
 import type { AcademicCalendar } from "@/types/calendar";
 
-export async function getAcademicCalendar(academicYearId?: string): Promise<AcademicCalendar | null> {
+export async function getAcademicCalendar(
+  academicYearId?: string
+): Promise<AcademicCalendar | null> {
   if (!academicYearId) return null;
   const response = await api.get(`/academic-calendar/${academicYearId}`);
   return unwrapData<AcademicCalendar>(response);
@@ -11,7 +13,10 @@ export async function getAcademicCalendar(academicYearId?: string): Promise<Acad
 export async function createAcademicCalendar(
   input: Omit<AcademicCalendar, "id">
 ): Promise<AcademicCalendar> {
-  const response = await api.post("/academic-calendar", input as unknown as Record<string, unknown>);
+  const response = await api.post(
+    "/academic-calendar",
+    input as unknown as Record<string, unknown>
+  );
   return unwrapData<AcademicCalendar>(response);
 }
 

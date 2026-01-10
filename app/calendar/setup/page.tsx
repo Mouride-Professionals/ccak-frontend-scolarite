@@ -128,13 +128,17 @@ export default function CalendarSetupPage() {
                 <input
                   type="date"
                   value={form.start_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, start_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, start_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 />
                 <input
                   type="date"
                   value={form.end_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, end_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, end_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 />
               </div>

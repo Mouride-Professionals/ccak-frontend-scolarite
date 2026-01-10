@@ -39,7 +39,8 @@ export default function EvaluationResultsPage() {
               Cours: {evaluation?.course?.name ?? evaluation?.course_id ?? "—"}
             </div>
             <div className="text-sm text-zinc-500">
-              Enseignant: {evaluation?.faculty_member?.full_name ?? evaluation?.faculty_member_id ?? "—"}
+              Enseignant:{" "}
+              {evaluation?.faculty_member?.full_name ?? evaluation?.faculty_member_id ?? "—"}
             </div>
           </div>
 
@@ -48,10 +49,14 @@ export default function EvaluationResultsPage() {
             {results?.ratings && results.ratings.length > 0 ? (
               <ul className="mt-4 space-y-3">
                 {results.ratings.map((rating, index) => (
-                  <li key={`${rating.question}-${index}`} className="rounded-lg border border-zinc-200 p-4">
+                  <li
+                    key={`${rating.question}-${index}`}
+                    className="rounded-lg border border-zinc-200 p-4"
+                  >
                     <div className="text-sm font-medium text-zinc-800">{rating.question}</div>
                     <div className="mt-2 text-sm text-zinc-500">
-                      Moyenne: <span className="font-semibold text-[#00365F]">{rating.average}</span>
+                      Moyenne:{" "}
+                      <span className="font-semibold text-[#00365F]">{rating.average}</span>
                     </div>
                   </li>
                 ))}
@@ -67,7 +72,10 @@ export default function EvaluationResultsPage() {
           {results?.comments && results.comments.length > 0 ? (
             <ul className="mt-4 space-y-3">
               {results.comments.map((comment, index) => (
-                <li key={`${comment}-${index}`} className="rounded-lg border border-zinc-200 p-4 text-sm text-zinc-600">
+                <li
+                  key={`${comment}-${index}`}
+                  className="rounded-lg border border-zinc-200 p-4 text-sm text-zinc-600"
+                >
                   {comment}
                 </li>
               ))}

@@ -274,7 +274,11 @@ export default function ScheduleCreationPage() {
                 <select
                   value={filters.academic_year_id}
                   onChange={(event) =>
-                    setFilters((prev) => ({ ...prev, academic_year_id: event.target.value, page: 1 }))
+                    setFilters((prev) => ({
+                      ...prev,
+                      academic_year_id: event.target.value,
+                      page: 1,
+                    }))
                   }
                   className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
                 >

@@ -54,9 +54,7 @@ export default function TeachingAssignmentNewPage() {
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Enseignant *
-              </label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">Enseignant *</label>
               <FacultySearch
                 onSelect={(faculty) =>
                   setForm((prev) => ({
@@ -128,9 +126,7 @@ export default function TeachingAssignmentNewPage() {
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Taux horaire
-              </label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">Taux horaire</label>
               <input
                 type="number"
                 value={form.hourlyRate}

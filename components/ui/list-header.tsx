@@ -17,12 +17,7 @@ interface ListHeaderProps {
 
 const defaultActionIcon = (
   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 4v16m8-8H4"
-    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
   </svg>
 );
 
@@ -52,9 +47,7 @@ export default function ListHeader({
       : "border-[#008D36] bg-[#008D36]/10 text-[#008D36]";
   const badgeClasses = variant === "blue" ? "bg-[#00365F]" : "bg-[#008D36]";
   const actionClasses =
-    variant === "blue"
-      ? "bg-[#00365F] hover:bg-[#00365F]/90"
-      : "bg-[#008D36] hover:bg-[#007A2E]";
+    variant === "blue" ? "bg-[#00365F] hover:bg-[#00365F]/90" : "bg-[#008D36] hover:bg-[#007A2E]";
 
   return (
     <div
@@ -63,7 +56,12 @@ export default function ListHeader({
       <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="relative w-full min-w-0 sm:flex-1">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg className="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-5 w-5 text-zinc-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -85,7 +83,9 @@ export default function ListHeader({
             type="button"
             onClick={onToggleFilters}
             className={`flex w-full items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors sm:w-auto ${
-              isFiltersOpen ? filterActiveClasses : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+              isFiltersOpen
+                ? filterActiveClasses
+                : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
             }`}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

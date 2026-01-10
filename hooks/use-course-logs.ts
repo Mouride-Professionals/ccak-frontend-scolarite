@@ -2,19 +2,19 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as courseLogApi from "@/lib/api/course-logs";
-import type { CourseLogFilters, CreateCourseLogInput, UpdateCourseLogInput } from "@/types/course-log";
+import type {
+  CourseLogFilters,
+  CreateCourseLogInput,
+  UpdateCourseLogInput,
+} from "@/types/course-log";
 
 export const courseLogKeys = {
   all: ["course-logs"] as const,
   lists: () => [...courseLogKeys.all, "list"] as const,
   list: (filters?: CourseLogFilters) => [...courseLogKeys.lists(), filters] as const,
   detail: (id: string) => [...courseLogKeys.all, "detail", id] as const,
-  course: (courseId: string, filters?: CourseLogFilters) => [
-    ...courseLogKeys.all,
-    "course",
-    courseId,
-    filters,
-  ] as const,
+  course: (courseId: string, filters?: CourseLogFilters) =>
+    [...courseLogKeys.all, "course", courseId, filters] as const,
 };
 
 export function useCourseLogs(filters?: CourseLogFilters) {

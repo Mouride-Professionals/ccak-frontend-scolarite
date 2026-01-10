@@ -1,9 +1,6 @@
 import type { AttendanceStatus } from "@/types/attendance";
 
-const statusConfig: Record<
-  AttendanceStatus,
-  { label: string; className: string }
-> = {
+const statusConfig: Record<AttendanceStatus, { label: string; className: string }> = {
   PRESENT: {
     label: "Présent",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",

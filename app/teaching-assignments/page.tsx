@@ -37,7 +37,9 @@ export default function TeachingAssignmentsPage() {
           searchPlaceholder="Rechercher un enseignant..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[filters.courseId, filters.academicYearId, filters.role].filter(Boolean).length}
+          filtersCount={
+            [filters.courseId, filters.academicYearId, filters.role].filter(Boolean).length
+          }
           rightSlot={
             <button
               type="button"

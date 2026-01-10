@@ -100,9 +100,7 @@ export default function FacultyMemberEditPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Matricule
-                </label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Matricule</label>
                 <input
                   value={formData.staff_number}
                   disabled

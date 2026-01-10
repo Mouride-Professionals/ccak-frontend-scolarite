@@ -18,10 +18,9 @@ export default function StudentSchedulePage() {
     page: 1,
     limit: 10,
   });
-  const { data: schedule, isLoading: isLoadingSchedule } = useStudentSchedule(
-    selectedStudentId,
-    { week: week || undefined }
-  );
+  const { data: schedule, isLoading: isLoadingSchedule } = useStudentSchedule(selectedStudentId, {
+    week: week || undefined,
+  });
 
   return (
     <ProtectedRoute>

@@ -20,12 +20,7 @@ export async function getActivityTypes(
   return toPaginated<ActivityType>(response);
 }
 
-export async function createActivityType(
-  input: Omit<ActivityType, "id">
-): Promise<ActivityType> {
-  const response = await api.post(
-    "/activity-types",
-    input as unknown as Record<string, unknown>
-  );
+export async function createActivityType(input: Omit<ActivityType, "id">): Promise<ActivityType> {
+  const response = await api.post("/activity-types", input as unknown as Record<string, unknown>);
   return unwrapData<ActivityType>(response);
 }

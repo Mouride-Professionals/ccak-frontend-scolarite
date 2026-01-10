@@ -146,7 +146,9 @@ export default function FacultyMemberProfilePage() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-2">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-[#00365F]">Affectations pédagogiques</h2>
+                  <h2 className="text-sm font-semibold text-[#00365F]">
+                    Affectations pédagogiques
+                  </h2>
                   <button
                     type="button"
                     onClick={() => router.push(`/faculty-members/${faculty.id}/assignments`)}
@@ -191,7 +193,6 @@ export default function FacultyMemberProfilePage() {
                 Aucun contrat enregistré.
               </div>
             </div>
-
           </div>
         )}
       </DashboardLayout>

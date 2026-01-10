@@ -91,9 +91,7 @@ export default function FacultyRegistrationPage() {
               <div key={item.id} className="flex items-center gap-2">
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
-                    item.id <= step
-                      ? "bg-[#008D36] text-white"
-                      : "bg-zinc-100 text-zinc-400"
+                    item.id <= step ? "bg-[#008D36] text-white" : "bg-zinc-100 text-zinc-400"
                   }`}
                 >
                   {item.id}
@@ -119,9 +117,7 @@ export default function FacultyRegistrationPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Email *
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Email *</label>
                   <input
                     type="email"
                     value={formData.email}
@@ -144,9 +140,7 @@ export default function FacultyRegistrationPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Adresse
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Adresse</label>
                   <input
                     value={formData.address}
                     onChange={(event) =>
@@ -212,9 +206,7 @@ export default function FacultyRegistrationPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Matricule
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Matricule</label>
                   <input
                     value="Auto-généré"
                     disabled
@@ -310,10 +302,10 @@ export default function FacultyRegistrationPage() {
                       {key === "cv"
                         ? "CV"
                         : key === "diploma"
-                        ? "Diplôme"
-                        : key === "cni"
-                        ? "CNI"
-                        : "Autre"}
+                          ? "Diplôme"
+                          : key === "cni"
+                            ? "CNI"
+                            : "Autre"}
                     </label>
                     <input
                       type="file"

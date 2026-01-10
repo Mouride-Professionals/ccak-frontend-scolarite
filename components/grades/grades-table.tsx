@@ -99,9 +99,7 @@ export default function GradesTable({ grades, onEdit, onDelete }: GradesTablePro
                   <GradeStatusBadge status={grade.status} />
                 </td>
                 <td className="hidden px-4 py-4 sm:px-6 sm:py-5 lg:table-cell">
-                  <div className="text-sm text-zinc-700">
-                    {getEnteredByLabel(grade)}
-                  </div>
+                  <div className="text-sm text-zinc-700">{getEnteredByLabel(grade)}</div>
                 </td>
                 <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 xl:table-cell">
                   {new Date(grade.entered_at).toLocaleDateString("fr-FR", {

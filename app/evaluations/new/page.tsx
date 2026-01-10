@@ -95,7 +95,9 @@ export default function EvaluationFormPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Cours</label>
                 <select
                   value={form.course_id}
-                  onChange={(event) => setForm((prev) => ({ ...prev, course_id: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, course_id: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 >
                   <option value="">Sélectionner</option>
@@ -140,9 +142,7 @@ export default function EvaluationFormPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Début
-                </label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Début</label>
                 <input
                   type="date"
                   value={form.start_date}
@@ -157,7 +157,9 @@ export default function EvaluationFormPage() {
                 <input
                   type="date"
                   value={form.end_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, end_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, end_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>

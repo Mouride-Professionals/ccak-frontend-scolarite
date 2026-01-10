@@ -42,9 +42,7 @@ export async function createSchedule(input: Omit<Schedule, "id">): Promise<Sched
   return unwrapData<Schedule>(response);
 }
 
-export async function checkAvailability(
-  input: AvailabilityRequest
-): Promise<AvailabilityResponse> {
+export async function checkAvailability(input: AvailabilityRequest): Promise<AvailabilityResponse> {
   const response = await api.post(
     "/schedules/check-availability",
     input as unknown as Record<string, unknown>
@@ -59,7 +57,9 @@ export async function getProgramSchedule(
   const params = new URLSearchParams();
   if (filters?.semester) params.append("filter[semester]", filters.semester.toString());
   if (filters?.week) params.append("filter[week]", filters.week);
-  const response = await api.get(`/programs/${programId}/schedule${params.toString() ? `?${params}` : ""}`);
+  const response = await api.get(
+    `/programs/${programId}/schedule${params.toString() ? `?${params}` : ""}`
+  );
   return unwrapData<Schedule[]>(response);
 }
 
@@ -70,7 +70,9 @@ export async function getFacultySchedule(
   const params = new URLSearchParams();
   if (filters?.week) params.append("filter[week]", filters.week);
   if (filters?.month) params.append("filter[month]", filters.month);
-  const response = await api.get(`/faculty/${facultyId}/schedule${params.toString() ? `?${params}` : ""}`);
+  const response = await api.get(
+    `/faculty/${facultyId}/schedule${params.toString() ? `?${params}` : ""}`
+  );
   return unwrapData<Schedule[]>(response);
 }
 
@@ -80,6 +82,8 @@ export async function getStudentSchedule(
 ): Promise<Schedule[]> {
   const params = new URLSearchParams();
   if (filters?.week) params.append("filter[week]", filters.week);
-  const response = await api.get(`/students/${studentId}/schedule${params.toString() ? `?${params}` : ""}`);
+  const response = await api.get(
+    `/students/${studentId}/schedule${params.toString() ? `?${params}` : ""}`
+  );
   return unwrapData<Schedule[]>(response);
 }

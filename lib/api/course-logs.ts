@@ -49,10 +49,7 @@ export async function createCourseLog(input: CreateCourseLogInput): Promise<Cour
   return unwrapData<CourseLog>(response);
 }
 
-export async function updateCourseLog(
-  id: string,
-  input: UpdateCourseLogInput
-): Promise<CourseLog> {
+export async function updateCourseLog(id: string, input: UpdateCourseLogInput): Promise<CourseLog> {
   const response = await api.put(`/course-logs/${id}`, input as unknown as Record<string, unknown>);
   return unwrapData<CourseLog>(response);
 }

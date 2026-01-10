@@ -5,18 +5,10 @@ import * as attendanceApi from "@/lib/api/attendance";
 import type { AttendanceFilters, CreateAttendanceInput } from "@/types/attendance";
 
 export const attendanceKeys = {
-  student: (studentId: string, filters?: AttendanceFilters) => [
-    "attendance",
-    "student",
-    studentId,
-    filters,
-  ] as const,
-  course: (courseId: string, filters?: AttendanceFilters) => [
-    "attendance",
-    "course",
-    courseId,
-    filters,
-  ] as const,
+  student: (studentId: string, filters?: AttendanceFilters) =>
+    ["attendance", "student", studentId, filters] as const,
+  course: (courseId: string, filters?: AttendanceFilters) =>
+    ["attendance", "course", courseId, filters] as const,
   dispensations: (studentId: string) => ["dispensations", studentId] as const,
 };
 

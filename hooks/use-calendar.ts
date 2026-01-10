@@ -50,7 +50,9 @@ export function useSaveAcademicCalendar() {
         ? calendarApi.updateAcademicCalendar(input.id, input.payload)
         : calendarApi.createAcademicCalendar(input.payload),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: calendarKeys.calendar(variables.payload.academic_year_id) });
+      queryClient.invalidateQueries({
+        queryKey: calendarKeys.calendar(variables.payload.academic_year_id),
+      });
     },
   });
 }
@@ -153,7 +155,10 @@ export function useCheckAvailability() {
   });
 }
 
-export function useProgramSchedule(programId: string, filters?: { semester?: number; week?: string }) {
+export function useProgramSchedule(
+  programId: string,
+  filters?: { semester?: number; week?: string }
+) {
   return useQuery({
     queryKey: calendarKeys.programSchedule(programId, filters),
     queryFn: () => schedulesApi.getProgramSchedule(programId, filters),

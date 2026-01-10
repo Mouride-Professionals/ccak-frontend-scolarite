@@ -29,9 +29,7 @@ export default function FacultyAssignmentsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-[#00365F]">Affectations en cours</h2>
-              <p className="text-sm text-zinc-500">
-                Liste des cours assignés à cet enseignant.
-              </p>
+              <p className="text-sm text-zinc-500">Liste des cours assignés à cet enseignant.</p>
             </div>
             <button
               type="button"

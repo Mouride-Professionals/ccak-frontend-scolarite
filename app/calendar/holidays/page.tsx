@@ -52,9 +52,7 @@ export default function HolidaysPage() {
       <DashboardLayout title="Jours fériés">
         <ListHeader
           searchValue={filters.search}
-          onSearchChange={(value) =>
-            setFilters((prev) => ({ ...prev, search: value, page: 1 }))
-          }
+          onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value, page: 1 }))}
           searchPlaceholder="Rechercher un jour férié..."
           onToggleFilters={() => {}}
           isFiltersOpen={false}

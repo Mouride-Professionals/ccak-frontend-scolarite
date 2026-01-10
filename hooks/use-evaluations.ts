@@ -2,11 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as evaluationApi from "@/lib/api/evaluations";
-import type {
-  Evaluation,
-  EvaluationFilters,
-  EvaluationResponseInput,
-} from "@/types/evaluation";
+import type { Evaluation, EvaluationFilters, EvaluationResponseInput } from "@/types/evaluation";
 
 export const evaluationKeys = {
   all: ["evaluations"] as const,

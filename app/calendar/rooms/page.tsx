@@ -56,9 +56,7 @@ export default function RoomsPage() {
       <DashboardLayout title="Salles">
         <ListHeader
           searchValue={filters.search}
-          onSearchChange={(value) =>
-            setFilters((prev) => ({ ...prev, search: value, page: 1 }))
-          }
+          onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value, page: 1 }))}
           searchPlaceholder="Rechercher une salle..."
           onToggleFilters={() => {}}
           isFiltersOpen={false}
@@ -153,7 +151,9 @@ export default function RoomsPage() {
               <input
                 placeholder="Équipement (csv)"
                 value={form.equipment}
-                onChange={(event) => setForm((prev) => ({ ...prev, equipment: event.target.value }))}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, equipment: event.target.value }))
+                }
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
               <label className="flex items-center gap-2 text-sm text-zinc-600">

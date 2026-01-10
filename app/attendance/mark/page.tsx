@@ -151,9 +151,7 @@ export default function AttendanceMarkingPage() {
           {loadingEnrollments ? (
             <p className="mt-4 text-sm text-zinc-500">Chargement...</p>
           ) : students.length === 0 ? (
-            <p className="mt-4 text-sm text-zinc-500">
-              Aucun étudiant inscrit pour ce cours.
-            </p>
+            <p className="mt-4 text-sm text-zinc-500">Aucun étudiant inscrit pour ce cours.</p>
           ) : (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-sm">

@@ -25,11 +25,19 @@ export default function ScheduleGrid({
   emptyMessage = "Aucune séance disponible.",
 }: ScheduleGridProps) {
   if (isLoading) {
-    return <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">Chargement...</div>;
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+        Chargement...
+      </div>
+    );
   }
 
   if (!schedules.length) {
-    return <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">{emptyMessage}</div>;
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+        {emptyMessage}
+      </div>
+    );
   }
 
   return (

@@ -86,7 +86,12 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
             className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white p-2 text-[#00365F] shadow-sm transition hover:bg-zinc-50 md:hidden"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
           <h1 className="text-lg font-semibold text-[#00365F] md:text-2xl">{title}</h1>

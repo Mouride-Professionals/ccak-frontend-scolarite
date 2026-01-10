@@ -96,7 +96,7 @@ export default function StudentAttendancePage() {
                   <tbody className="divide-y divide-zinc-100">
                     {(attendance?.data ?? []).map((record) => (
                       <tr key={record.id}>
-                        <td className="px-4 py-3">{record.course?.name ?? record.course_id}</td>
+                        <td className="px-4 py-3">{record.course?.name ?? record.course?.id}</td>
                         <td className="px-4 py-3">
                           {record.marked_at
                             ? new Date(record.marked_at).toLocaleDateString("fr-FR")

@@ -71,10 +71,9 @@ export default function NotificationsPage() {
           searchPlaceholder="Rechercher une notification..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.type,
-            filters.is_read !== undefined ? "read" : "",
-          ].filter(Boolean).length}
+          filtersCount={
+            [filters.type, filters.is_read !== undefined ? "read" : ""].filter(Boolean).length
+          }
           actionLabel="Nouvelle notification"
           onAction={() => setIsModalOpen(true)}
         />

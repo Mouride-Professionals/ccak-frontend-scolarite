@@ -297,7 +297,10 @@ export default function GradeDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Saisi par</p>
                 <p className="mt-1 text-sm text-zinc-900">
-                  {grade.entered_by_user?.full_name || grade.entered_by}
+                  {grade.entered_by_user?.full_name ||
+                    (typeof grade.entered_by === "string"
+                      ? grade.entered_by
+                      : grade.entered_by?.full_name || grade.entered_by?.email || "—")}
                 </p>
               </div>
               <div>

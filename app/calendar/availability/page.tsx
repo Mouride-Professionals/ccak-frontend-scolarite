@@ -61,7 +61,9 @@ export default function AvailabilityPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Salle</label>
                 <select
                   value={form.room_id}
-                  onChange={(event) => setForm((prev) => ({ ...prev, room_id: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, room_id: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 >
                   <option value="">Toutes les salles</option>

@@ -132,10 +132,10 @@ export default function AnnouncementsPage() {
             searchPlaceholder="Rechercher une annonce..."
             onToggleFilters={() => setShowFilters(!showFilters)}
             isFiltersOpen={showFilters}
-            filtersCount={[
-              filters.priority,
-              filters.is_draft !== undefined ? "draft" : "",
-            ].filter(Boolean).length}
+            filtersCount={
+              [filters.priority, filters.is_draft !== undefined ? "draft" : ""].filter(Boolean)
+                .length
+            }
             actionLabel="Nouvelle annonce"
             onAction={handleNewClick}
           />

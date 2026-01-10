@@ -97,7 +97,7 @@ const typeConfig: Record<
     textColor: "text-teal-700",
     borderColor: "border-teal-200",
   },
-  };
+};
 
 const defaultConfig = {
   label: "Document",

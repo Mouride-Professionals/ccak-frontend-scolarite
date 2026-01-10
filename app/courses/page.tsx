@@ -160,10 +160,11 @@ function CoursesPageContent() {
           searchPlaceholder="Rechercher un cours..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.course_unit_id,
-            filters.is_active !== undefined ? "active" : "",
-          ].filter(Boolean).length}
+          filtersCount={
+            [filters.course_unit_id, filters.is_active !== undefined ? "active" : ""].filter(
+              Boolean
+            ).length
+          }
           actionLabel="Nouveau Cours"
           onAction={() => setIsCreateModalOpen(true)}
         />

@@ -9,11 +9,7 @@ import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { useCourses } from "@/hooks/use-courses";
-import {
-  useDeleteEvaluation,
-  useEvaluations,
-  useShareEvaluation,
-} from "@/hooks/use-evaluations";
+import { useDeleteEvaluation, useEvaluations, useShareEvaluation } from "@/hooks/use-evaluations";
 
 export default function EvaluationsManagementPage() {
   const [filters, setFilters] = useState({

@@ -71,12 +71,21 @@ export default function CourseLogHistoryPage() {
       await updateLog.mutateAsync({
         id: editingLog.id,
         input: {
-          topics: editForm.topics.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean),
+          topics: editForm.topics
+            .split(/\n|,/)
+            .map((entry) => entry.trim())
+            .filter(Boolean),
           chapters: editForm.chapters
-            ? editForm.chapters.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean)
+            ? editForm.chapters
+                .split(/\n|,/)
+                .map((entry) => entry.trim())
+                .filter(Boolean)
             : undefined,
           objectives: editForm.objectives
-            ? editForm.objectives.split(/\n|,/).map((entry) => entry.trim()).filter(Boolean)
+            ? editForm.objectives
+                .split(/\n|,/)
+                .map((entry) => entry.trim())
+                .filter(Boolean)
             : undefined,
           notes: editForm.notes || undefined,
         },
@@ -223,9 +232,7 @@ export default function CourseLogHistoryPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Chapitres
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Chapitres</label>
                   <input
                     value={editForm.chapters}
                     onChange={(event) =>
@@ -235,9 +242,7 @@ export default function CourseLogHistoryPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Objectifs
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Objectifs</label>
                   <textarea
                     value={editForm.objectives}
                     onChange={(event) =>

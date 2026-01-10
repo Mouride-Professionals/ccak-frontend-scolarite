@@ -5,11 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
-import {
-  FacultyDocumentStatus,
-  FacultyDocumentType,
-  type FacultyDocument,
-} from "@/types/academic";
+import { FacultyDocumentStatus, FacultyDocumentType, type FacultyDocument } from "@/types/academic";
 
 const statusStyles: Record<FacultyDocumentStatus, string> = {
   [FacultyDocumentStatus.PENDING]: "bg-amber-100 text-amber-800",
@@ -134,9 +130,7 @@ export default function FacultyDocumentsPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Type</label>
                   <select
                     value={selectedType}
-                    onChange={(event) =>
-                      setSelectedType(event.target.value as FacultyDocumentType)
-                    }
+                    onChange={(event) => setSelectedType(event.target.value as FacultyDocumentType)}
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                   >
                     {Object.values(FacultyDocumentType).map((type) => (

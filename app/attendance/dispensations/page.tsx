@@ -46,7 +46,10 @@ export default function DispensationsPage() {
               ) : (
                 <ul className="space-y-3">
                   {(dispensations ?? []).map((dispensation) => (
-                    <li key={dispensation.course_id} className="rounded-lg border border-zinc-200 p-4">
+                    <li
+                      key={dispensation.course_id}
+                      className="rounded-lg border border-zinc-200 p-4"
+                    >
                       <div className="text-sm font-semibold text-[#00365F]">
                         {dispensation.course_name ?? dispensation.course_id}
                       </div>

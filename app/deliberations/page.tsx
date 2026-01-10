@@ -165,12 +165,14 @@ export default function DeliberationsPage() {
           searchPlaceholder="Rechercher une session..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.status,
-            filters.semester,
-            filters.academic_year_id,
-            filters.academic_program_id,
-          ].filter(Boolean).length}
+          filtersCount={
+            [
+              filters.status,
+              filters.semester,
+              filters.academic_year_id,
+              filters.academic_program_id,
+            ].filter(Boolean).length
+          }
           actionLabel="Nouvelle Session"
           onAction={() => setIsCreateModalOpen(true)}
         />

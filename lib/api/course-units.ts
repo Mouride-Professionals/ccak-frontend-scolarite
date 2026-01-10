@@ -52,9 +52,7 @@ const mapCourseUnitInput = (input: CreateCourseUnitInput | UpdateCourseUnitInput
   is_active: input.isActive ?? true,
 });
 
-export const getCourseUnits = async (
-  filters?: CourseUnitFilters
-): Promise<CourseUnitsResponse> => {
+export const getCourseUnits = async (filters?: CourseUnitFilters): Promise<CourseUnitsResponse> => {
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
   if (filters?.limit) params.append("per_page", filters.limit.toString());

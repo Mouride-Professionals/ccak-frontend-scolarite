@@ -177,12 +177,14 @@ export default function EnrollmentsPage() {
           searchPlaceholder="Rechercher un enrollement..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.status,
-            filters.current_semester,
-            filters.academic_year_id,
-            filters.academic_program_id,
-          ].filter(Boolean).length}
+          filtersCount={
+            [
+              filters.status,
+              filters.current_semester,
+              filters.academic_year_id,
+              filters.academic_program_id,
+            ].filter(Boolean).length
+          }
           actionLabel="Nouvel Enrollement"
           onAction={() => setIsCreateModalOpen(true)}
         />

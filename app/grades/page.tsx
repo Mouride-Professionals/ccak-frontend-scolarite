@@ -159,7 +159,9 @@ export default function GradesPage() {
           searchPlaceholder="Rechercher une note..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[filters.status, filters.course_id, filters.student_id].filter(Boolean).length}
+          filtersCount={
+            [filters.status, filters.course_id, filters.student_id].filter(Boolean).length
+          }
           actionLabel="Nouvelle Note"
           onAction={() => setIsCreateModalOpen(true)}
         />

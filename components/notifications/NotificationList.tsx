@@ -22,9 +22,7 @@ interface NotificationListProps {
 
 const NotificationList = ({ className = "" }: NotificationListProps) => {
   return (
-    <div
-      className={`rounded-lg border border-gray-100 bg-white p-4 shadow-xl ${className}`}
-    >
+    <div className={`rounded-lg border border-gray-100 bg-white p-4 shadow-xl ${className}`}>
       {notifications.map((notif, index) => (
         <NotificationItem
           key={notif.id}

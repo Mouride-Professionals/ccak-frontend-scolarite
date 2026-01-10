@@ -119,7 +119,7 @@ export default function StudentDocumentsPage() {
             </div>
           ) : (
             <DocumentTable
-              documents={documents || []}
+              documents={documents?.data ?? []}
               onDownload={handleDownload}
               onIssue={handleIssue}
               onRevoke={handleRevoke}

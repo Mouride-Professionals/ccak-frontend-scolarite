@@ -171,11 +171,13 @@ function ProgrammesPageContent() {
           searchPlaceholder="Rechercher un programme..."
           onToggleFilters={() => setShowFilters(!showFilters)}
           isFiltersOpen={showFilters}
-          filtersCount={[
-            filters.department_id,
-            filters.level,
-            filters.is_active !== undefined ? "active" : "",
-          ].filter(Boolean).length}
+          filtersCount={
+            [
+              filters.department_id,
+              filters.level,
+              filters.is_active !== undefined ? "active" : "",
+            ].filter(Boolean).length
+          }
           actionLabel="Nouveau Programme"
           onAction={() => setIsCreateModalOpen(true)}
         />

@@ -25,7 +25,7 @@ export default function EvaluationResponsePage() {
 
   const questions = useMemo(() => evaluation?.question_template ?? [], [evaluation]);
 
-  const handleAnswerChange = (index: number, value: number | string) => {
+  const handleAnswerChange = (index: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [index]: value }));
   };
 
