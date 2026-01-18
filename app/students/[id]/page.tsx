@@ -160,11 +160,11 @@ export default function StudentDetailPage() {
     }
   };
 
-  const handleRejectDocument = async (documentId: string, notes: string) => {
+  const handleRejectDocument = async (documentId: string, reason: string) => {
     try {
       await rejectDocumentMutation.mutateAsync({
         id: documentId,
-        notes,
+        reason,
       });
       setToast({
         isOpen: true,

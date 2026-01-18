@@ -125,8 +125,8 @@ export function useRejectDocument() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, notes }: { id: string; notes: string }) =>
-      documentsApi.rejectDocument(id, notes),
+    mutationFn: ({ id, reason, notes }: { id: string; reason: string; notes?: string }) =>
+      documentsApi.rejectDocument(id, reason, notes),
     onSuccess: (data) => {
       queryClient.setQueryData(documentKeys.detail(data.id), data);
       queryClient.invalidateQueries({ queryKey: documentKeys.list(data.student_id) });

@@ -17,7 +17,7 @@ import { DocumentStatus } from "@/types/student";
  * Get all documents for a student
  */
 export async function getDocuments(studentId: string): Promise<Document[]> {
-  const response = await api.get(`/students/${studentId}/documents`);
+  const response = await api.get(`/documents/student/${studentId}`);
   return toPaginated<Document>(response).data;
 }
 
@@ -34,10 +34,12 @@ export async function getDocument(id: string): Promise<Document> {
  */
 export async function createDocument(input: CreateDocumentInput): Promise<Document> {
   const formData = new FormData();
-  formData.append("document", input.document);
+  formData.append("document_file", input.document);
   formData.append("type", input.type);
+  formData.append("student_id", input.student_id);
+  if (input.notes) formData.append("notes", input.notes);
 
-  const response = await api.post(`/students/${input.student_id}/documents`, formData, {
+  const response = await api.post(`/documents`, formData, {
     headers: {},
   });
   return unwrapData<Document>(response);
@@ -62,8 +64,7 @@ export async function deleteDocument(id: string): Promise<void> {
  * Approve a document
  */
 export async function approveDocument(id: string, notes?: string): Promise<Document> {
-  const response = await api.put(`/documents/${id}/review`, {
-    status: DocumentStatus.APPROVED,
+  const response = await api.post(`/documents/${id}/approve`, {
     notes: notes ?? null,
   });
   return unwrapData<Document>(response);
@@ -72,10 +73,14 @@ export async function approveDocument(id: string, notes?: string): Promise<Docum
 /**
  * Reject a document
  */
-export async function rejectDocument(id: string, notes: string): Promise<Document> {
-  const response = await api.put(`/documents/${id}/review`, {
-    status: DocumentStatus.REJECTED,
-    notes,
+export async function rejectDocument(
+  id: string,
+  reason: string,
+  notes?: string
+): Promise<Document> {
+  const response = await api.post(`/documents/${id}/reject`, {
+    reason,
+    notes: notes ?? null,
   });
   return unwrapData<Document>(response);
 }

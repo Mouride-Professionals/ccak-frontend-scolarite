@@ -191,13 +191,13 @@ export interface GuardiansResponse {
 // =====================
 
 export enum DocumentType {
+  ATTESTATION = "ATTESTATION",
   CNI = "CNI",
   BIRTH_CERT = "BIRTH_CERT",
   BAC_DIPLOMA = "BAC_DIPLOMA",
   TRANSCRIPT = "TRANSCRIPT",
   PHOTO = "PHOTO",
   MEDICAL = "MEDICAL",
-  OTHER = "OTHER",
 }
 
 export enum DocumentStatus {
@@ -231,6 +231,7 @@ export interface CreateDocumentInput {
   student_id: string;
   type: DocumentType;
   document: File;
+  notes?: string;
   [key: string]: unknown;
 }
 

@@ -15,7 +15,7 @@ export default function StudentEvaluationsPage() {
   const { data: evaluations, isLoading } = useStudentEvaluations(studentId);
   const evaluationList = Array.isArray(evaluations)
     ? evaluations
-    : (evaluations as { data?: typeof evaluations })?.data ?? [];
+    : ((evaluations as unknown as { data?: typeof evaluations })?.data ?? []);
 
   return (
     <ProtectedRoute>
