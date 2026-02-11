@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -19,18 +19,18 @@ import {
   useCreateAcademicProgram,
   useDepartments,
 } from "@/hooks/use-academic";
-import type { AcademicProgram } from "@/types/academic";
 import { AcademicLevel } from "@/types/academic";
 import type { CreateProgrammeInput, AcademicProgramFilters } from "@/types/programme";
 
 function ProgrammesPageContent() {
   const searchParams = useSearchParams();
+  const queryEditId = searchParams.get("edit");
   const [filters, setFilters] = useState<AcademicProgramFilters>({
     page: 1,
     limit: 10,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editProgrammeId, setEditProgrammeId] = useState<string | null>(null);
+  const [editProgrammeId, setEditProgrammeId] = useState<string | null>(queryEditId);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -50,7 +50,6 @@ function ProgrammesPageContent() {
     type: "success",
   });
 
-  // TODO: Implement hooks
   const { data, isLoading, error } = useAcademicPrograms(filters);
   const { data: programmeToEdit } = useAcademicProgram(editProgrammeId || "", !!editProgrammeId);
   const deleteMutation = useDeleteAcademicProgram();
@@ -59,14 +58,6 @@ function ProgrammesPageContent() {
 
   // Load form data
   const { data: departments, isLoading: loadingDepartments } = useDepartments();
-
-  // Check for edit parameter in URL
-  useEffect(() => {
-    const editId = searchParams.get("edit");
-    if (editId) {
-      setEditProgrammeId(editId);
-    }
-  }, [searchParams]);
 
   const handleEditClick = (id: string) => {
     setEditProgrammeId(id);
@@ -210,12 +201,12 @@ function ProgrammesPageContent() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les départements</option>
-                  {/* TODO: Map departments */}
-                  {/* {departments?.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </option>
-                  ))} */}
+                  {Array.isArray(departments) &&
+                    departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
                 </select>
               </div>
 

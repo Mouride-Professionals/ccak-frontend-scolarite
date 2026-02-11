@@ -6,7 +6,7 @@ import * as holidaysApi from "@/lib/api/holidays";
 import * as roomsApi from "@/lib/api/rooms";
 import * as activityTypesApi from "@/lib/api/activity-types";
 import * as schedulesApi from "@/lib/api/schedules";
-import type { AcademicCalendar, Holiday, Room } from "@/types/calendar";
+import type { AcademicCalendar, Holiday, Room, Schedule } from "@/types/calendar";
 import type { HolidayFilters } from "@/lib/api/holidays";
 import type { RoomFilters } from "@/lib/api/rooms";
 import type { ActivityTypeFilters } from "@/lib/api/activity-types";
@@ -138,6 +138,15 @@ export function useCreateSchedule() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: schedulesApi.createSchedule,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["schedules"] }),
+  });
+}
+
+export function useUpdateSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: Partial<Schedule> }) =>
+      schedulesApi.updateSchedule(id, input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["schedules"] }),
   });
 }

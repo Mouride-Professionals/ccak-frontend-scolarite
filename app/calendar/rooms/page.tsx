@@ -6,7 +6,16 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
-import { useCreateRoom, useDeleteRoom, useRooms } from "@/hooks/use-calendar";
+import { useCreateRoom, useDeleteRoom, useRooms, useUpdateRoom } from "@/hooks/use-calendar";
+
+const equipmentOptions = [
+  "Projecteur",
+  "Tableau interactif",
+  "Ordinateurs",
+  "Climatisation",
+  "Sonorisation",
+  "Laboratoire",
+];
 
 export default function RoomsPage() {
   const [filters, setFilters] = useState({
@@ -19,7 +28,10 @@ export default function RoomsPage() {
   });
   const { data, isLoading } = useRooms(filters);
   const createRoom = useCreateRoom();
+  const updateRoom = useUpdateRoom();
   const deleteRoom = useDeleteRoom();
+
+  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
   const [toast, setToast] = useState({
     isOpen: false,
     message: "",
@@ -31,23 +43,58 @@ export default function RoomsPage() {
     building: "",
     capacity: "",
     type: "",
-    equipment: "",
+    equipment: [] as string[],
     is_available: true,
   });
 
-  const handleCreate = async () => {
-    try {
-      await createRoom.mutateAsync({
-        name: form.name,
-        building: form.building,
-        capacity: Number(form.capacity || 0),
-        type: form.type,
-        equipment: form.equipment ? form.equipment.split(",").map((item) => item.trim()) : [],
-        is_available: form.is_available,
+  const toggleEquipment = (item: string) => {
+    setForm((prev) => ({
+      ...prev,
+      equipment: prev.equipment.includes(item)
+        ? prev.equipment.filter((entry) => entry !== item)
+        : [...prev.equipment, item],
+    }));
+  };
+
+  const handleCreateOrUpdate = async () => {
+    if (!form.name || !form.type || !form.capacity) {
+      setToast({
+        isOpen: true,
+        message: "Nom, type et capacité sont requis.",
+        type: "error",
       });
-      setToast({ isOpen: true, message: "Salle ajoutée.", type: "success" });
+      return;
+    }
+
+    const payload = {
+      name: form.name,
+      building: form.building,
+      capacity: Number(form.capacity || 0),
+      type: form.type,
+      equipment: form.equipment,
+      is_available: form.is_available,
+    };
+
+    try {
+      if (editingRoomId) {
+        await updateRoom.mutateAsync({ id: editingRoomId, input: payload });
+        setToast({ isOpen: true, message: "Salle modifiée.", type: "success" });
+      } else {
+        await createRoom.mutateAsync(payload);
+        setToast({ isOpen: true, message: "Salle ajoutée.", type: "success" });
+      }
+
+      setEditingRoomId(null);
+      setForm({
+        name: "",
+        building: "",
+        capacity: "",
+        type: "",
+        equipment: [],
+        is_available: true,
+      });
     } catch {
-      setToast({ isOpen: true, message: "Erreur lors de l'ajout.", type: "error" });
+      setToast({ isOpen: true, message: "Erreur lors de l'enregistrement.", type: "error" });
     }
   };
 
@@ -58,9 +105,28 @@ export default function RoomsPage() {
           searchValue={filters.search}
           onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value, page: 1 }))}
           searchPlaceholder="Rechercher une salle..."
-          onToggleFilters={() => {}}
-          isFiltersOpen={false}
-          filtersCount={0}
+          rightSlot={
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={filters.is_available === undefined ? "" : String(filters.is_available)}
+                onChange={(event) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    is_available:
+                      event.target.value === ""
+                        ? undefined
+                        : event.target.value === "true",
+                    page: 1,
+                  }))
+                }
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Toutes</option>
+                <option value="true">Disponibles</option>
+                <option value="false">Indisponibles</option>
+              </select>
+            </div>
+          }
         />
 
         <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -81,6 +147,12 @@ export default function RoomsPage() {
                       <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                         Capacité
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                        Équipements
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                        Disponibilité
+                      </th>
                       <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                         Actions
                       </th>
@@ -89,17 +161,70 @@ export default function RoomsPage() {
                   <tbody className="divide-y divide-zinc-100">
                     {(data?.data ?? []).map((room) => (
                       <tr key={room.id}>
-                        <td className="px-4 py-3">{room.name}</td>
+                        <td className="px-4 py-3">
+                          <div className="font-medium text-zinc-800">{room.name}</div>
+                          <div className="text-xs text-zinc-500">{room.type}</div>
+                        </td>
                         <td className="px-4 py-3">{room.building || "—"}</td>
                         <td className="px-4 py-3">{room.capacity}</td>
-                        <td className="px-4 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => deleteRoom.mutate(room.id)}
-                            className="text-sm text-red-500 hover:text-red-600"
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {(room.equipment || []).slice(0, 3).map((item) => (
+                              <span
+                                key={`${room.id}-${item}`}
+                                className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600"
+                              >
+                                {item}
+                              </span>
+                            ))}
+                            {(room.equipment || []).length > 3 && (
+                              <span className="text-xs text-zinc-500">+{(room.equipment || []).length - 3}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                              room.is_available
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-rose-100 text-rose-700"
+                            }`}
                           >
-                            Supprimer
-                          </button>
+                            <span
+                              className={`mr-1 inline-block h-1.5 w-1.5 rounded-full ${
+                                room.is_available ? "bg-emerald-600" : "bg-rose-600"
+                              }`}
+                            />
+                            {room.is_available ? "Disponible" : "Indisponible"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingRoomId(room.id);
+                                setForm({
+                                  name: room.name,
+                                  building: room.building || "",
+                                  capacity: String(room.capacity),
+                                  type: room.type,
+                                  equipment: room.equipment || [],
+                                  is_available: room.is_available,
+                                });
+                              }}
+                              className="text-sm font-medium text-[#00365F]"
+                            >
+                              Modifier
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteRoom.mutate(room.id)}
+                              className="text-sm font-medium text-red-500"
+                            >
+                              Supprimer
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -121,7 +246,9 @@ export default function RoomsPage() {
           </div>
 
           <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-[#00365F]">Ajouter une salle</h2>
+            <h2 className="text-sm font-semibold text-[#00365F]">
+              {editingRoomId ? "Modifier la salle" : "Ajouter une salle"}
+            </h2>
             <div className="mt-4 space-y-4">
               <input
                 placeholder="Nom de la salle"
@@ -148,14 +275,23 @@ export default function RoomsPage() {
                 onChange={(event) => setForm((prev) => ({ ...prev, type: event.target.value }))}
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-              <input
-                placeholder="Équipement (csv)"
-                value={form.equipment}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, equipment: event.target.value }))
-                }
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-              />
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Équipements</label>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {equipmentOptions.map((item) => (
+                    <label key={item} className="flex items-center gap-2 text-sm text-zinc-700">
+                      <input
+                        type="checkbox"
+                        checked={form.equipment.includes(item)}
+                        onChange={() => toggleEquipment(item)}
+                      />
+                      {item}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <label className="flex items-center gap-2 text-sm text-zinc-600">
                 <input
                   type="checkbox"
@@ -166,13 +302,35 @@ export default function RoomsPage() {
                 />
                 Disponible
               </label>
-              <button
-                type="button"
-                onClick={handleCreate}
-                className="w-full rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white"
-              >
-                Ajouter
-              </button>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCreateOrUpdate}
+                  className="flex-1 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white"
+                >
+                  {editingRoomId ? "Enregistrer" : "Ajouter"}
+                </button>
+                {editingRoomId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingRoomId(null);
+                      setForm({
+                        name: "",
+                        building: "",
+                        capacity: "",
+                        type: "",
+                        equipment: [],
+                        is_available: true,
+                      });
+                    }}
+                    className="rounded-lg border border-zinc-300 px-4 py-2 text-sm"
+                  >
+                    Annuler
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

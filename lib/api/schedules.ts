@@ -42,6 +42,15 @@ export async function createSchedule(input: Omit<Schedule, "id">): Promise<Sched
   return unwrapData<Schedule>(response);
 }
 
+export async function updateSchedule(id: string, input: Partial<Schedule>): Promise<Schedule> {
+  const response = await api.put(`/schedules/${id}`, input as unknown as Record<string, unknown>);
+  return unwrapData<Schedule>(response);
+}
+
+export async function deleteSchedule(id: string): Promise<void> {
+  await api.del(`/schedules/${id}`);
+}
+
 export async function checkAvailability(input: AvailabilityRequest): Promise<AvailabilityResponse> {
   const response = await api.post(
     "/schedules/check-availability",
