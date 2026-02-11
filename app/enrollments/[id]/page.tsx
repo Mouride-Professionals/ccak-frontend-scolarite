@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -12,7 +13,7 @@ import { useEnrollment, useDeleteEnrollment } from "@/hooks/use-enrollments";
 
 export default function EnrollmentDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const enrollmentId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);

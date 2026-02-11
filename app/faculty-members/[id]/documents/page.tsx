@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
@@ -14,7 +15,7 @@ const statusStyles: Record<FacultyDocumentStatus, string> = {
 };
 
 export default function FacultyDocumentsPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
 

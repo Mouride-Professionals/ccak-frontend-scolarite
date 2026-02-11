@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
 import { useCreateEvaluationResponse, useEvaluation } from "@/hooks/use-evaluations";
 
 export default function EvaluationResponsePage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const evaluationId = typeof params.id === "string" ? params.id : "";
   const { data: evaluation, isLoading } = useEvaluation(evaluationId, !!evaluationId);
   const createResponse = useCreateEvaluationResponse();

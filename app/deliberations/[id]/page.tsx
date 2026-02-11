@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,7 +19,7 @@ import { DeliberationStatus } from "@/types/deliberation";
 
 export default function DeliberationDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const sessionId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);

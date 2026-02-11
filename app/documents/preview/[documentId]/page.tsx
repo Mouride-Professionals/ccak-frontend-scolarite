@@ -1,12 +1,13 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import PdfViewer from "@/components/documents/pdf-viewer";
 import * as documentsApi from "@/lib/api/documents-genarate";
 
 export default function DocumentPreviewPage() {
-  const params = useParams();
+  const params = useSafeParams<{ documentId: string }>();
   const router = useRouter();
   const documentId = params.documentId as string;
 

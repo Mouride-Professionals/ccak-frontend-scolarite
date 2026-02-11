@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import CourseForm from "@/components/courses/course-form";
@@ -9,7 +10,7 @@ import type { CreateCourseInput } from "@/types/course";
 
 export default function EditCoursePage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const courseId = params.id as string;
 
   const { data: course, isLoading: loadingCourse } = useCourse(courseId);

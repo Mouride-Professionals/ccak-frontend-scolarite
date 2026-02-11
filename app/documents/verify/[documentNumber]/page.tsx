@@ -1,13 +1,13 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useState } from "react";
 import { useVerifyDocument } from "@/hooks/use-documents-generate";
 import DocumentTypeBadge from "@/components/documents/document-type-badge";
 import DocumentStatusBadge from "@/components/documents/document-status-badge";
 
 export default function VerifyDocumentPage() {
-  const params = useParams();
+  const params = useSafeParams<{ documentNumber: string }>();
   const documentNumber = params.documentNumber as string;
   const [studentId, setStudentId] = useState<string>("");
 

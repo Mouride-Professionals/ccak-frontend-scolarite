@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { Student, Course, EvaluationTypeOption, CreateGradeInput } from "@/types/grade";
 import { GradeStatus } from "@/types/grade";
+import { GradeSchema, type GradeFormData } from "@/lib/validations/schemas";
+import { toUserError } from "@/lib/error-handler";
 
 interface GradeFormProps {
   onSubmit: (data: CreateGradeInput) => Promise<void>;
@@ -23,102 +26,45 @@ export default function GradeForm({
   isLoading = false,
   initialData,
 }: GradeFormProps) {
-  const [formData, setFormData] = useState<CreateGradeInput>({
-    student_id: initialData?.student_id || "",
-    course_id: initialData?.course_id || "",
-    type: initialData?.type || "",
-    score: initialData?.score || 0,
-    max_score: initialData?.max_score || 20,
-    weight: initialData?.weight || 1,
-    status: initialData?.status || GradeStatus.DRAFT,
-    comments: initialData?.comments || "",
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<GradeFormData>({
+    resolver: zodResolver(GradeSchema),
+    defaultValues: {
+      student_id: initialData?.student_id || "",
+      course_id: initialData?.course_id || "",
+      type: initialData?.type || "",
+      score: initialData?.score || 0,
+      max_score: initialData?.max_score || 20,
+      weight: initialData?.weight || 1,
+      status: initialData?.status || GradeStatus.DRAFT,
+      comments: initialData?.comments || "",
+    },
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        student_id: initialData.student_id || "",
-        course_id: initialData.course_id || "",
-        type: initialData.type || "",
-        score: initialData.score || 0,
-        max_score: initialData.max_score || 20,
-        weight: initialData.weight || 1,
-        status: initialData.status || GradeStatus.DRAFT,
-        comments: initialData.comments || "",
-      });
-    }
-  }, [initialData]);
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.student_id) {
-      newErrors.student_id = "Veuillez sélectionner un étudiant";
-    }
-    if (!formData.course_id) {
-      newErrors.course_id = "Veuillez sélectionner un cours";
-    }
-    if (!formData.type) {
-      newErrors.type = "Veuillez sélectionner un type d'évaluation";
-    }
-    if (formData.score < 0) {
-      newErrors.score = "La note ne peut pas être négative";
-    }
-    if (formData.score > formData.max_score) {
-      newErrors.score = "La note ne peut pas dépasser la note maximale";
-    }
-    if (formData.max_score <= 0) {
-      newErrors.max_score = "La note maximale doit être positive";
-    }
-    if (formData.weight <= 0 || formData.weight > 1) {
-      newErrors.weight = "Le coefficient doit être entre 0 et 1";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    await onSubmit(formData);
-  };
-
-  const handleChange = (field: keyof CreateGradeInput, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+  const handleFormSubmit = async (data: GradeFormData) => {
+    try {
+      await onSubmit(data as CreateGradeInput);
+    } catch (error) {
+      const userError = toUserError(error);
+      console.error("Form submission error:", userError.message);
     }
   };
 
   const handleEvaluationTypeChange = (typeCode: string) => {
     const selectedType = evaluationTypes.find((t) => t.code === typeCode);
-    setFormData((prev) => ({
-      ...prev,
-      type: typeCode,
-      weight: selectedType?.default_weight || prev.weight,
-    }));
-    if (errors.type) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.type;
-        return newErrors;
-      });
+    setValue("type", typeCode);
+    if (selectedType?.default_weight) {
+      setValue("weight", selectedType.default_weight);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       {/* INFORMATIONS GÉNÉRALES */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
@@ -132,8 +78,7 @@ export default function GradeForm({
             </label>
             <select
               id="student"
-              value={formData.student_id}
-              onChange={(e) => handleChange("student_id", e.target.value)}
+              {...register("student_id")}
               className={`block w-full appearance-none rounded-md border ${
                 errors.student_id ? "border-red-300" : "border-zinc-300"
               } bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
@@ -147,7 +92,7 @@ export default function GradeForm({
               ))}
             </select>
             {errors.student_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.student_id}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.student_id.message}</p>
             )}
           </div>
 
@@ -158,8 +103,7 @@ export default function GradeForm({
             </label>
             <select
               id="course"
-              value={formData.course_id}
-              onChange={(e) => handleChange("course_id", e.target.value)}
+              {...register("course_id")}
               className={`block w-full appearance-none rounded-md border ${
                 errors.course_id ? "border-red-300" : "border-zinc-300"
               } bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
@@ -172,7 +116,7 @@ export default function GradeForm({
                 </option>
               ))}
             </select>
-            {errors.course_id && <p className="mt-1.5 text-xs text-red-600">{errors.course_id}</p>}
+            {errors.course_id && <p className="mt-1.5 text-xs text-red-600">{errors.course_id.message}</p>}
           </div>
 
           {/* Evaluation Type */}
@@ -182,7 +126,7 @@ export default function GradeForm({
             </label>
             <select
               id="type"
-              value={formData.type}
+              {...register("type")}
               onChange={(e) => handleEvaluationTypeChange(e.target.value)}
               className={`block w-full appearance-none rounded-md border ${
                 errors.type ? "border-red-300" : "border-zinc-300"
@@ -196,7 +140,7 @@ export default function GradeForm({
                 </option>
               ))}
             </select>
-            {errors.type && <p className="mt-1.5 text-xs text-red-600">{errors.type}</p>}
+            {errors.type && <p className="mt-1.5 text-xs text-red-600">{errors.type.message}</p>}
           </div>
         </div>
       </div>
@@ -213,8 +157,7 @@ export default function GradeForm({
             <input
               type="number"
               id="score"
-              value={formData.score}
-              onChange={(e) => handleChange("score", parseFloat(e.target.value) || 0)}
+              {...register("score", { valueAsNumber: true })}
               min="0"
               step="0.5"
               placeholder="0"
@@ -223,7 +166,7 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.score && <p className="mt-1.5 text-xs text-red-600">{errors.score}</p>}
+            {errors.score && <p className="mt-1.5 text-xs text-red-600">{errors.score.message}</p>}
           </div>
 
           {/* Max Score */}
@@ -234,8 +177,7 @@ export default function GradeForm({
             <input
               type="number"
               id="max_score"
-              value={formData.max_score}
-              onChange={(e) => handleChange("max_score", parseFloat(e.target.value) || 20)}
+              {...register("max_score", { valueAsNumber: true })}
               min="1"
               step="0.5"
               placeholder="20"
@@ -244,7 +186,7 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.max_score && <p className="mt-1.5 text-xs text-red-600">{errors.max_score}</p>}
+            {errors.max_score && <p className="mt-1.5 text-xs text-red-600">{errors.max_score.message}</p>}
           </div>
 
           {/* Weight */}
@@ -255,8 +197,7 @@ export default function GradeForm({
             <input
               type="number"
               id="weight"
-              value={formData.weight}
-              onChange={(e) => handleChange("weight", parseFloat(e.target.value) || 1)}
+              {...register("weight", { valueAsNumber: true })}
               min="0"
               max="1"
               step="0.1"
@@ -266,7 +207,7 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.weight && <p className="mt-1.5 text-xs text-red-600">{errors.weight}</p>}
+            {errors.weight && <p className="mt-1.5 text-xs text-red-600">{errors.weight.message}</p>}
             <p className="mt-1 text-xs text-zinc-500">Entre 0 et 1 (ex: 0.3 pour 30%)</p>
           </div>
 
@@ -277,8 +218,7 @@ export default function GradeForm({
             </label>
             <select
               id="status"
-              value={formData.status}
-              onChange={(e) => handleChange("status", e.target.value)}
+              {...register("status")}
               className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             >
@@ -302,8 +242,7 @@ export default function GradeForm({
           </label>
           <textarea
             id="comments"
-            value={formData.comments}
-            onChange={(e) => handleChange("comments", e.target.value)}
+            {...register("comments")}
             rows={4}
             placeholder="| Saisir des commentaires..."
             className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"

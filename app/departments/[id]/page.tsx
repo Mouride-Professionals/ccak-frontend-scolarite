@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -10,7 +11,7 @@ import Toast from "@/components/ui/toast";
 import { useDepartment, useDeleteDepartment } from "@/hooks/use-departments";
 
 export default function DepartmentDetailPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const departmentId = params.id as string;
 

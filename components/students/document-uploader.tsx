@@ -89,7 +89,7 @@ export default function DocumentUploader({
           <option value="TRANSCRIPT">Relevé de Notes</option>
           <option value="PHOTO">Photo d'Identité</option>
           <option value="MEDICAL">Certificat Médical</option>
-          <option value="OTHER">Autre</option>
+          <option value="ATTESTATION">Attestation</option>
         </select>
       </div>
 

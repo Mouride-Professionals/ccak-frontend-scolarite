@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DocumentTable from "@/components/documents/document-table";
@@ -15,7 +15,7 @@ import {
 import type { DocumentFilters } from "@/types/document";
 
 export default function StudentDocumentsPage() {
-  const params = useParams();
+  const params = useSafeParams<{ studentId: string }>();
   const studentId = params.studentId as string;
 
   const [filters, setFilters] = useState<DocumentFilters>({

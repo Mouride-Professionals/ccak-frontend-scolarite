@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -30,7 +31,7 @@ type TabType = "info" | "guardians" | "documents" | "status";
 
 export default function StudentDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const studentId = params.id as string;
 
   const [activeTab, setActiveTab] = useState<TabType>("info");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -10,7 +10,7 @@ import { useDeliberationSession, useDeliberationResults } from "@/hooks/use-deli
 import { DeliberationDecision, DeliberationStatus, HonorLevel } from "@/types/deliberation";
 
 export default function DeliberationResultsPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const sessionId = params.id as string;
 
   const [toast, setToast] = useState<{

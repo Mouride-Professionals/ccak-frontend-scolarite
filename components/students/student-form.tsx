@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateStudentInput, Student } from "@/types/student";
 import { Gender, DocumentType } from "@/types/student";
 import DocumentUploader from "./document-uploader";
+import { StudentSchema, type StudentFormData } from "@/lib/validations/schemas";
+import { toUserError } from "@/lib/error-handler";
 
 interface StudentFormProps {
   onSubmit: (data: CreateStudentInput) => void;
@@ -18,118 +21,44 @@ export default function StudentForm({
   isLoading = false,
   initialData,
 }: StudentFormProps) {
-  const [formData, setFormData] = useState<CreateStudentInput>({
-    full_name: initialData?.full_name ?? "",
-    gender: initialData?.gender ?? Gender.M,
-    date_of_birth: initialData?.date_of_birth ?? "",
-    place_of_birth: initialData?.place_of_birth ?? "",
-    nationality: initialData?.nationality ?? "",
-    phone: initialData?.phone ?? "",
-    emergency_contact_name: initialData?.emergency_contact_name ?? "",
-    emergency_contact_phone: initialData?.emergency_contact_phone ?? "",
-    address: initialData?.address ?? "",
-    documents: [],
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<StudentFormData>({
+    resolver: zodResolver(StudentSchema),
+    defaultValues: {
+      full_name: initialData?.full_name ?? "",
+      gender: initialData?.gender ?? Gender.M,
+      date_of_birth: initialData?.date_of_birth ?? "",
+      place_of_birth: initialData?.place_of_birth ?? "",
+      nationality: initialData?.nationality ?? "",
+      phone: initialData?.phone ?? "",
+      emergency_contact_name: initialData?.emergency_contact_name ?? "",
+      emergency_contact_phone: initialData?.emergency_contact_phone ?? "",
+      address: initialData?.address ?? "",
+      documents: [],
+    },
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleChange = (field: keyof CreateStudentInput, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
   const handleDocumentUpload = (files: File[], type: DocumentType) => {
-    // Pour la création, on stocke temporairement les fichiers
-    // Ils seront traités lors de la soumission du formulaire
-    setFormData((prev) => ({
-      ...prev,
-      documents: [...(prev.documents || []), ...files],
-    }));
-
-    // Clear documents error
-    if (errors.documents) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.documents;
-        return newErrors;
-      });
-    }
+    const currentDocs = watch("documents") || [];
+    setValue("documents", [...currentDocs, ...files]);
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.full_name.trim()) {
-      newErrors.full_name = "Le nom complet est requis";
-    } else if (formData.full_name.trim().length < 2) {
-      newErrors.full_name = "Le nom doit contenir au moins 2 caractères";
-    }
-
-    if (!formData.date_of_birth) {
-      newErrors.date_of_birth = "La date de naissance est requise";
-    } else {
-      const birthDate = new Date(formData.date_of_birth);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      if (age < 15 || age > 100) {
-        newErrors.date_of_birth = "L'âge doit être entre 15 et 100 ans";
-      }
-    }
-
-    if (!formData.place_of_birth.trim()) {
-      newErrors.place_of_birth = "Le lieu de naissance est requis";
-    }
-
-    if (!formData.nationality.trim()) {
-      newErrors.nationality = "La nationalité est requise";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Le numéro de téléphone est requis";
-    } else if (!/^\+221\d{9}$/.test(formData.phone.trim())) {
-      newErrors.phone = "Le numéro de téléphone doit être au format +221XXXXXXXXX";
-    }
-
-    if (!formData.emergency_contact_name.trim()) {
-      newErrors.emergency_contact_name = "Le nom du contact d'urgence est requis";
-    }
-
-    if (!formData.emergency_contact_phone.trim()) {
-      newErrors.emergency_contact_phone = "Le téléphone du contact d'urgence est requis";
-    } else if (!/^\+221\d{9}$/.test(formData.emergency_contact_phone.trim())) {
-      newErrors.emergency_contact_phone =
-        "Le numéro de téléphone doit être au format +221XXXXXXXXX";
-    }
-
-    if (!formData.address.trim()) {
-      newErrors.address = "L'adresse est requise";
-    }
-
-    // Validation des documents - au moins une photo de profil requise
-    if (!formData.documents || formData.documents.length === 0) {
-      newErrors.documents = "Au moins un document (photo de profil) est requis";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onSubmit(formData);
+  const handleFormSubmit = async (data: StudentFormData) => {
+    try {
+      await onSubmit(data as CreateStudentInput);
+    } catch (error) {
+      const userError = toUserError(error);
+      console.error("Form submission error:", userError.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       {/* INFORMATIONS PERSONNELLES */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
@@ -144,13 +73,14 @@ export default function StudentForm({
             <input
               type="text"
               id="full_name"
-              value={formData.full_name}
-              onChange={(e) => handleChange("full_name", e.target.value)}
+              {...register("full_name")}
               placeholder="Prénom NOM"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.full_name ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.full_name && <p className="mt-1.5 text-xs text-red-600">{errors.full_name}</p>}
+            {errors.full_name && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.full_name.message}</p>
+            )}
           </div>
 
           {/* Gender */}
@@ -160,8 +90,7 @@ export default function StudentForm({
             </label>
             <select
               id="gender"
-              value={formData.gender}
-              onChange={(e) => handleChange("gender", e.target.value as Gender)}
+              {...register("gender")}
               className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             >
@@ -178,13 +107,12 @@ export default function StudentForm({
             <input
               type="date"
               id="date_of_birth"
-              value={formData.date_of_birth}
-              onChange={(e) => handleChange("date_of_birth", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("date_of_birth")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.date_of_birth ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.date_of_birth && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.date_of_birth}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.date_of_birth.message}</p>
             )}
           </div>
 
@@ -196,14 +124,13 @@ export default function StudentForm({
             <input
               type="text"
               id="place_of_birth"
-              value={formData.place_of_birth}
-              onChange={(e) => handleChange("place_of_birth", e.target.value)}
+              {...register("place_of_birth")}
               placeholder="Ville, Pays"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.place_of_birth ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.place_of_birth && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.place_of_birth}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.place_of_birth.message}</p>
             )}
           </div>
 
@@ -215,14 +142,13 @@ export default function StudentForm({
             <input
               type="text"
               id="nationality"
-              value={formData.nationality}
-              onChange={(e) => handleChange("nationality", e.target.value)}
+              {...register("nationality")}
               placeholder="Sénégalaise"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.nationality ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.nationality && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.nationality}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.nationality.message}</p>
             )}
           </div>
         </div>
@@ -242,13 +168,12 @@ export default function StudentForm({
             <input
               type="tel"
               id="phone"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
+              {...register("phone")}
               placeholder="+221771234567"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.phone && <p className="mt-1.5 text-xs text-red-600">{errors.phone}</p>}
+            {errors.phone && <p className="mt-1.5 text-xs text-red-600">{errors.phone.message}</p>}
           </div>
 
           {/* Address */}
@@ -258,14 +183,15 @@ export default function StudentForm({
             </label>
             <textarea
               id="address"
-              value={formData.address}
-              onChange={(e) => handleChange("address", e.target.value)}
+              {...register("address")}
               placeholder="Adresse complète"
               rows={3}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.address ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.address && <p className="mt-1.5 text-xs text-red-600">{errors.address}</p>}
+            {errors.address && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.address.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -273,7 +199,7 @@ export default function StudentForm({
       {/* CONTACT D'URGENCE */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-          Contact d'urgence
+          Contact d&apos;urgence
         </h3>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {/* Emergency Contact Name */}
@@ -284,14 +210,13 @@ export default function StudentForm({
             <input
               type="text"
               id="emergency_contact_name"
-              value={formData.emergency_contact_name}
-              onChange={(e) => handleChange("emergency_contact_name", e.target.value)}
+              {...register("emergency_contact_name")}
               placeholder="Prénom NOM"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.emergency_contact_name ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.emergency_contact_name && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_name}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_name.message}</p>
             )}
           </div>
 
@@ -303,14 +228,15 @@ export default function StudentForm({
             <input
               type="tel"
               id="emergency_contact_phone"
-              value={formData.emergency_contact_phone}
-              onChange={(e) => handleChange("emergency_contact_phone", e.target.value)}
+              {...register("emergency_contact_phone")}
               placeholder="+221771234567"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.emergency_contact_phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.emergency_contact_phone && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_phone}</p>
+              <p className="mt-1.5 text-xs text-red-600">
+                {errors.emergency_contact_phone.message}
+              </p>
             )}
           </div>
         </div>
@@ -327,7 +253,9 @@ export default function StudentForm({
           isLoading={isLoading}
           acceptedTypes=".pdf,.jpg,.jpeg,.png"
         />
-        {errors.documents && <p className="mt-2 text-xs text-red-600">{errors.documents}</p>}
+        {errors.documents && (
+          <p className="mt-2 text-xs text-red-600">{errors.documents.message}</p>
+        )}
       </div>
 
       {/* Footer */}

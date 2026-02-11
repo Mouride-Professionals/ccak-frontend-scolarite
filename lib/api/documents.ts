@@ -5,13 +5,7 @@
 
 import { api } from "@/lib/api-client";
 import { toPaginated, unwrapData } from "@/lib/api/api-response";
-import type {
-  Document,
-  DocumentsResponse,
-  CreateDocumentInput,
-  UpdateDocumentInput,
-} from "@/types/student";
-import { DocumentStatus } from "@/types/student";
+import type { Document, CreateDocumentInput, UpdateDocumentInput } from "@/types/student";
 
 /**
  * Get all documents for a student

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
@@ -10,7 +11,7 @@ import { useFacultyMember } from "@/hooks/use-faculty-members-management";
 import { FacultyContractType, FacultyRank } from "@/types/academic";
 
 export default function FacultyMemberEditPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
   const { data: faculty, isLoading } = useFacultyMember(facultyId, !!facultyId);

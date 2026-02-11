@@ -36,6 +36,7 @@ yarn-error.log*
 # except for example .env.local.example and .env.docker.example files
 !.env.docker.example
 !.env.local.example
+!.env.example
 
 
 

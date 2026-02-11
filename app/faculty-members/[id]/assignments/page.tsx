@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import TeachingAssignmentsTable from "@/components/teaching-assignments/teaching-assignments-table";
@@ -8,7 +9,7 @@ import Pagination from "@/components/ui/pagination";
 import type { TeachingAssignment } from "@/types/teaching-assignment";
 
 export default function FacultyAssignmentsPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
 

@@ -49,6 +49,12 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {
+        // ignore storage errors
+      }
       // Get Keycloak configuration from environment
       const keycloakBaseUrl = process.env.NEXT_PUBLIC_KEYCLOAK_BASE_URL;
       const keycloakRealm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM;

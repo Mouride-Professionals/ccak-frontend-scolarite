@@ -1,6 +1,8 @@
 "use client";
 
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import { sanitizePayload } from "@/lib/sanitize";
+import { logError } from "@/lib/error-handler";
 
 type ApiOptions = Omit<RequestInit, "body" | "headers"> & {
   /** Relative path (appends to base) or absolute URL */
@@ -51,13 +53,21 @@ async function handleResponse<T>(res: Response, expectJson: boolean): Promise<T>
     // non-JSON error body
   }
   const error = new ApiError("Request failed", res.status, res.statusText, body);
+
+  // Security: Log errors without exposing sensitive data
+  logError(error, `API ${res.status}`);
+
   throw error;
 }
 
 export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
   const { path, expectJson = true, headers, body, ...rest } = options;
 
-  const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
+  const rawUrl = path.startsWith("http") ? path : `${BASE_URL}${path}`;
+  const url =
+    process.env.NODE_ENV === "production" && rawUrl.startsWith("http://")
+      ? rawUrl.replace("http://", "https://")
+      : rawUrl;
 
   const authToken = await getAuthToken();
 
@@ -77,10 +87,15 @@ export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
   const init: RequestInit = {
     ...rest,
     headers: mergedHeaders,
-    body: isJsonBody ? JSON.stringify(body) : (body as BodyInit),
+    // Sanitize string fields before sending to reduce XSS risk.
+    body: isJsonBody ? JSON.stringify(sanitizePayload(body)) : (body as BodyInit),
   };
 
   const res = await fetch(url, init);
+  // Force re-auth on unauthorized responses.
+  if (res.status === 401 || res.status === 403) {
+    await signOut({ callbackUrl: "/login" });
+  }
   return handleResponse<T>(res, expectJson);
 }
 

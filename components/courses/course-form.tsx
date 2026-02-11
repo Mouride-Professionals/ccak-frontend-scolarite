@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateCourseInput, Course } from "@/types/course";
 import type { CourseUnit } from "@/types/course-unit";
+import { CourseSchema, type CourseFormData } from "@/lib/validations/schemas";
+import { toUserError } from "@/lib/error-handler";
 
 interface CourseFormProps {
   onSubmit: (data: CreateCourseInput) => Promise<void>;
@@ -19,91 +22,47 @@ export default function CourseForm({
   isLoading = false,
   initialData,
 }: CourseFormProps) {
-  const [formData, setFormData] = useState<CreateCourseInput>({
-    course_unit_id: initialData?.course_unit_id || "",
-    code: initialData?.code || "",
-    name: initialData?.name || "",
-    description: initialData?.description || "",
-    credits: initialData?.credits || 3,
-    hours_lecture: initialData?.hours_lecture || 0,
-    hours_td: initialData?.hours_td || 0,
-    hours_tp: initialData?.hours_tp || 0,
-    coefficient: initialData?.coefficient || 1,
-    prerequisites: initialData?.prerequisites || [],
-    is_active: initialData?.is_active !== false,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CourseFormData>({
+    resolver: zodResolver(CourseSchema),
+    defaultValues: {
+      course_unit_id: initialData?.course_unit_id || "",
+      code: initialData?.code || "",
+      name: initialData?.name || "",
+      description: initialData?.description || "",
+      credits: initialData?.credits || 3,
+      hours_lecture: initialData?.hours_lecture || 0,
+      hours_td: initialData?.hours_td || 0,
+      hours_tp: initialData?.hours_tp || 0,
+      coefficient: initialData?.coefficient || 1,
+      prerequisites: initialData?.prerequisites || [],
+      is_active: initialData?.is_active !== false,
+    },
   });
 
-  const [error, setError] = useState("");
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : type === "number"
-            ? parseInt(value) || 0
-            : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-
-    if (!formData.course_unit_id) {
-      setError("Veuillez sélectionner une unité d'enseignement");
-      return;
-    }
-
-    if (!formData.code.trim()) {
-      setError("Le code du cours est obligatoire");
-      return;
-    }
-
-    if (!formData.name.trim()) {
-      setError("Le nom du cours est obligatoire");
-      return;
-    }
-
-    if (formData.credits <= 0) {
-      setError("Les crédits doivent être supérieurs à 0");
-      return;
-    }
-
+  const handleFormSubmit = async (data: CourseFormData) => {
     try {
-      await onSubmit(formData);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Une erreur est survenue lors de la sauvegarde"
-      );
+      await onSubmit(data as CreateCourseInput);
+    } catch (error) {
+      const userError = toUserError(error);
+      console.error("Form submission error:", userError.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
-
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {/* Course Unit */}
       <div>
-        <label htmlFor="course_unit_id" className="block text-sm font-medium text-zinc-700 mb-2">
-          Unité d'Enseignement *
+        <label htmlFor="course_unit_id" className="mb-2 block text-sm font-medium text-zinc-700">
+          Unité d&apos;Enseignement *
         </label>
         <select
           id="course_unit_id"
-          name="course_unit_id"
-          value={formData.course_unit_id}
-          onChange={handleChange}
-          required
-          className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+          {...register("course_unit_id")}
+          className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.course_unit_id ? "border-red-300" : "border-zinc-300"}`}
         >
           <option value="">Sélectionner une unité</option>
           {courseUnits?.map((unit) => (
@@ -112,139 +71,141 @@ export default function CourseForm({
             </option>
           ))}
         </select>
+        {errors.course_unit_id && (
+          <p className="mt-1 text-sm text-red-600">{errors.course_unit_id.message}</p>
+        )}
       </div>
 
       {/* Code and Name */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="code" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="code" className="mb-2 block text-sm font-medium text-zinc-700">
             Code *
           </label>
           <input
             type="text"
             id="code"
-            name="code"
-            value={formData.code}
-            onChange={handleChange}
-            required
+            {...register("code")}
             placeholder="ex: CS101"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.code ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="name" className="mb-2 block text-sm font-medium text-zinc-700">
             Nom *
           </label>
           <input
             type="text"
             id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
+            {...register("name")}
             placeholder="ex: Introduction à la Programmation"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.name ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-zinc-700 mb-2">
+        <label htmlFor="description" className="mb-2 block text-sm font-medium text-zinc-700">
           Description
         </label>
         <textarea
           id="description"
-          name="description"
-          value={formData.description || ""}
-          onChange={handleChange}
+          {...register("description")}
           rows={3}
           placeholder="Description du cours..."
-          className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+          className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.description ? "border-red-300" : "border-zinc-300"}`}
         />
+        {errors.description && (
+          <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+        )}
       </div>
 
       {/* Credits and Coefficient */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="credits" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="credits" className="mb-2 block text-sm font-medium text-zinc-700">
             Crédits *
           </label>
           <input
             type="number"
             id="credits"
-            name="credits"
-            value={formData.credits}
-            onChange={handleChange}
-            required
+            {...register("credits", { valueAsNumber: true })}
             min="1"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.credits ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.credits && <p className="mt-1 text-sm text-red-600">{errors.credits.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="coefficient" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="coefficient" className="mb-2 block text-sm font-medium text-zinc-700">
             Coefficient
           </label>
           <input
             type="number"
             id="coefficient"
-            name="coefficient"
-            value={formData.coefficient}
-            onChange={handleChange}
+            {...register("coefficient", { valueAsNumber: true })}
             min="0"
             step="0.1"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.coefficient ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.coefficient && (
+            <p className="mt-1 text-sm text-red-600">{errors.coefficient.message}</p>
+          )}
         </div>
       </div>
 
       {/* Hours */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
-          <label htmlFor="hours_lecture" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="hours_lecture" className="mb-2 block text-sm font-medium text-zinc-700">
             Heures CM
           </label>
           <input
             type="number"
             id="hours_lecture"
-            name="hours_lecture"
-            value={formData.hours_lecture}
-            onChange={handleChange}
+            {...register("hours_lecture", { valueAsNumber: true })}
             min="0"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.hours_lecture ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.hours_lecture && (
+            <p className="mt-1 text-sm text-red-600">{errors.hours_lecture.message}</p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="hours_td" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="hours_td" className="mb-2 block text-sm font-medium text-zinc-700">
             Heures TD
           </label>
           <input
             type="number"
             id="hours_td"
-            name="hours_td"
-            value={formData.hours_td}
-            onChange={handleChange}
+            {...register("hours_td", { valueAsNumber: true })}
             min="0"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.hours_td ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.hours_td && (
+            <p className="mt-1 text-sm text-red-600">{errors.hours_td.message}</p>
+          )}
         </div>
 
         <div>
-          <label htmlFor="hours_tp" className="block text-sm font-medium text-zinc-700 mb-2">
+          <label htmlFor="hours_tp" className="mb-2 block text-sm font-medium text-zinc-700">
             Heures TP
           </label>
           <input
             type="number"
             id="hours_tp"
-            name="hours_tp"
-            value={formData.hours_tp}
-            onChange={handleChange}
+            {...register("hours_tp", { valueAsNumber: true })}
             min="0"
-            className="block w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.hours_tp ? "border-red-300" : "border-zinc-300"}`}
           />
+          {errors.hours_tp && (
+            <p className="mt-1 text-sm text-red-600">{errors.hours_tp.message}</p>
+          )}
         </div>
       </div>
 
@@ -253,9 +214,7 @@ export default function CourseForm({
         <input
           type="checkbox"
           id="is_active"
-          name="is_active"
-          checked={formData.is_active}
-          onChange={handleChange}
+          {...register("is_active")}
           className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
         />
         <label htmlFor="is_active" className="ml-3 text-sm font-medium text-zinc-700">

@@ -8,7 +8,16 @@ import FacultySearch from "@/components/faculty-members/faculty-search";
 import { useAcademicYears } from "@/hooks/use-enrollments";
 import { useCourses } from "@/hooks/use-courses";
 import { useCreateEvaluation } from "@/hooks/use-evaluations";
+import { sanitizeText } from "@/lib/sanitize";
+import { z } from "zod";
 const createQuestion = () => "";
+
+const evaluationSchema = z.object({
+  course_id: z.string().min(1, "Cours requis"),
+  faculty_member_id: z.string().min(1, "Enseignant requis"),
+  response_deadline: z.string().min(1, "Date limite requise"),
+  question_template: z.array(z.string().min(1)).min(1, "Au moins une question"),
+});
 
 export default function EvaluationFormPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
@@ -53,6 +62,21 @@ export default function EvaluationFormPage() {
       setToast({ isOpen: true, message: "Complétez les champs requis.", type: "error" });
       return;
     }
+    const questionTemplate = questions.map((q) => sanitizeText(q)).filter(Boolean);
+    const validation = evaluationSchema.safeParse({
+      course_id: form.course_id,
+      faculty_member_id: form.faculty_member_id,
+      response_deadline: form.response_deadline,
+      question_template: questionTemplate,
+    });
+    if (!validation.success) {
+      setToast({
+        isOpen: true,
+        message: validation.error.issues[0]?.message ?? "Formulaire invalide.",
+        type: "error",
+      });
+      return;
+    }
     try {
       await createEvaluation.mutateAsync({
         course_id: form.course_id,
@@ -64,7 +88,7 @@ export default function EvaluationFormPage() {
           ? new Date(`${form.response_deadline}T00:00:00`).toISOString()
           : undefined,
         is_published: form.is_published,
-        question_template: questions.filter((q) => q.trim()),
+        question_template: questionTemplate,
       });
       setToast({ isOpen: true, message: "Évaluation créée.", type: "success" });
       setForm((prev) => ({

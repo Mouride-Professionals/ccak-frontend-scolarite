@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   CreateEnrollmentInput,
   Student,
@@ -8,6 +9,8 @@ import type {
   AcademicYear,
 } from "@/types/enrollment";
 import { EnrollmentStatus } from "@/types/enrollment";
+import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
+import { toUserError } from "@/lib/error-handler";
 
 interface EnrollmentFormProps {
   onSubmit: (data: CreateEnrollmentInput) => void;
@@ -28,75 +31,35 @@ export default function EnrollmentForm({
   isLoading = false,
   initialData,
 }: EnrollmentFormProps) {
-  const [formData, setFormData] = useState<CreateEnrollmentInput>({
-    student_id: initialData?.student_id ?? "",
-    academic_program_id: initialData?.academic_program_id ?? "",
-    academic_year_id: initialData?.academic_year_id ?? "",
-    current_semester: initialData?.current_semester ?? 1,
-    enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
-    registration_fee_paid: initialData?.registration_fee_paid ?? 0,
-    is_scholarship: initialData?.is_scholarship ?? false,
-    status: initialData?.status ?? EnrollmentStatus.PENDING,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EnrollmentFormData>({
+    resolver: zodResolver(EnrollmentSchema),
+    defaultValues: {
+      student_id: initialData?.student_id ?? "",
+      academic_program_id: initialData?.academic_program_id ?? "",
+      academic_year_id: initialData?.academic_year_id ?? "",
+      current_semester: initialData?.current_semester ?? 1,
+      enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
+      registration_fee_paid: initialData?.registration_fee_paid ?? 0,
+      is_scholarship: initialData?.is_scholarship ?? false,
+      status: initialData?.status ?? EnrollmentStatus.PENDING,
+    },
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleChange = (field: keyof CreateEnrollmentInput, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.student_id) {
-      newErrors.student_id = "L'étudiant est requis";
-    }
-
-    if (!formData.academic_program_id) {
-      newErrors.academic_program_id = "Le programme académique est requis";
-    }
-
-    if (!formData.academic_year_id) {
-      newErrors.academic_year_id = "L'année académique est requise";
-    }
-
-    if (
-      !formData.current_semester ||
-      formData.current_semester < 1 ||
-      formData.current_semester > 10
-    ) {
-      newErrors.current_semester = "Le semestre doit être entre 1 et 10";
-    }
-
-    if (!formData.enrollment_date) {
-      newErrors.enrollment_date = "La date d'inscription est requise";
-    }
-
-    if (formData.registration_fee_paid < 0) {
-      newErrors.registration_fee_paid = "Les frais d'inscription ne peuvent pas être négatifs";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onSubmit(formData);
+  const handleFormSubmit = async (data: EnrollmentFormData) => {
+    try {
+      await onSubmit(data as CreateEnrollmentInput);
+    } catch (error) {
+      const userError = toUserError(error);
+      console.error("Form submission error:", userError.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       {/* INFORMATIONS GÉNÉRALES */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
@@ -110,9 +73,8 @@ export default function EnrollmentForm({
             </label>
             <select
               id="student_id"
-              value={formData.student_id}
-              onChange={(e) => handleChange("student_id", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("student_id")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.student_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
               <option value="">Sélectionner un étudiant</option>
@@ -123,7 +85,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.student_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.student_id}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.student_id.message}</p>
             )}
           </div>
 
@@ -135,13 +97,12 @@ export default function EnrollmentForm({
             <input
               type="date"
               id="enrollment_date"
-              value={formData.enrollment_date}
-              onChange={(e) => handleChange("enrollment_date", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("enrollment_date")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.enrollment_date ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.enrollment_date && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_date}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_date.message}</p>
             )}
           </div>
         </div>
@@ -160,9 +121,8 @@ export default function EnrollmentForm({
             </label>
             <select
               id="academic_program_id"
-              value={formData.academic_program_id}
-              onChange={(e) => handleChange("academic_program_id", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("academic_program_id")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_program_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
               <option value="">Sélectionner un programme</option>
@@ -173,7 +133,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_program_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_program_id}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.academic_program_id.message}</p>
             )}
           </div>
 
@@ -184,9 +144,8 @@ export default function EnrollmentForm({
             </label>
             <select
               id="academic_year_id"
-              value={formData.academic_year_id}
-              onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("academic_year_id")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_year_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
               <option value="">Sélectionner une année</option>
@@ -197,7 +156,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_year_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id.message}</p>
             )}
           </div>
 
@@ -208,9 +167,8 @@ export default function EnrollmentForm({
             </label>
             <select
               id="current_semester"
-              value={formData.current_semester}
-              onChange={(e) => handleChange("current_semester", parseInt(e.target.value, 10))}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("current_semester", { valueAsNumber: true })}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.current_semester ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
               {[1, 2, 3, 4, 5, 6].map((sem) => (
@@ -220,7 +178,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.current_semester && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.current_semester}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.current_semester.message}</p>
             )}
           </div>
 
@@ -231,8 +189,7 @@ export default function EnrollmentForm({
             </label>
             <select
               id="status"
-              value={formData.status}
-              onChange={(e) => handleChange("status", e.target.value as EnrollmentStatus)}
+              {...register("status")}
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             >
@@ -252,18 +209,15 @@ export default function EnrollmentForm({
             <input
               type="number"
               id="registration_fee_paid"
-              value={formData.registration_fee_paid}
-              onChange={(e) =>
-                handleChange("registration_fee_paid", parseFloat(e.target.value) || 0)
-              }
+              {...register("registration_fee_paid", { valueAsNumber: true })}
               placeholder="| Saisir"
               min="0"
               step="1000"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.registration_fee_paid ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.registration_fee_paid && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.registration_fee_paid}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.registration_fee_paid.message}</p>
             )}
           </div>
 
@@ -272,8 +226,7 @@ export default function EnrollmentForm({
             <input
               type="checkbox"
               id="is_scholarship"
-              checked={formData.is_scholarship}
-              onChange={(e) => handleChange("is_scholarship", e.target.checked)}
+              {...register("is_scholarship")}
               className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
               disabled={isLoading}
             />

@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -10,7 +11,7 @@ import Toast from "@/components/ui/toast";
 import { useFaculty, useDeleteFaculty } from "@/hooks/use-faculties";
 
 export default function FacultyDetailPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params.id as string;
 

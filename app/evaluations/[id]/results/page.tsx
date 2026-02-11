@@ -1,12 +1,12 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useEvaluation, useEvaluationResults } from "@/hooks/use-evaluations";
 
 export default function EvaluationResultsPage() {
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const evaluationId = typeof params.id === "string" ? params.id : "";
   const { data: evaluation } = useEvaluation(evaluationId, !!evaluationId);
   const { data: results, isLoading } = useEvaluationResults(evaluationId);
