@@ -11,6 +11,18 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
+import { useEnrollmentDashboard } from "@/hooks/use-enrollment-dashboard";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+} from "recharts";
 import {
   useEnrollments,
   useDeleteEnrollment,
@@ -21,7 +33,11 @@ import {
   useAcademicPrograms,
   useStudents,
 } from "@/hooks/use-enrollments";
-import type { EnrollmentFilters, CreateEnrollmentInput } from "@/types/enrollment";
+import type {
+  EnrollmentFilters,
+  CreateEnrollmentInput,
+  UpdateEnrollmentInput,
+} from "@/types/enrollment";
 import { EnrollmentStatus } from "@/types/enrollment";
 
 export default function EnrollmentsPage() {
@@ -52,6 +68,7 @@ export default function EnrollmentsPage() {
   });
 
   const { data, isLoading, error } = useEnrollments(filters);
+  const { data: dashboardData, isLoading: loadingDashboard } = useEnrollmentDashboard();
   const deleteMutation = useDeleteEnrollment();
   const createMutation = useCreateEnrollment();
   const updateMutation = useUpdateEnrollment();
@@ -125,7 +142,7 @@ export default function EnrollmentsPage() {
     }
   };
 
-  const handleEditSubmit = async (data: any) => {
+  const handleEditSubmit = async (data: UpdateEnrollmentInput) => {
     if (!editingEnrollmentId) return;
 
     try {
@@ -188,6 +205,106 @@ export default function EnrollmentsPage() {
           actionLabel="Nouvel Enrollement"
           onAction={() => setIsCreateModalOpen(true)}
         />
+
+        <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">Total inscriptions</p>
+            <p className="mt-2 text-2xl font-semibold text-[#00365F]">
+              {loadingDashboard ? "..." : dashboardData?.kpis.total_enrollments ?? 0}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">Actives</p>
+            <p className="mt-2 text-2xl font-semibold text-[#0A8F3D]">
+              {loadingDashboard ? "..." : dashboardData?.kpis.active_enrollments ?? 0}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">En attente</p>
+            <p className="mt-2 text-2xl font-semibold text-amber-600">
+              {loadingDashboard ? "..." : dashboardData?.kpis.pending_enrollments ?? 0}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">Terminées</p>
+            <p className="mt-2 text-2xl font-semibold text-[#083B66]">
+              {loadingDashboard ? "..." : dashboardData?.kpis.completed_enrollments ?? 0}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">Retirées</p>
+            <p className="mt-2 text-2xl font-semibold text-[#E11D48]">
+              {loadingDashboard ? "..." : dashboardData?.kpis.withdrawn_enrollments ?? 0}
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-6 grid gap-6 xl:grid-cols-3">
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm xl:col-span-2">
+            <h3 className="text-sm font-semibold text-[#00365F]">Évolution des inscriptions</h3>
+            <div className="mt-3 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dashboardData?.trend ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                  <YAxis tickLine={false} axisLine={false} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#083B66"
+                    strokeWidth={2}
+                    dot={{ r: 4, fill: "#083B66" }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[#00365F]">Répartition programmes</h3>
+            <div className="mt-3 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dashboardData?.program_distribution ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false} />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#0A8F3D" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <h3 className="text-sm font-semibold text-[#00365F]">Activités récentes</h3>
+          {loadingDashboard ? (
+            <p className="mt-3 text-sm text-zinc-500">Chargement des activités...</p>
+          ) : !dashboardData || dashboardData.recent_enrollments.length === 0 ? (
+            <p className="mt-3 text-sm text-zinc-500">Aucune activité récente.</p>
+          ) : (
+            <div className="mt-3 divide-y divide-zinc-100">
+              {dashboardData.recent_enrollments.map((enrollment) => (
+                <div key={enrollment.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-900">
+                      {enrollment.student?.full_name ?? "Étudiant"}
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {enrollment.academic_program?.name ?? "Programme"} - semestre{" "}
+                      {enrollment.current_semester}
+                    </p>
+                  </div>
+                  <p className="text-xs text-zinc-500">
+                    {new Date(enrollment.enrollment_date).toLocaleDateString("fr-FR")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Filters Panel */}
         {showFilters && (

@@ -12,6 +12,7 @@ import type {
   CreateCourseEnrollmentInput,
   UpdateCourseEnrollmentInput,
   Course,
+  CourseAvailability,
 } from "@/types/course-enrollment";
 import type { AcademicYear } from "@/types/enrollment";
 
@@ -106,4 +107,48 @@ export async function getCourses(): Promise<Course[]> {
 export async function getAcademicYears(): Promise<AcademicYear[]> {
   const response = await api.get("/academic-years");
   return unwrapData<AcademicYear[]>(response);
+}
+
+export async function checkCourseAvailability(
+  courseId: string,
+  academicYearId: string,
+  semester: number
+): Promise<CourseAvailability> {
+  try {
+    const response = await api.get(
+      `/courses/${courseId}/availability?academic_year_id=${academicYearId}&semester=${semester}`
+    );
+    const payload = unwrapData<Record<string, unknown>>(response);
+
+    return {
+      course_id: courseId,
+      is_available:
+        Boolean(payload?.is_available) ||
+        Boolean(payload?.available) ||
+        Number(payload?.remaining_seats ?? 0) > 0,
+      remaining_seats:
+        typeof payload?.remaining_seats === "number" ? payload.remaining_seats : null,
+      total_seats:
+        typeof payload?.total_seats === "number"
+          ? payload.total_seats
+          : typeof payload?.capacity === "number"
+            ? payload.capacity
+            : null,
+      enrolled_count:
+        typeof payload?.enrolled_count === "number"
+          ? payload.enrolled_count
+          : typeof payload?.current_enrollment === "number"
+            ? payload.current_enrollment
+            : null,
+      message: typeof payload?.message === "string" ? payload.message : undefined,
+    };
+  } catch {
+    return {
+      course_id: courseId,
+      is_available: true,
+      remaining_seats: null,
+      total_seats: null,
+      enrolled_count: null,
+    };
+  }
 }

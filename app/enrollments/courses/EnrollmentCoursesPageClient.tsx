@@ -7,6 +7,7 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import CourseEnrollmentTable from "@/components/course-enrollments/course-enrollment-table";
 import CourseEnrollmentForm from "@/components/course-enrollments/course-enrollment-form";
+import type { CreateCourseEnrollmentBatchInput } from "@/components/course-enrollments/course-enrollment-form";
 import Modal from "@/components/ui/modal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
@@ -19,10 +20,9 @@ import {
   useAcademicYears,
 } from "@/hooks/use-course-enrollments";
 import { useEnrollment } from "@/hooks/use-enrollments";
-import type {
-  CourseEnrollmentFilters,
-  CreateCourseEnrollmentInput,
-} from "@/types/course-enrollment";
+import { CourseEnrollmentStatus, type CourseEnrollmentFilters } from "@/types/course-enrollment";
+import { useCourseBasketStore } from "@/stores/course-basket-store";
+import { toUserError } from "@/lib/error-handler";
 
 export default function EnrollmentCoursesPageClient() {
   const searchParams = useSearchParams();
@@ -53,6 +53,7 @@ export default function EnrollmentCoursesPageClient() {
 
   const { data, isLoading, error } = useCourseEnrollments(filters);
   const { data: enrollment } = useEnrollment(enrollmentId);
+  const clearBasket = useCourseBasketStore((state) => state.clear);
   const deleteMutation = useDeleteCourseEnrollment();
   const createMutation = useCreateCourseEnrollment();
 
@@ -95,20 +96,32 @@ export default function EnrollmentCoursesPageClient() {
     }
   };
 
-  const handleCreateSubmit = async (data: CreateCourseEnrollmentInput) => {
+  const handleCreateSubmit = async (payload: CreateCourseEnrollmentBatchInput) => {
     try {
-      await createMutation.mutateAsync(data);
+      await Promise.all(
+        payload.course_ids.map((courseId) =>
+          createMutation.mutateAsync({
+            enrollment_id: payload.enrollment_id,
+            course_id: courseId,
+            academic_year_id: payload.academic_year_id,
+            semester: payload.semester,
+            enrollment_date: payload.enrollment_date,
+            status: payload.status,
+          })
+        )
+      );
+      clearBasket();
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
-        message: "Cours ajouté avec succès",
+        message: `${payload.course_ids.length} cours ajouté(s) avec succès`,
         type: "success",
       });
     } catch (error) {
-      console.error("Error creating course enrollment:", error);
+      console.error("Error creating course enrollment batch:", error);
       setToast({
         isOpen: true,
-        message: "Erreur lors de l'ajout du cours",
+        message: toUserError(error).message,
         type: "error",
       });
     }
@@ -120,7 +133,7 @@ export default function EnrollmentCoursesPageClient() {
         <DashboardLayout title="Cours enrolés">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">
-              ID d'inscription manquant. Veuillez retourner à la liste des inscriptions.
+              ID d&apos;inscription manquant. Veuillez retourner à la liste des inscriptions.
             </p>
           </div>
         </DashboardLayout>
@@ -216,7 +229,10 @@ export default function EnrollmentCoursesPageClient() {
         {/* Create Modal */}
         <Modal
           isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => {
+            clearBasket();
+            setIsCreateModalOpen(false);
+          }}
           title="Ajouter un Cours"
           subtitle="Formulaire d'ajout de cours"
           size="lg"
@@ -231,10 +247,16 @@ export default function EnrollmentCoursesPageClient() {
           ) : (
             <CourseEnrollmentForm
               onSubmit={handleCreateSubmit}
-              onCancel={() => setIsCreateModalOpen(false)}
+              onCancel={() => {
+                clearBasket();
+                setIsCreateModalOpen(false);
+              }}
               enrollments={enrollment ? [enrollment] : []}
               courses={courses ?? []}
               years={years ?? []}
+              alreadyEnrolledCourseIds={(data?.data ?? [])
+                .filter((item) => item.status !== CourseEnrollmentStatus.DROPPED)
+                .map((item) => item.course_id)}
               isLoading={createMutation.isPending}
               initialData={{
                 enrollment_id: enrollmentId,

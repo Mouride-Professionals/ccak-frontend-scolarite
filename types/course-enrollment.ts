@@ -64,6 +64,18 @@ export interface Course {
   name: string;
   credits: number;
   description?: string;
+  prerequisites?: string[];
+  capacity?: number;
+  enrolled_count?: number;
+}
+
+export interface CourseAvailability {
+  course_id: string;
+  is_available: boolean;
+  remaining_seats: number | null;
+  total_seats: number | null;
+  enrolled_count: number | null;
+  message?: string;
 }
 
 // =====================
