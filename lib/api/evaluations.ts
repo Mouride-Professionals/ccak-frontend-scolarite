@@ -34,6 +34,29 @@ export async function createEvaluation(
   return unwrapData<Evaluation>(response);
 }
 
+export async function duplicateEvaluation(id: string): Promise<Evaluation> {
+  const source = await getEvaluation(id);
+  const defaultDeadline = new Date();
+  defaultDeadline.setDate(defaultDeadline.getDate() + 7);
+
+  const payload: Omit<Evaluation, "id" | "created_at" | "updated_at"> = {
+    course_id: source.course_id,
+    faculty_member_id: source.faculty_member_id,
+    academic_year_id: source.academic_year_id,
+    start_date: source.start_date ?? null,
+    end_date: source.end_date ?? null,
+    response_deadline: source.response_deadline ?? defaultDeadline.toISOString(),
+    is_published: false,
+    question_template: source.question_template ?? [],
+    rating_scale_min: source.rating_scale_min,
+    rating_scale_max: source.rating_scale_max,
+    rating_scale_low_label: source.rating_scale_low_label ?? null,
+    rating_scale_high_label: source.rating_scale_high_label ?? null,
+  };
+
+  return createEvaluation(payload);
+}
+
 export async function updateEvaluation(
   id: string,
   input: Partial<Evaluation>

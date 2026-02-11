@@ -8,6 +8,10 @@ export interface Evaluation {
   response_deadline?: string;
   is_published: boolean;
   question_template: string[];
+  rating_scale_min?: number;
+  rating_scale_max?: number;
+  rating_scale_low_label?: string | null;
+  rating_scale_high_label?: string | null;
   created_at?: string;
   updated_at?: string;
   course?: {
@@ -51,6 +55,9 @@ export interface EvaluationResult {
   evaluation_id: string;
   response_rate?: number;
   average_rating?: number;
+  response_count?: number;
+  total_targets?: number;
+  benchmark_average?: number;
   ratings?: Array<{ question: string; average: number }>;
   comments?: Array<string>;
 }

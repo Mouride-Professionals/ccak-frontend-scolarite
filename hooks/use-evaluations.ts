@@ -77,6 +77,16 @@ export function useDeleteEvaluation() {
   });
 }
 
+export function useDuplicateEvaluation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: evaluationApi.duplicateEvaluation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: evaluationKeys.lists() });
+    },
+  });
+}
+
 export function useShareEvaluation() {
   const queryClient = useQueryClient();
   return useMutation({

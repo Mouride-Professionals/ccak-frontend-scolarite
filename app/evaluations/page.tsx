@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQueries } from "@tanstack/react-query";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ListHeader from "@/components/ui/list-header";
@@ -9,7 +10,13 @@ import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import { useCourses } from "@/hooks/use-courses";
-import { useDeleteEvaluation, useEvaluations, useShareEvaluation } from "@/hooks/use-evaluations";
+import {
+  useDeleteEvaluation,
+  useDuplicateEvaluation,
+  useEvaluations,
+  useShareEvaluation,
+} from "@/hooks/use-evaluations";
+import * as evaluationApi from "@/lib/api/evaluations";
 
 export default function EvaluationsManagementPage() {
   const [filters, setFilters] = useState({
@@ -26,6 +33,7 @@ export default function EvaluationsManagementPage() {
   });
   const { data: courses } = useCourses({ page: 1, limit: 100 });
   const shareEvaluation = useShareEvaluation();
+  const duplicateEvaluation = useDuplicateEvaluation();
   const deleteEvaluation = useDeleteEvaluation();
   const [toast, setToast] = useState({
     isOpen: false,
@@ -34,12 +42,42 @@ export default function EvaluationsManagementPage() {
   });
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const evaluationsList = useMemo(() => evaluations?.data ?? [], [evaluations?.data]);
+
+  const responseRateQueries = useQueries({
+    queries: evaluationsList.map((evaluation) => ({
+      queryKey: ["evaluations", "results", evaluation.id],
+      queryFn: () => evaluationApi.getEvaluationResults(evaluation.id),
+      enabled: !!evaluation.id,
+      staleTime: 30000,
+    })),
+  });
+
+  const responseRateById = useMemo(() => {
+    const map: Record<string, number> = {};
+    responseRateQueries.forEach((query, index) => {
+      const evaluation = evaluationsList[index];
+      if (!evaluation) return;
+      map[evaluation.id] = Number(query.data?.response_rate ?? 0);
+    });
+    return map;
+  }, [evaluationsList, responseRateQueries]);
+
   const handleShare = async (id: string) => {
     try {
       await shareEvaluation.mutateAsync(id);
       setToast({ isOpen: true, message: "Évaluation partagée.", type: "success" });
     } catch {
       setToast({ isOpen: true, message: "Erreur lors du partage.", type: "error" });
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      await duplicateEvaluation.mutateAsync(id);
+      setToast({ isOpen: true, message: "Évaluation dupliquée.", type: "success" });
+    } catch {
+      setToast({ isOpen: true, message: "Duplication impossible.", type: "error" });
     }
   };
 
@@ -103,6 +141,9 @@ export default function EvaluationsManagementPage() {
                       Enseignant
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                      Taux de réponse
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                       Statut
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
@@ -111,17 +152,18 @@ export default function EvaluationsManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {(evaluations?.data ?? []).map((evaluation) => (
+                  {evaluationsList.map((evaluation) => (
                     <tr key={evaluation.id}>
-                      <td className="px-4 py-3">
-                        {evaluation.course?.name ?? evaluation.course_id}
-                      </td>
+                      <td className="px-4 py-3">{evaluation.course?.name ?? evaluation.course_id}</td>
                       <td className="px-4 py-3">
                         {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
                       </td>
                       <td className="px-4 py-3">
-                        {evaluation.is_published ? "Publié" : "Brouillon"}
+                        <span className="font-medium text-[#00365F]">
+                          {(responseRateById[evaluation.id] ?? 0).toFixed(1)}%
+                        </span>
                       </td>
+                      <td className="px-4 py-3">{evaluation.is_published ? "Publié" : "Brouillon"}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex flex-wrap justify-end gap-2">
                           <Link
@@ -142,6 +184,13 @@ export default function EvaluationsManagementPage() {
                             className="text-sm font-medium text-[#00365F]"
                           >
                             Partager
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDuplicate(evaluation.id)}
+                            className="text-sm font-medium text-[#0A8F3D]"
+                          >
+                            Dupliquer
                           </button>
                           <button
                             type="button"
