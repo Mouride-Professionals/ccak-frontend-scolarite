@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateCourseInput, Course } from "@/types/course";
 import type { CourseUnit } from "@/types/course-unit";
@@ -11,6 +11,7 @@ interface CourseFormProps {
   onSubmit: (data: CreateCourseInput) => Promise<void>;
   onCancel: () => void;
   courseUnits: CourseUnit[];
+  availableCourses?: Course[];
   isLoading?: boolean;
   initialData?: Partial<Course>;
 }
@@ -19,12 +20,14 @@ export default function CourseForm({
   onSubmit,
   onCancel,
   courseUnits,
+  availableCourses = [],
   isLoading = false,
   initialData,
 }: CourseFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<CourseFormData>({
     resolver: zodResolver(CourseSchema),
@@ -42,6 +45,7 @@ export default function CourseForm({
       is_active: initialData?.is_active !== false,
     },
   });
+  const prerequisiteChoices = availableCourses.filter((course) => course.id !== initialData?.id);
 
   const handleFormSubmit = async (data: CourseFormData) => {
     try {
@@ -207,6 +211,63 @@ export default function CourseForm({
             <p className="mt-1 text-sm text-red-600">{errors.hours_tp.message}</p>
           )}
         </div>
+      </div>
+
+      {/* Prerequisites */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-zinc-700">Prérequis</label>
+        <Controller
+          control={control}
+          name="prerequisites"
+          render={({ field }) => {
+            const selectedPrerequisites = field.value || [];
+            const togglePrerequisite = (courseId: string) => {
+              const isSelected = selectedPrerequisites.includes(courseId);
+              const updated = isSelected
+                ? selectedPrerequisites.filter((item) => item !== courseId)
+                : [...selectedPrerequisites, courseId];
+              field.onChange(updated);
+            };
+
+            return (
+              <>
+                <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+                  {prerequisiteChoices.length === 0 ? (
+                    <p className="text-sm text-zinc-500">Aucun cours disponible pour les prérequis.</p>
+                  ) : (
+                    prerequisiteChoices.map((course) => (
+                      <label key={course.id} className="flex items-center gap-2 text-sm text-zinc-700">
+                        <input
+                          type="checkbox"
+                          checked={selectedPrerequisites.includes(course.id)}
+                          onChange={() => togglePrerequisite(course.id)}
+                        />
+                        <span>
+                          {course.code} - {course.name}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
+                {selectedPrerequisites.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {selectedPrerequisites.map((id) => {
+                      const prerequisite = prerequisiteChoices.find((item) => item.id === id);
+                      return (
+                        <span
+                          key={id}
+                          className="rounded-full bg-[#00365F]/10 px-2 py-1 text-xs font-medium text-[#00365F]"
+                        >
+                          {prerequisite?.code || id}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            );
+          }}
+        />
       </div>
 
       {/* Active Status */}

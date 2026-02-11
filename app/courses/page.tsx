@@ -25,6 +25,7 @@ function CoursesPageContent() {
     page: 1,
     limit: 10,
   });
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editCourseId, setEditCourseId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -48,6 +49,7 @@ function CoursesPageContent() {
 
   // Data queries
   const { data, isLoading, error } = useCourses(filters);
+  const { data: allCoursesData } = useCourses({ page: 1, limit: 200 });
   const { data: courseToEdit } = useCourse(editCourseId || "");
   const deleteMutation = useDeleteCourse();
   const createMutation = useCreateCourse();
@@ -169,6 +171,29 @@ function CoursesPageContent() {
           onAction={() => setIsCreateModalOpen(true)}
         />
 
+        <div className="mb-4 flex justify-end">
+          <div className="inline-flex rounded-lg border border-zinc-300 bg-white p-1">
+            <button
+              type="button"
+              onClick={() => setViewMode("table")}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+                viewMode === "table" ? "bg-[#00365F] text-white" : "text-zinc-600"
+              }`}
+            >
+              Liste
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+                viewMode === "grid" ? "bg-[#00365F] text-white" : "text-zinc-600"
+              }`}
+            >
+              Grille
+            </button>
+          </div>
+        </div>
+
         {/* Filters Panel */}
         {showFilters && (
           <div className="mb-6 animate-in slide-in-from-top-2 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
@@ -188,7 +213,7 @@ function CoursesPageContent() {
                   htmlFor="courseUnit"
                   className="block text-sm font-medium text-zinc-700 mb-2"
                 >
-                  Unité d'Enseignement
+                  Unité d&apos;Enseignement
                 </label>
                 <select
                   id="courseUnit"
@@ -246,6 +271,7 @@ function CoursesPageContent() {
               courses={data?.data ?? []}
               onEdit={handleEditClick}
               onDelete={handleDeleteClick}
+              viewMode={viewMode}
             />
 
             <Pagination
@@ -284,6 +310,7 @@ function CoursesPageContent() {
               onSubmit={handleCreateSubmit}
               onCancel={() => setIsCreateModalOpen(false)}
               courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
+              availableCourses={allCoursesData?.data ?? []}
               isLoading={createMutation.isPending}
             />
           )}
@@ -311,6 +338,7 @@ function CoursesPageContent() {
               onSubmit={handleEditSubmit}
               onCancel={() => setEditCourseId(null)}
               courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
+              availableCourses={allCoursesData?.data ?? []}
               isLoading={updateMutation.isPending}
               initialData={courseToEdit}
             />

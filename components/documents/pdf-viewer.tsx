@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface PdfViewerProps {
   url: string;
@@ -9,6 +9,8 @@ interface PdfViewerProps {
   onDownload?: () => void;
   onClose?: () => void;
 }
+
+const zoomLevels = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
 
 export default function PdfViewer({
   url,
@@ -19,13 +21,50 @@ export default function PdfViewer({
 }: PdfViewerProps) {
   const [scale, setScale] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
   const [totalPages, setTotalPages] = useState(1);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Zoom levels
-  const zoomLevels = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
-  const currentZoomIndex = zoomLevels.findIndex((z) => z === scale) || 3;
+  const currentZoomIndex = zoomLevels.findIndex((z) => z === scale) || 0;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPdfMeta = async () => {
+      try {
+        const pdfjs = await import("pdfjs-dist");
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.296/pdf.worker.min.mjs";
+
+        const loadingTask = pdfjs.getDocument(url);
+        const pdf = await loadingTask.promise;
+
+        if (!cancelled) {
+          setTotalPages(pdf.numPages || 1);
+          setCurrentPage(1);
+          setPageInput("1");
+        }
+
+        await pdf.destroy();
+      } catch {
+        if (!cancelled) {
+          setTotalPages(1);
+          setCurrentPage(1);
+          setPageInput("1");
+        }
+      }
+    };
+
+    void loadPdfMeta();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  const viewerUrl = useMemo(
+    () => `${url}#page=${currentPage}&zoom=${Math.round(scale * 100)}`,
+    [currentPage, scale, url]
+  );
 
   const handleZoomIn = () => {
     const nextIndex = Math.min(currentZoomIndex + 1, zoomLevels.length - 1);
@@ -43,14 +82,26 @@ export default function PdfViewer({
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const next = currentPage - 1;
+      setCurrentPage(next);
+      setPageInput(String(next));
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const next = currentPage + 1;
+      setCurrentPage(next);
+      setPageInput(String(next));
     }
+  };
+
+  const handlePageSubmit = () => {
+    const parsed = Number(pageInput);
+    if (!Number.isFinite(parsed)) return;
+    const nextPage = Math.min(Math.max(1, Math.floor(parsed)), totalPages);
+    setCurrentPage(nextPage);
+    setPageInput(String(nextPage));
   };
 
   const handlePrint = () => {
@@ -62,79 +113,68 @@ export default function PdfViewer({
   const handleDownload = () => {
     if (onDownload) {
       onDownload();
-    } else {
-      // Fallback: download the PDF directly
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${documentNumber || documentId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      return;
     }
-  };
 
-  // Update iframe scale
-  useEffect(() => {
-    if (iframeRef.current) {
-      iframeRef.current.style.transform = `scale(${scale})`;
-      iframeRef.current.style.transformOrigin = "top left";
-    }
-  }, [scale]);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${documentNumber || documentId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="flex h-full flex-col bg-zinc-50">
-      {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-zinc-900">
-            {documentNumber || "Document PDF"}
-          </h3>
+          <h3 className="text-sm font-semibold text-zinc-900">{documentNumber || "Document PDF"}</h3>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Page Navigation */}
           <div className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-2 py-1">
             <button
               onClick={handlePreviousPage}
               disabled={currentPage <= 1}
-              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="Page précédente"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <span className="text-sm text-zinc-700 min-w-[80px] text-center">
-              {currentPage} / {totalPages}
-            </span>
+
+            <input
+              value={pageInput}
+              onChange={(event) => setPageInput(event.target.value)}
+              onBlur={handlePageSubmit}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  handlePageSubmit();
+                }
+              }}
+              className="w-10 rounded border border-zinc-200 px-1 py-0.5 text-center text-sm"
+            />
+            <span className="text-sm text-zinc-700">/ {totalPages}</span>
+
             <button
               onClick={handleNextPage}
               disabled={currentPage >= totalPages}
-              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="Page suivante"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
 
-          {/* Zoom Controls */}
           <div className="flex items-center gap-1 rounded-lg border border-zinc-300 bg-white px-2 py-1">
             <button
               onClick={handleZoomOut}
               disabled={currentZoomIndex === 0}
-              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="Zoom arrière"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +200,7 @@ export default function PdfViewer({
             <button
               onClick={handleZoomIn}
               disabled={currentZoomIndex === zoomLevels.length - 1}
-              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
               title="Zoom avant"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +215,7 @@ export default function PdfViewer({
             <button
               onClick={handleZoomFit}
               className="rounded p-1 text-zinc-600 transition-colors hover:bg-zinc-100"
-              title="Ajuster à la page"
+              title="Ajuster à 100%"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -188,7 +228,6 @@ export default function PdfViewer({
             </button>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-1">
             <button
               onClick={handleDownload}
@@ -226,51 +265,15 @@ export default function PdfViewer({
                 className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                 title="Fermer"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                Fermer
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* PDF Container */}
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-auto bg-zinc-200 p-4"
-        style={{ position: "relative" }}
-      >
-        <div
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "top center",
-            transition: "transform 0.2s ease",
-          }}
-          className="mx-auto"
-        >
-          <iframe
-            ref={iframeRef}
-            src={url}
-            className="h-[100vh] w-full border-0 shadow-lg"
-            title="PDF Viewer"
-            style={{
-              width: `${100 / scale}%`,
-              height: `${100 / scale}%`,
-            }}
-            onLoad={() => {
-              // Try to get total pages from iframe (if PDF.js is used)
-              // For now, we'll use a default value
-              // In production, you might want to use PDF.js to get actual page count
-              setTotalPages(1);
-            }}
-          />
-        </div>
+      <div className="flex-1 overflow-auto bg-zinc-200 p-4" style={{ position: "relative" }}>
+        <iframe ref={iframeRef} src={viewerUrl} className="h-[100vh] w-full border-0 shadow-lg" title="PDF Viewer" />
       </div>
     </div>
   );

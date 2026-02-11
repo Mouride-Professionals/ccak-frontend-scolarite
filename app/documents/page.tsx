@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DocumentTable from "@/components/documents/document-table";
 import GenerateDocumentForm from "@/components/documents/generate-document-form";
+import StudentSearch from "@/components/students/student-search";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Modal from "@/components/ui/modal";
 import Toast from "@/components/ui/toast";
 import Pagination from "@/components/ui/pagination";
 import {
-  useStudentDocuments,
   useAllDocuments,
   useDownloadDocument,
   useIssueDocument,
@@ -21,6 +22,7 @@ import {
   useGenerateDiploma,
   useGenerateAttestation,
 } from "@/hooks/use-documents-generate";
+import { useStudents } from "@/hooks/use-students";
 import type {
   DocumentFilters,
   DocumentType,
@@ -30,23 +32,42 @@ import type {
   GenerateIdCardInput,
   GenerateDiplomaInput,
   GenerateAttestationInput,
+  GeneratedDocument,
 } from "@/types/document";
 import { DocumentType as DocType, DocumentStatus as DocStatus } from "@/types/document";
 
+const requestableTypes: DocumentType[] = [
+  DocType.TRANSCRIPT,
+  DocType.CERTIFICATE,
+  DocType.ID_CARD,
+  DocType.DIPLOMA,
+];
+
 export default function DocumentsPage() {
   const router = useRouter();
-  // View mode: "all" for admin (all documents) or "student" for specific student
-  const [viewMode, setViewMode] = useState<"all" | "student">("all");
-  // TODO: Get from auth context or URL params when student module is available
-  const [studentId, setStudentId] = useState<string>(""); // Empty = all documents
-  const [filters, setFilters] = useState<DocumentFilters & { student_id?: string }>({
+
+  const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [selectedStudentLabel, setSelectedStudentLabel] = useState<string>("");
+  const [filters, setFilters] = useState<DocumentFilters>({
     page: 1,
     limit: 10,
   });
+
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isBulkGenerateModalOpen, setIsBulkGenerateModalOpen] = useState(false);
+  const [isGenerateConfirmOpen, setIsGenerateConfirmOpen] = useState(false);
+  const [isRequestConfirmOpen, setIsRequestConfirmOpen] = useState(false);
+
   const [generateType, setGenerateType] = useState<DocumentType | null>(null);
-  const [generateStudentId, setGenerateStudentId] = useState<string>("");
+  const [pendingGenerateData, setPendingGenerateData] = useState<Record<string, unknown> | null>(null);
+  const [requestType, setRequestType] = useState<DocumentType>(DocType.TRANSCRIPT);
+
+  const [bulkType, setBulkType] = useState<DocumentType>(DocType.TRANSCRIPT);
+  const [bulkStudentSearch, setBulkStudentSearch] = useState("");
+  const [bulkSelectedStudentIds, setBulkSelectedStudentIds] = useState<string[]>([]);
+
+  const [lastGeneratedDocument, setLastGeneratedDocument] = useState<GeneratedDocument | null>(null);
+
   const [toast, setToast] = useState<{
     isOpen: boolean;
     message: string;
@@ -57,16 +78,20 @@ export default function DocumentsPage() {
     type: "success",
   });
 
-  // Use appropriate query based on view mode
-  const studentDocumentsQuery = useStudentDocuments(studentId, filters);
-  const allDocumentsQuery = useAllDocuments(filters);
+  const { data: documents, isLoading, error } = useAllDocuments({
+    ...filters,
+    student_id: selectedStudentId || undefined,
+  });
 
-  const {
-    data: documents,
-    isLoading,
-    error,
-  } = viewMode === "all" ? allDocumentsQuery : studentDocumentsQuery;
+  const { data: bulkStudentsData, isLoading: bulkStudentsLoading } = useStudents({
+    page: 1,
+    limit: 30,
+    search: bulkStudentSearch || undefined,
+  });
+
   const documentRows = documents?.data ?? [];
+  const bulkStudents = useMemo(() => bulkStudentsData?.data ?? [], [bulkStudentsData?.data]);
+
   const downloadMutation = useDownloadDocument();
   const issueMutation = useIssueDocument();
   const revokeMutation = useRevokeDocument();
@@ -76,131 +101,12 @@ export default function DocumentsPage() {
   const generateDiplomaMutation = useGenerateDiploma();
   const generateAttestationMutation = useGenerateAttestation();
 
-  const handleDownload = async (documentId: string) => {
-    try {
-      await downloadMutation.mutateAsync(documentId);
-      setToast({
-        isOpen: true,
-        message: "Téléchargement démarré",
-        type: "success",
-      });
-    } catch (err) {
-      console.error("Error downloading document:", err);
-      setToast({
-        isOpen: true,
-        message: "Erreur lors du téléchargement",
-        type: "error",
-      });
-    }
-  };
-
-  const handlePreview = (documentId: string) => {
-    // Navigate to the dedicated preview page
-    router.push(`/documents/preview/${documentId}`);
-  };
-
-  const handleIssue = async (documentId: string) => {
-    try {
-      await issueMutation.mutateAsync(documentId);
-      setToast({
-        isOpen: true,
-        message: "Document émis avec succès",
-        type: "success",
-      });
-    } catch (err) {
-      console.error("Error issuing document:", err);
-      setToast({
-        isOpen: true,
-        message: "Erreur lors de l'émission du document",
-        type: "error",
-      });
-    }
-  };
-
-  const handleRevoke = async (documentId: string, reason?: string) => {
-    try {
-      await revokeMutation.mutateAsync({ documentId, reason });
-      setToast({
-        isOpen: true,
-        message: "Document révoqué avec succès",
-        type: "success",
-      });
-    } catch (err) {
-      console.error("Error revoking document:", err);
-      setToast({
-        isOpen: true,
-        message: "Erreur lors de la révocation du document",
-        type: "error",
-      });
-    }
-  };
-
-  const handleFilterChange = (
-    key: keyof (DocumentFilters & { student_id?: string }),
-    value: string | number | undefined
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value || undefined,
-      page: key === "page" ? Number(value) || 1 : 1,
-    }));
-
-    // Update studentId when filtering by student
-    if (key === "student_id") {
-      setStudentId((value as string) || "");
-      setViewMode(value ? "student" : "all");
-    }
-  };
-
-  const handleGenerateClick = (type: DocumentType) => {
-    setGenerateType(type);
-    setGenerateStudentId(studentId || "");
-    setIsGenerateModalOpen(true);
-  };
-
-  const handleGenerateSubmit = async (data: Record<string, unknown>) => {
-    if (!generateType) return;
-
-    try {
-      switch (generateType) {
-        case DocType.TRANSCRIPT:
-          await generateTranscriptMutation.mutateAsync(data as unknown as GenerateTranscriptInput);
-          break;
-        case DocType.CERTIFICATE:
-          await generateCertificateMutation.mutateAsync(
-            data as unknown as GenerateCertificateInput
-          );
-          break;
-        case DocType.ID_CARD:
-          await generateIdCardMutation.mutateAsync(data as unknown as GenerateIdCardInput);
-          break;
-        case DocType.DIPLOMA:
-          await generateDiplomaMutation.mutateAsync(data as unknown as GenerateDiplomaInput);
-          break;
-        case DocType.ATTESTATION:
-          await generateAttestationMutation.mutateAsync(
-            data as unknown as GenerateAttestationInput
-          );
-          break;
-        default:
-          return;
-      }
-      setIsGenerateModalOpen(false);
-      setGenerateType(null);
-      setToast({
-        isOpen: true,
-        message: "Document généré avec succès",
-        type: "success",
-      });
-    } catch (err) {
-      console.error("Error generating document:", err);
-      setToast({
-        isOpen: true,
-        message: "Erreur lors de la génération du document",
-        type: "error",
-      });
-    }
-  };
+  const isGenerating =
+    generateTranscriptMutation.isPending ||
+    generateCertificateMutation.isPending ||
+    generateIdCardMutation.isPending ||
+    generateDiplomaMutation.isPending ||
+    generateAttestationMutation.isPending;
 
   const getDocumentTypeLabel = (type: DocumentType) => {
     const labels = {
@@ -213,64 +119,270 @@ export default function DocumentsPage() {
     return labels[type];
   };
 
+  const generateDocumentByType = async (
+    type: DocumentType,
+    payload: Record<string, unknown>
+  ): Promise<GeneratedDocument> => {
+    switch (type) {
+      case DocType.TRANSCRIPT:
+        return generateTranscriptMutation.mutateAsync(payload as GenerateTranscriptInput);
+      case DocType.CERTIFICATE:
+        return generateCertificateMutation.mutateAsync(payload as GenerateCertificateInput);
+      case DocType.ID_CARD:
+        return generateIdCardMutation.mutateAsync(payload as GenerateIdCardInput);
+      case DocType.DIPLOMA:
+        return generateDiplomaMutation.mutateAsync(payload as GenerateDiplomaInput);
+      case DocType.ATTESTATION:
+        return generateAttestationMutation.mutateAsync(payload as GenerateAttestationInput);
+      default:
+        throw new Error("Type de document non supporté");
+    }
+  };
+
+  const handleDownload = async (documentId: string) => {
+    try {
+      await downloadMutation.mutateAsync(documentId);
+      setToast({ isOpen: true, message: "Téléchargement démarré", type: "success" });
+    } catch (err) {
+      console.error("Error downloading document:", err);
+      setToast({ isOpen: true, message: "Erreur lors du téléchargement", type: "error" });
+    }
+  };
+
+  const handlePreview = (documentId: string) => {
+    router.push(`/documents/preview/${documentId}`);
+  };
+
+  const handleIssue = async (documentId: string) => {
+    try {
+      await issueMutation.mutateAsync(documentId);
+      setToast({ isOpen: true, message: "Document émis avec succès", type: "success" });
+    } catch (err) {
+      console.error("Error issuing document:", err);
+      setToast({ isOpen: true, message: "Erreur lors de l'émission du document", type: "error" });
+    }
+  };
+
+  const handleRevoke = async (documentId: string, reason?: string) => {
+    try {
+      await revokeMutation.mutateAsync({ documentId, reason });
+      setToast({ isOpen: true, message: "Document révoqué avec succès", type: "success" });
+    } catch (err) {
+      console.error("Error revoking document:", err);
+      setToast({ isOpen: true, message: "Erreur lors de la révocation du document", type: "error" });
+    }
+  };
+
+  const handleFilterChange = (key: keyof DocumentFilters, value: string | number | undefined) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value || undefined,
+      page: key === "page" ? Number(value) || 1 : 1,
+    }));
+  };
+
+  const handleGenerateClick = (type: DocumentType) => {
+    if (!selectedStudentId) {
+      setToast({
+        isOpen: true,
+        message: "Sélectionnez d'abord un étudiant.",
+        type: "error",
+      });
+      return;
+    }
+
+    setGenerateType(type);
+    setPendingGenerateData(null);
+    setIsGenerateModalOpen(true);
+  };
+
+  const handleGenerateSubmit = async (data: Record<string, unknown>) => {
+    setPendingGenerateData(data);
+    setIsGenerateConfirmOpen(true);
+  };
+
+  const confirmGenerate = async () => {
+    if (!generateType || !pendingGenerateData) return;
+
+    try {
+      const generated = await generateDocumentByType(generateType, pendingGenerateData);
+      setLastGeneratedDocument(generated);
+      setToast({ isOpen: true, message: "Document généré avec succès", type: "success" });
+      setIsGenerateModalOpen(false);
+      setIsGenerateConfirmOpen(false);
+      setGenerateType(null);
+      setPendingGenerateData(null);
+    } catch (err) {
+      console.error("Error generating document:", err);
+      setToast({ isOpen: true, message: "Erreur lors de la génération du document", type: "error" });
+    }
+  };
+
+  const confirmRequestWorkflow = async () => {
+    if (!selectedStudentId) return;
+
+    try {
+      const generated = await generateDocumentByType(requestType, {
+        student_id: selectedStudentId,
+      });
+      setLastGeneratedDocument(generated);
+      setToast({
+        isOpen: true,
+        message: "Demande traitée et document généré. Vous pouvez le télécharger.",
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Error processing request:", err);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors du traitement de la demande.",
+        type: "error",
+      });
+    } finally {
+      setIsRequestConfirmOpen(false);
+    }
+  };
+
+  const visibleBulkStudentIds = useMemo(() => bulkStudents.map((student) => student.id), [bulkStudents]);
+
+  const toggleBulkStudent = (studentId: string) => {
+    setBulkSelectedStudentIds((prev) =>
+      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+    );
+  };
+
+  const handleSelectAllBulk = () => {
+    const allSelected = visibleBulkStudentIds.every((id) => bulkSelectedStudentIds.includes(id));
+    setBulkSelectedStudentIds(allSelected ? [] : visibleBulkStudentIds);
+  };
+
+  const executeBulkGeneration = async () => {
+    if (bulkSelectedStudentIds.length === 0) {
+      setToast({ isOpen: true, message: "Aucun étudiant sélectionné.", type: "error" });
+      return;
+    }
+
+    let successCount = 0;
+    for (const studentId of bulkSelectedStudentIds) {
+      try {
+        await generateDocumentByType(bulkType, { student_id: studentId });
+        successCount += 1;
+      } catch {
+        // Continue batch even if one generation fails
+      }
+    }
+
+    setToast({
+      isOpen: true,
+      message: `Génération terminée: ${successCount}/${bulkSelectedStudentIds.length} document(s).`,
+      type: successCount > 0 ? "success" : "error",
+    });
+
+    setIsBulkGenerateModalOpen(false);
+    setBulkSelectedStudentIds([]);
+    setBulkStudentSearch("");
+  };
+
   return (
     <ProtectedRoute>
       <DashboardLayout title="Documents">
         <div className="space-y-6">
-          {/* Header */}
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-[#00365F]">Documents</h1>
-              <p className="mt-1 text-sm text-zinc-600">
-                Gérez les documents académiques des étudiants
-              </p>
+              <p className="mt-1 text-sm text-zinc-600">Gérez les documents académiques des étudiants</p>
             </div>
-            {studentId && (
-              <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedStudentId && (
                 <button
                   onClick={() => handleGenerateClick(DocType.TRANSCRIPT)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] md:w-auto"
+                  className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
-                  </svg>
                   Générer un document
                 </button>
-              </div>
-            )}
+              )}
+              <button
+                onClick={() => setIsBulkGenerateModalOpen(true)}
+                className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-[#00365F]"
+              >
+                Génération en lot
+              </button>
+            </div>
           </div>
 
-          {/* Filters */}
+          {selectedStudentId && (
+            <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-[#00365F]">Demande de document étudiant</h2>
+              <p className="mt-1 text-xs text-zinc-500">Étudiant: {selectedStudentLabel}</p>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
+                <select
+                  value={requestType}
+                  onChange={(event) => setRequestType(event.target.value as DocumentType)}
+                  className="rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+                >
+                  {requestableTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {getDocumentTypeLabel(type)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setIsRequestConfirmOpen(true)}
+                  className="rounded-lg bg-[#00365F] px-4 py-2 text-sm font-medium text-white"
+                >
+                  Confirmer la demande
+                </button>
+              </div>
+            </div>
+          )}
+
+          {lastGeneratedDocument && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-sm font-medium text-emerald-800">
+                Document prêt: {lastGeneratedDocument.document_number}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleDownload(lastGeneratedDocument.id)}
+                  className="rounded-lg border border-emerald-300 bg-white px-3 py-2 text-sm font-medium text-emerald-800"
+                >
+                  Télécharger maintenant
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePreview(lastGeneratedDocument.id)}
+                  className="rounded-lg border border-emerald-300 bg-white px-3 py-2 text-sm font-medium text-emerald-800"
+                >
+                  Prévisualiser
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {/* Student Filter */}
               <div>
-                <label htmlFor="student" className="block text-sm font-medium text-zinc-700 mb-2">
-                  Étudiant
-                </label>
-                <select
-                  id="student"
-                  value={filters.student_id ?? ""}
-                  onChange={(e) => handleFilterChange("student_id", e.target.value)}
-                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-                >
-                  <option value="">Tous les étudiants</option>
-                  <option value="student-1">Amadou Diallo (STU-2024-001)</option>
-                  <option value="student-2">Fatou Ndiaye (STU-2024-002)</option>
-                  <option value="student-3">Ibrahima Sarr (STU-2024-003)</option>
-                </select>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Étudiant</label>
+                <StudentSearch
+                  value={selectedStudentLabel}
+                  onSelect={(student) => {
+                    setSelectedStudentId(student.id);
+                    setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
+                    setFilters((prev) => ({ ...prev, page: 1 }));
+                  }}
+                  onClear={() => {
+                    setSelectedStudentId("");
+                    setSelectedStudentLabel("");
+                    setFilters((prev) => ({ ...prev, page: 1 }));
+                  }}
+                  placeholder="Filtrer par étudiant..."
+                />
               </div>
 
-              {/* Type Filter */}
               <div>
-                <label htmlFor="type" className="block text-sm font-medium text-zinc-700 mb-2">
-                  Type
-                </label>
+                <label htmlFor="type" className="mb-2 block text-sm font-medium text-zinc-700">Type</label>
                 <select
                   id="type"
                   value={filters.type ?? ""}
@@ -286,11 +398,8 @@ export default function DocumentsPage() {
                 </select>
               </div>
 
-              {/* Status Filter */}
               <div>
-                <label htmlFor="status" className="block text-sm font-medium text-zinc-700 mb-2">
-                  Statut
-                </label>
+                <label htmlFor="status" className="mb-2 block text-sm font-medium text-zinc-700">Statut</label>
                 <select
                   id="status"
                   value={filters.status ?? ""}
@@ -304,11 +413,8 @@ export default function DocumentsPage() {
                 </select>
               </div>
 
-              {/* Search */}
               <div>
-                <label htmlFor="search" className="block text-sm font-medium text-zinc-700 mb-2">
-                  Recherche
-                </label>
+                <label htmlFor="search" className="mb-2 block text-sm font-medium text-zinc-700">Recherche</label>
                 <input
                   id="search"
                   type="text"
@@ -321,7 +427,6 @@ export default function DocumentsPage() {
             </div>
           </div>
 
-          {/* Documents Table */}
           {isLoading ? (
             <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#00365F] border-r-transparent"></div>
@@ -329,9 +434,7 @@ export default function DocumentsPage() {
             </div>
           ) : error ? (
             <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-              <p className="text-sm text-red-700">
-                Erreur lors du chargement des documents. Veuillez réessayer.
-              </p>
+              <p className="text-sm text-red-700">Erreur lors du chargement des documents. Veuillez réessayer.</p>
             </div>
           ) : (
             <DocumentTable
@@ -340,9 +443,9 @@ export default function DocumentsPage() {
               onPreview={handlePreview}
               onIssue={handleIssue}
               onRevoke={handleRevoke}
-              canIssue={true} // TODO: Check user permissions
-              canRevoke={true} // TODO: Check user permissions
-              showStudent={viewMode === "all"}
+              canIssue
+              canRevoke
+              showStudent={!selectedStudentId}
             />
           )}
 
@@ -356,7 +459,6 @@ export default function DocumentsPage() {
             onPerPageChange={(nextLimit) => handleFilterChange("limit", nextLimit)}
           />
 
-          {/* Generate Document Modal */}
           {generateType && (
             <Modal
               isOpen={isGenerateModalOpen}
@@ -369,25 +471,128 @@ export default function DocumentsPage() {
               size="md"
             >
               <GenerateDocumentForm
+                key={`${generateType}-${selectedStudentId}`}
                 type={generateType}
-                studentId={generateStudentId}
+                studentId={selectedStudentId}
                 onSubmit={handleGenerateSubmit}
                 onCancel={() => {
                   setIsGenerateModalOpen(false);
                   setGenerateType(null);
                 }}
-                isLoading={
-                  generateTranscriptMutation.isPending ||
-                  generateCertificateMutation.isPending ||
-                  generateIdCardMutation.isPending ||
-                  generateDiplomaMutation.isPending ||
-                  generateAttestationMutation.isPending
-                }
+                isLoading={isGenerating}
               />
             </Modal>
           )}
 
-          {/* Toast */}
+          <Modal
+            isOpen={isBulkGenerateModalOpen}
+            onClose={() => setIsBulkGenerateModalOpen(false)}
+            title="Génération en lot"
+            subtitle="Sélectionnez les étudiants et le type de document"
+            size="md"
+          >
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Type de document</label>
+                <select
+                  value={bulkType}
+                  onChange={(event) => setBulkType(event.target.value as DocumentType)}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+                >
+                  {requestableTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {getDocumentTypeLabel(type)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">Rechercher un étudiant</label>
+                <input
+                  type="text"
+                  value={bulkStudentSearch}
+                  onChange={(event) => setBulkStudentSearch(event.target.value)}
+                  placeholder="Nom ou matricule..."
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="max-h-60 overflow-y-auto rounded-lg border border-zinc-200 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-xs text-zinc-500">Sélectionnez les étudiants</p>
+                  <button
+                    type="button"
+                    onClick={handleSelectAllBulk}
+                    className="text-xs font-medium text-[#00365F]"
+                  >
+                    Tout sélectionner
+                  </button>
+                </div>
+                {bulkStudentsLoading ? (
+                  <p className="text-sm text-zinc-500">Chargement...</p>
+                ) : bulkStudents.length === 0 ? (
+                  <p className="text-sm text-zinc-500">Aucun étudiant trouvé.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {bulkStudents.map((student) => (
+                      <label key={student.id} className="flex items-center gap-2 text-sm text-zinc-700">
+                        <input
+                          type="checkbox"
+                          checked={bulkSelectedStudentIds.includes(student.id)}
+                          onChange={() => toggleBulkStudent(student.id)}
+                        />
+                        {student.full_name} · {student.student_number}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkGenerateModalOpen(false)}
+                  className="rounded-lg border border-zinc-300 px-4 py-2 text-sm"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  onClick={executeBulkGeneration}
+                  disabled={isGenerating}
+                  className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Lancer la génération
+                </button>
+              </div>
+            </div>
+          </Modal>
+
+          <ConfirmDialog
+            isOpen={isGenerateConfirmOpen}
+            onClose={() => setIsGenerateConfirmOpen(false)}
+            onConfirm={confirmGenerate}
+            title="Confirmer la génération"
+            message="Voulez-vous générer ce document maintenant ?"
+            confirmText="Générer"
+            cancelText="Annuler"
+            variant="info"
+            isLoading={isGenerating}
+          />
+
+          <ConfirmDialog
+            isOpen={isRequestConfirmOpen}
+            onClose={() => setIsRequestConfirmOpen(false)}
+            onConfirm={confirmRequestWorkflow}
+            title="Confirmer la demande"
+            message={`Créer ${getDocumentTypeLabel(requestType)} pour l'étudiant sélectionné ?`}
+            confirmText="Confirmer"
+            cancelText="Annuler"
+            variant="info"
+            isLoading={isGenerating}
+          />
+
           <Toast
             isOpen={toast.isOpen}
             onClose={() => setToast({ ...toast, isOpen: false })}
