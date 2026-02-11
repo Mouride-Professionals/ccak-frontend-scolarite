@@ -8,12 +8,18 @@ import Toast from "@/components/ui/toast";
 import FacultySearch from "@/components/faculty-members/faculty-search";
 import { useCourses } from "@/hooks/use-courses";
 import { useAcademicYears } from "@/hooks/use-enrollments";
+import {
+  useCreateTeachingAssignment,
+  useTeachingAssignmentConflictCheck,
+} from "@/hooks/use-teaching-assignments";
 import { TeachingRole } from "@/types/teaching-assignment";
 
 export default function TeachingAssignmentNewPage() {
   const router = useRouter();
   const { data: coursesData } = useCourses({ page: 1, limit: 100 });
   const { data: years } = useAcademicYears();
+  const createMutation = useCreateTeachingAssignment();
+  const conflictMutation = useTeachingAssignmentConflictCheck();
   const [toast, setToast] = useState({
     isOpen: false,
     message: "",
@@ -30,7 +36,7 @@ export default function TeachingAssignmentNewPage() {
     hourlyRate: "",
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.facultyId || !form.courseId || !form.academicYearId || !form.hours) {
       setToast({
         isOpen: true,
@@ -40,12 +46,44 @@ export default function TeachingAssignmentNewPage() {
       return;
     }
 
-    setToast({
-      isOpen: true,
-      message: "Affectation créée (connexion API à venir).",
-      type: "success",
-    });
-    router.push("/teaching-assignments");
+    const payload = {
+      faculty_member_id: form.facultyId,
+      course_id: form.courseId,
+      academic_year_id: form.academicYearId,
+      role: form.role,
+      hours_assigned: Number(form.hours),
+      hourly_rate: form.hourlyRate ? Number(form.hourlyRate) : null,
+    };
+
+    try {
+      const conflict = await conflictMutation.mutateAsync(payload);
+      if (conflict.has_conflict) {
+        setToast({
+          isOpen: true,
+          message:
+            conflict.message || "Conflit détecté: cet enseignant est déjà affecté sur ce créneau.",
+          type: "error",
+        });
+        return;
+      }
+
+      await createMutation.mutateAsync(payload);
+      setToast({
+        isOpen: true,
+        message: "Affectation créée avec succès.",
+        type: "success",
+      });
+      setTimeout(() => {
+        router.push("/teaching-assignments");
+      }, 1000);
+    } catch (error) {
+      console.error("Error creating teaching assignment:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la création de l'affectation.",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -149,9 +187,12 @@ export default function TeachingAssignmentNewPage() {
             <button
               type="button"
               onClick={handleSubmit}
+              disabled={createMutation.isPending || conflictMutation.isPending}
               className="rounded-lg bg-[#008D36] px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E]"
             >
-              Enregistrer
+              {createMutation.isPending || conflictMutation.isPending
+                ? "Enregistrement..."
+                : "Enregistrer"}
             </button>
           </div>
         </div>

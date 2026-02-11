@@ -1,19 +1,30 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import TeachingAssignmentsTable from "@/components/teaching-assignments/teaching-assignments-table";
 import Pagination from "@/components/ui/pagination";
-import type { TeachingAssignment } from "@/types/teaching-assignment";
+import {
+  useDeleteTeachingAssignment,
+  useTeachingAssignments,
+} from "@/hooks/use-teaching-assignments";
 
 export default function FacultyAssignmentsPage() {
   const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
-
-  const assignments: TeachingAssignment[] = [];
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const { data, isLoading } = useTeachingAssignments({
+    page,
+    limit,
+    faculty_member_id: facultyId,
+  });
+  const deleteMutation = useDeleteTeachingAssignment();
+  const assignments = data?.data ?? [];
 
   return (
     <ProtectedRoute>
@@ -41,14 +52,27 @@ export default function FacultyAssignmentsPage() {
             </button>
           </div>
 
-          <TeachingAssignmentsTable assignments={assignments} />
+          {isLoading ? (
+            <div className="rounded-lg border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
+              Chargement des affectations...
+            </div>
+          ) : (
+            <TeachingAssignmentsTable
+              assignments={assignments}
+              onDelete={(id) => deleteMutation.mutate(id)}
+            />
+          )}
           <Pagination
-            page={1}
-            totalPages={1}
-            totalItems={assignments.length}
-            perPage={10}
+            page={data?.page ?? 1}
+            totalPages={data?.total_pages ?? 1}
+            totalItems={data?.total ?? assignments.length}
+            perPage={data?.limit ?? limit}
             itemLabel="affectations"
-            onPageChange={() => {}}
+            onPageChange={(nextPage) => setPage(nextPage)}
+            onPerPageChange={(nextLimit) => {
+              setLimit(nextLimit);
+              setPage(1);
+            }}
           />
         </div>
       </DashboardLayout>

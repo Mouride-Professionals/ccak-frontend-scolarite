@@ -6,6 +6,10 @@ import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
+import {
+  useFacultyDocuments,
+  useCreateFacultyDocument,
+} from "@/hooks/use-faculty-members-management";
 import { FacultyDocumentStatus, FacultyDocumentType, type FacultyDocument } from "@/types/academic";
 
 const statusStyles: Record<FacultyDocumentStatus, string> = {
@@ -18,8 +22,12 @@ export default function FacultyDocumentsPage() {
   const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
+  const { data: documentsData = [], isLoading: loadingDocuments } = useFacultyDocuments(
+    facultyId,
+    !!facultyId
+  );
+  const createDocumentMutation = useCreateFacultyDocument();
 
-  const [documents, setDocuments] = useState<FacultyDocument[]>([]);
   const [selectedType, setSelectedType] = useState<FacultyDocumentType>(FacultyDocumentType.CV);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [toast, setToast] = useState({
@@ -30,7 +38,7 @@ export default function FacultyDocumentsPage() {
 
   const canUpload = useMemo(() => selectedFile !== null, [selectedFile]);
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
       setToast({
         isOpen: true,
@@ -40,23 +48,28 @@ export default function FacultyDocumentsPage() {
       return;
     }
 
-    const newDoc: FacultyDocument = {
-      id: crypto.randomUUID(),
-      faculty_member_id: facultyId,
-      type: selectedType,
-      status: FacultyDocumentStatus.PENDING,
-      file_path: selectedFile.name,
-      reviewed_by: null,
-      created_at: new Date().toISOString(),
-    };
-
-    setDocuments((prev) => [newDoc, ...prev]);
-    setSelectedFile(null);
-    setToast({
-      isOpen: true,
-      message: "Document ajouté (connexion API à venir).",
-      type: "success",
-    });
+    try {
+      await createDocumentMutation.mutateAsync({
+        facultyId,
+        input: {
+          type: selectedType,
+          document: selectedFile,
+        },
+      });
+      setSelectedFile(null);
+      setToast({
+        isOpen: true,
+        message: "Document ajouté avec succès.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error uploading faculty document:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de l'ajout du document.",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -74,7 +87,9 @@ export default function FacultyDocumentsPage() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
               <h2 className="text-sm font-semibold text-[#00365F]">Documents enregistrés</h2>
-              {documents.length === 0 ? (
+              {loadingDocuments ? (
+                <div className="mt-4 text-sm text-zinc-500">Chargement des documents...</div>
+              ) : documentsData.length === 0 ? (
                 <div className="mt-4 rounded-lg border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500">
                   Aucun document disponible.
                 </div>
@@ -98,7 +113,7 @@ export default function FacultyDocumentsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100">
-                      {documents.map((doc) => (
+                      {documentsData.map((doc: FacultyDocument) => (
                         <tr key={doc.id}>
                           <td className="px-4 py-3 text-sm text-zinc-700">{doc.type}</td>
                           <td className="px-4 py-3">
@@ -153,10 +168,10 @@ export default function FacultyDocumentsPage() {
                 <button
                   type="button"
                   onClick={handleUpload}
-                  disabled={!canUpload}
+                  disabled={!canUpload || createDocumentMutation.isPending}
                   className="w-full rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Télécharger
+                  {createDocumentMutation.isPending ? "Téléchargement..." : "Télécharger"}
                 </button>
               </div>
             </div>

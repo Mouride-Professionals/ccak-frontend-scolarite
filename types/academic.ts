@@ -167,6 +167,48 @@ export interface FacultyMembersResponse {
   total_pages: number;
 }
 
+export interface CreateFacultyMemberInput {
+  full_name: string;
+  email?: string;
+  phone: string;
+  address?: string;
+  department_id: string;
+  rank: FacultyRank;
+  contract_type: FacultyContractType | string;
+  hire_date: string;
+  salary?: number | null;
+  contract_start?: string;
+  contract_end?: string | null;
+  contract_terms?: string;
+  is_active?: boolean;
+}
+
+export interface UpdateFacultyMemberInput extends Partial<CreateFacultyMemberInput> {}
+
+export interface CreateFacultyDocumentInput {
+  type: FacultyDocumentType;
+  document: File;
+}
+
+export interface CreateFacultyContractInput {
+  contract_type: FacultyContractType | string;
+  start_date: string;
+  end_date?: string | null;
+  salary?: number | null;
+  is_current?: boolean;
+  file?: File | null;
+}
+
+export interface FacultyWorkload {
+  total_hours: number;
+  assigned_courses: number;
+  overload_hours: number;
+  breakdown: Array<{
+    label: string;
+    value: number;
+  }>;
+}
+
 /**
  * Course Unit (Unité d'enseignement)
  */

@@ -46,4 +46,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-/docs
+
+# docs (keep generated/reference docs ignored; allow remediation plan tracking)
+/docs/*
+!/docs/frontend-audit-remediation-plan.md

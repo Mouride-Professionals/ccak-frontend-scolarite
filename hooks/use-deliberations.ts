@@ -10,9 +10,9 @@ import type {
   DeliberationSessionFilters,
   CreateDeliberationSessionInput,
   UpdateDeliberationSessionInput,
-  DeliberationResult,
-  CreateDeliberationResultInput,
+  DeliberationResultFilters,
   UpdateDeliberationResultInput,
+  FinalizeDeliberationSessionInput,
 } from "@/types/deliberation";
 import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
 import * as deliberationsApi from "@/lib/api/deliberations";
@@ -171,7 +171,7 @@ export function useFacultyMembers() {
 export const deliberationResultKeys = {
   all: ["deliberation-results"] as const,
   lists: () => [...deliberationResultKeys.all, "list"] as const,
-  list: (sessionId: string, filters?: any) =>
+  list: (sessionId: string, filters?: DeliberationResultFilters) =>
     [...deliberationResultKeys.lists(), sessionId, filters] as const,
   details: () => [...deliberationResultKeys.all, "detail"] as const,
   detail: (id: string) => [...deliberationResultKeys.details(), id] as const,
@@ -180,7 +180,7 @@ export const deliberationResultKeys = {
 /**
  * Get deliberation results for a session
  */
-export function useDeliberationResults(sessionId: string, filters?: any) {
+export function useDeliberationResults(sessionId: string, filters?: DeliberationResultFilters) {
   return useQuery({
     queryKey: deliberationResultKeys.list(sessionId, filters),
     queryFn: () => deliberationsApi.getDeliberationResults(sessionId, filters),
@@ -197,7 +197,7 @@ export function useCreateDeliberationResult() {
 
   return useMutation({
     mutationFn: deliberationsApi.createDeliberationResult,
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: deliberationResultKeys.lists(),
       });
@@ -212,7 +212,7 @@ export function useUpdateDeliberationResult() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: any }) =>
+    mutationFn: ({ id, input }: { id: string; input: UpdateDeliberationResultInput }) =>
       deliberationsApi.updateDeliberationResult(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -235,5 +235,46 @@ export function useBatchUpdateDeliberationResults() {
         queryKey: deliberationResultKeys.lists(),
       });
     },
+  });
+}
+
+export function useGenerateDeliberationResults() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) => deliberationsApi.generateDeliberationResults(sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: deliberationResultKeys.lists(),
+      });
+    },
+  });
+}
+
+export function useFinalizeDeliberationSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      sessionId,
+      input,
+    }: {
+      sessionId: string;
+      input: FinalizeDeliberationSessionInput;
+    }) => deliberationsApi.finalizeDeliberationSession(sessionId, input),
+    onSuccess: (session) => {
+      queryClient.setQueryData(deliberationKeys.detail(session.id), session);
+      queryClient.invalidateQueries({ queryKey: deliberationKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: deliberationResultKeys.lists() });
+    },
+  });
+}
+
+export function useStudentDeliberationHistory(studentId: string, enabled = true) {
+  return useQuery({
+    queryKey: ["student-deliberation-history", studentId],
+    queryFn: () => deliberationsApi.getStudentDeliberationHistory(studentId),
+    enabled: enabled && !!studentId,
+    staleTime: 60_000,
   });
 }

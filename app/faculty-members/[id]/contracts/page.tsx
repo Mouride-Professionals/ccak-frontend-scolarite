@@ -6,6 +6,10 @@ import { useSafeParams } from "@/hooks/use-safe-params";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
+import {
+  useFacultyContracts,
+  useCreateFacultyContract,
+} from "@/hooks/use-faculty-members-management";
 import { FacultyContractStatus, FacultyContractType, type FacultyContract } from "@/types/academic";
 
 const statusStyles: Record<FacultyContractStatus, string> = {
@@ -18,8 +22,12 @@ export default function FacultyContractsPage() {
   const params = useSafeParams<{ id: string }>();
   const router = useRouter();
   const facultyId = params?.id as string;
+  const { data: contractsData = [], isLoading: loadingContracts } = useFacultyContracts(
+    facultyId,
+    !!facultyId
+  );
+  const createContractMutation = useCreateFacultyContract();
 
-  const [contracts, setContracts] = useState<FacultyContract[]>([]);
   const [form, setForm] = useState({
     contract_type: FacultyContractType.PERMANENT,
     start_date: "",
@@ -36,7 +44,7 @@ export default function FacultyContractsPage() {
 
   const canSave = useMemo(() => form.start_date.length > 0, [form.start_date]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!canSave) {
       setToast({
         isOpen: true,
@@ -46,25 +54,37 @@ export default function FacultyContractsPage() {
       return;
     }
 
-    const newContract: FacultyContract = {
-      id: crypto.randomUUID(),
-      faculty_member_id: facultyId,
-      contract_type: form.contract_type,
-      start_date: form.start_date,
-      end_date: form.end_date || null,
-      salary: form.salary ? Number(form.salary) : null,
-      status: FacultyContractStatus.ACTIVE,
-      is_current: form.is_current,
-      file_path: form.file?.name ?? null,
-      created_at: new Date().toISOString(),
-    };
-
-    setContracts((prev) => [newContract, ...prev]);
-    setToast({
-      isOpen: true,
-      message: "Contrat ajouté (connexion API à venir).",
-      type: "success",
-    });
+    try {
+      await createContractMutation.mutateAsync({
+        facultyId,
+        input: {
+          contract_type: form.contract_type,
+          start_date: form.start_date,
+          end_date: form.end_date || null,
+          salary: form.salary ? Number(form.salary) : null,
+          is_current: form.is_current,
+          file: form.file,
+        },
+      });
+      setToast({
+        isOpen: true,
+        message: "Contrat ajouté avec succès.",
+        type: "success",
+      });
+      setForm((prev) => ({
+        ...prev,
+        end_date: "",
+        salary: "",
+        file: null,
+      }));
+    } catch (error) {
+      console.error("Error creating faculty contract:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la création du contrat.",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -82,7 +102,9 @@ export default function FacultyContractsPage() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
               <h2 className="text-sm font-semibold text-[#00365F]">Contrats enregistrés</h2>
-              {contracts.length === 0 ? (
+              {loadingContracts ? (
+                <div className="mt-4 text-sm text-zinc-500">Chargement des contrats...</div>
+              ) : contractsData.length === 0 ? (
                 <div className="mt-4 rounded-lg border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500">
                   Aucun contrat enregistré.
                 </div>
@@ -106,7 +128,7 @@ export default function FacultyContractsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100">
-                      {contracts.map((contract) => (
+                      {contractsData.map((contract: FacultyContract) => (
                         <tr key={contract.id}>
                           <td className="px-4 py-3 text-sm text-zinc-700">
                             {contract.contract_type}
@@ -206,10 +228,10 @@ export default function FacultyContractsPage() {
                 <button
                   type="button"
                   onClick={handleAdd}
-                  disabled={!canSave}
+                  disabled={!canSave || createContractMutation.isPending}
                   className="w-full rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Enregistrer
+                  {createContractMutation.isPending ? "Enregistrement..." : "Enregistrer"}
                 </button>
               </div>
             </div>

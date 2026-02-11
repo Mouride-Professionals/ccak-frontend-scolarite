@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
@@ -11,9 +12,10 @@ import type {
 import { EnrollmentStatus } from "@/types/enrollment";
 import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
 import { toUserError } from "@/lib/error-handler";
+import StudentSearch from "@/components/students/student-search";
 
 interface EnrollmentFormProps {
-  onSubmit: (data: CreateEnrollmentInput) => void;
+  onSubmit: (data: CreateEnrollmentInput) => Promise<void> | void;
   onCancel?: () => void;
   students: Student[];
   programs: AcademicProgram[];
@@ -34,6 +36,7 @@ export default function EnrollmentForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(EnrollmentSchema),
@@ -48,6 +51,7 @@ export default function EnrollmentForm({
       status: initialData?.status ?? EnrollmentStatus.PENDING,
     },
   });
+  const [selectedStudentLabel, setSelectedStudentLabel] = useState<string | null>(null);
 
   const handleFormSubmit = async (data: EnrollmentFormData) => {
     try {
@@ -57,6 +61,13 @@ export default function EnrollmentForm({
       console.error("Form submission error:", userError.message);
     }
   };
+
+  const initialSelectedStudentLabel = (() => {
+    if (!initialData?.student_id) return "";
+    const student = students.find((item) => item.id === initialData.student_id);
+    return student ? `${student.full_name} · ${student.student_number}` : "";
+  })();
+  const displayedStudentLabel = selectedStudentLabel ?? initialSelectedStudentLabel;
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -71,19 +82,30 @@ export default function EnrollmentForm({
             <label htmlFor="student_id" className="mb-2 block text-sm text-zinc-900">
               Étudiant <span className="text-red-500">*</span>
             </label>
-            <select
-              id="student_id"
-              {...register("student_id")}
-              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.student_id ? "border-red-300" : "border-zinc-300"}`}
+            <input type="hidden" id="student_id" {...register("student_id")} />
+            <StudentSearch
+              value={displayedStudentLabel}
+              onSelect={(student) =>
+                {
+                  setValue("student_id", student.id, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                  setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
+                }
+              }
+              onClear={() =>
+                {
+                  setValue("student_id", "", {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                  setSelectedStudentLabel("");
+                }
+              }
+              placeholder="Rechercher par nom ou matricule..."
               disabled={isLoading}
-            >
-              <option value="">Sélectionner un étudiant</option>
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.student_number} - {student.full_name}
-                </option>
-              ))}
-            </select>
+            />
             {errors.student_id && (
               <p className="mt-1.5 text-xs text-red-600">{errors.student_id.message}</p>
             )}
@@ -92,7 +114,7 @@ export default function EnrollmentForm({
           {/* Enrollment Date */}
           <div>
             <label htmlFor="enrollment_date" className="mb-2 block text-sm text-zinc-900">
-              Date d'inscription <span className="text-red-500">*</span>
+              Date d&apos;inscription <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -204,7 +226,7 @@ export default function EnrollmentForm({
           {/* Registration Fee Paid */}
           <div>
             <label htmlFor="registration_fee_paid" className="mb-2 block text-sm text-zinc-900">
-              Frais d'inscription payés (FCFA) <span className="text-red-500">*</span>
+              Frais d&apos;inscription payés (FCFA) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"

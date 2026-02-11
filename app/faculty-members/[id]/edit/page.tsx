@@ -7,7 +7,10 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
 import { useDepartments } from "@/hooks/use-departments";
-import { useFacultyMember } from "@/hooks/use-faculty-members-management";
+import {
+  useFacultyMember,
+  useUpdateFacultyMember,
+} from "@/hooks/use-faculty-members-management";
 import { FacultyContractType, FacultyRank } from "@/types/academic";
 
 export default function FacultyMemberEditPage() {
@@ -16,6 +19,7 @@ export default function FacultyMemberEditPage() {
   const facultyId = params?.id as string;
   const { data: faculty, isLoading } = useFacultyMember(facultyId, !!facultyId);
   const { data: departmentsData } = useDepartments({ page: 1, limit: 50 });
+  const updateMutation = useUpdateFacultyMember();
 
   const [toast, setToast] = useState({
     isOpen: false,
@@ -48,13 +52,36 @@ export default function FacultyMemberEditPage() {
     });
   }, [faculty]);
 
-  const handleSubmit = () => {
-    setToast({
-      isOpen: true,
-      message: "Modifications enregistrées (connexion API à venir).",
-      type: "success",
-    });
-    router.push(`/faculty-members/${facultyId}`);
+  const handleSubmit = async () => {
+    try {
+      await updateMutation.mutateAsync({
+        id: facultyId,
+        input: {
+          full_name: formData.full_name,
+          phone: formData.phone,
+          address: formData.address || undefined,
+          department_id: formData.department_id,
+          rank: formData.rank,
+          contract_type: formData.contract_type,
+          hire_date: formData.hire_date,
+        },
+      });
+      setToast({
+        isOpen: true,
+        message: "Modifications enregistrées avec succès.",
+        type: "success",
+      });
+      setTimeout(() => {
+        router.push(`/faculty-members/${facultyId}`);
+      }, 1000);
+    } catch (error) {
+      console.error("Error updating faculty member:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la mise à jour de l'enseignant.",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -167,7 +194,7 @@ export default function FacultyMemberEditPage() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Date d'embauche
+                  Date d&apos;embauche
                 </label>
                 <input
                   type="date"
@@ -191,9 +218,10 @@ export default function FacultyMemberEditPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
+                disabled={updateMutation.isPending}
                 className="rounded-lg bg-[#008D36] px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E]"
               >
-                Enregistrer
+                {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
               </button>
             </div>
           </div>

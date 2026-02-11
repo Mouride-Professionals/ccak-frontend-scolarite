@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 import { Gender } from "@/types/student";
+import { EnrollmentStatus } from "@/types/enrollment";
 
 // Common validation patterns
 const PHONE_REGEX = /^\+221\d{9}$/;
@@ -87,9 +88,19 @@ export const CourseSchema = z.object({
 
 export const EnrollmentSchema = z.object({
   student_id: z.string().min(1, "L'étudiant est requis"),
-  course_id: z.string().min(1, "Le cours est requis"),
+  academic_program_id: z.string().min(1, "Le programme académique est requis"),
+  academic_year_id: z.string().min(1, "L'année académique est requise"),
+  current_semester: z
+    .number()
+    .int("Le semestre doit être un nombre entier")
+    .min(1, "Le semestre doit être compris entre 1 et 6")
+    .max(6, "Le semestre doit être compris entre 1 et 6"),
   enrollment_date: z.string().min(1, "La date d'inscription est requise"),
-  status: z.enum(["active", "completed", "withdrawn", "suspended"]).default("active"),
+  registration_fee_paid: z
+    .number()
+    .min(0, "Les frais d'inscription ne peuvent pas être négatifs"),
+  is_scholarship: z.boolean().default(false),
+  status: z.nativeEnum(EnrollmentStatus).default(EnrollmentStatus.PENDING),
 });
 
 // ============================================================================

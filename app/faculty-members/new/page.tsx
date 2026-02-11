@@ -6,7 +6,11 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
 import { useDepartments } from "@/hooks/use-departments";
-import { FacultyContractType, FacultyRank } from "@/types/academic";
+import {
+  useCreateFacultyMember,
+  useCreateFacultyDocument,
+} from "@/hooks/use-faculty-members-management";
+import { FacultyContractType, FacultyDocumentType, FacultyRank } from "@/types/academic";
 
 const steps = [
   { id: 1, label: "Informations personnelles" },
@@ -18,6 +22,8 @@ const steps = [
 export default function FacultyRegistrationPage() {
   const router = useRouter();
   const { data: departmentsData } = useDepartments({ page: 1, limit: 50 });
+  const createFacultyMutation = useCreateFacultyMember();
+  const uploadDocumentMutation = useCreateFacultyDocument();
   const [step, setStep] = useState(1);
   const [toast, setToast] = useState({
     isOpen: false,
@@ -73,13 +79,60 @@ export default function FacultyRegistrationPage() {
 
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = () => {
-    setToast({
-      isOpen: true,
-      message: "Formulaire envoyé (connexion API à venir).",
-      type: "success",
-    });
-    router.push("/faculty-members");
+  const handleSubmit = async () => {
+    try {
+      const createdFaculty = await createFacultyMutation.mutateAsync({
+        full_name: formData.full_name,
+        email: formData.email || undefined,
+        phone: formData.phone,
+        address: formData.address || undefined,
+        department_id: formData.department_id,
+        rank: formData.rank,
+        contract_type: formData.contract_type,
+        hire_date: formData.hire_date,
+        salary: formData.salary ? Number(formData.salary) : null,
+        contract_start: formData.contract_start || undefined,
+        contract_end: formData.contract_end || undefined,
+        contract_terms: formData.contract_terms || undefined,
+      });
+
+      const documents = [
+        { file: formData.documents.cv, type: FacultyDocumentType.CV },
+        { file: formData.documents.diploma, type: FacultyDocumentType.DIPLOMA },
+        { file: formData.documents.cni, type: FacultyDocumentType.CNI },
+        { file: formData.documents.other, type: FacultyDocumentType.OTHER },
+      ].filter((item): item is { file: File; type: FacultyDocumentType } => item.file !== null);
+
+      if (documents.length > 0) {
+        await Promise.all(
+          documents.map((doc) =>
+            uploadDocumentMutation.mutateAsync({
+              facultyId: createdFaculty.id,
+              input: {
+                document: doc.file,
+                type: doc.type,
+              },
+            })
+          )
+        );
+      }
+
+      setToast({
+        isOpen: true,
+        message: "Enseignant créé avec succès.",
+        type: "success",
+      });
+      setTimeout(() => {
+        router.push("/faculty-members");
+      }, 1200);
+    } catch (error) {
+      console.error("Error creating faculty member:", error);
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la création de l'enseignant.",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -194,7 +247,7 @@ export default function FacultyRegistrationPage() {
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Date d'embauche *
+                    Date d&apos;embauche *
                   </label>
                   <input
                     type="date"
@@ -347,9 +400,12 @@ export default function FacultyRegistrationPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
+                disabled={createFacultyMutation.isPending || uploadDocumentMutation.isPending}
                 className="rounded-lg bg-[#008D36] px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E]"
               >
-                Enregistrer
+                {createFacultyMutation.isPending || uploadDocumentMutation.isPending
+                  ? "Enregistrement..."
+                  : "Enregistrer"}
               </button>
             )}
           </div>

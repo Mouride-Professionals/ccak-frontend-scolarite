@@ -4,22 +4,20 @@ import { useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import AttendanceStatusBadge from "@/components/attendance/attendance-status-badge";
-import ListHeader from "@/components/ui/list-header";
+import StudentSearch from "@/components/students/student-search";
 import Pagination from "@/components/ui/pagination";
 import { useCourses } from "@/hooks/use-courses";
-import { useStudents } from "@/hooks/use-students";
 import { useStudentAttendance } from "@/hooks/use-attendance";
 
 export default function StudentAttendancePage() {
-  const [search, setSearch] = useState("");
   const [studentId, setStudentId] = useState("");
+  const [selectedStudentLabel, setSelectedStudentLabel] = useState("");
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
     course_id: "",
   });
 
-  const { data: students } = useStudents({ search: search || undefined, page: 1, limit: 15 });
   const { data: courses } = useCourses({ page: 1, limit: 100 });
   const { data: attendance, isLoading } = useStudentAttendance(studentId, {
     page: filters.page,
@@ -30,28 +28,24 @@ export default function StudentAttendancePage() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Présences étudiant">
-        <ListHeader
-          searchValue={search}
-          onSearchChange={setSearch}
-          searchPlaceholder="Rechercher un étudiant..."
-        />
-
         <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">Étudiant</label>
-              <select
-                value={studentId}
-                onChange={(event) => setStudentId(event.target.value)}
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-              >
-                <option value="">Sélectionner</option>
-                {(students?.data ?? []).map((student) => (
-                  <option key={student.id} value={student.id}>
-                    {student.full_name} · {student.student_number}
-                  </option>
-                ))}
-              </select>
+              <StudentSearch
+                value={selectedStudentLabel}
+                onSelect={(student) => {
+                  setStudentId(student.id);
+                  setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
+                  setFilters((prev) => ({ ...prev, page: 1 }));
+                }}
+                onClear={() => {
+                  setStudentId("");
+                  setSelectedStudentLabel("");
+                  setFilters((prev) => ({ ...prev, page: 1 }));
+                }}
+                placeholder="Rechercher par nom ou matricule..."
+              />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">Cours</label>

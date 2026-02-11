@@ -138,7 +138,34 @@ export interface CreateDeliberationResultInput {
   honor_level?: HonorLevel;
 }
 
-export interface UpdateDeliberationResultInput extends Partial<CreateDeliberationResultInput> {}
+export interface UpdateDeliberationResultInput
+  extends Partial<Omit<CreateDeliberationResultInput, "decision" | "jury_remarks" | "honor_level">> {
+  decision?: DeliberationDecision | null;
+  jury_remarks?: string | null;
+  honor_level?: HonorLevel | null;
+}
+
+export interface FinalizeDeliberationSessionInput {
+  completion_notes?: string;
+  lock_session?: boolean;
+}
+
+export interface StudentDeliberationHistoryItem {
+  id: string;
+  deliberation_session_id: string;
+  session_name: string;
+  session_date: string;
+  semester: number;
+  academic_program_name?: string;
+  academic_year_name?: string;
+  decision: DeliberationDecision | null;
+  jury_remarks: string | null;
+  is_with_honors: boolean;
+  honor_level: HonorLevel | null;
+  semester_average?: number | null;
+  total_credits_earned?: number | null;
+  total_credits_enrolled?: number | null;
+}
 
 // =====================
 // FILTERS & QUERIES
@@ -195,4 +222,9 @@ export interface DeliberationResultsResponse {
   page: number;
   limit: number;
   total_pages: number;
+}
+
+export interface StudentDeliberationHistoryResponse {
+  data: StudentDeliberationHistoryItem[];
+  total: number;
 }

@@ -4,14 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
-import ListHeader from "@/components/ui/list-header";
-import { useStudents } from "@/hooks/use-students";
+import StudentSearch from "@/components/students/student-search";
 import { useStudentEvaluations } from "@/hooks/use-evaluations";
 
 export default function StudentEvaluationsPage() {
-  const [search, setSearch] = useState("");
   const [studentId, setStudentId] = useState("");
-  const { data: students } = useStudents({ search: search || undefined, page: 1, limit: 15 });
+  const [selectedStudentLabel, setSelectedStudentLabel] = useState("");
   const { data: evaluations, isLoading } = useStudentEvaluations(studentId);
   const evaluationList = Array.isArray(evaluations)
     ? evaluations
@@ -20,26 +18,20 @@ export default function StudentEvaluationsPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Évaluations étudiant">
-        <ListHeader
-          searchValue={search}
-          onSearchChange={setSearch}
-          searchPlaceholder="Rechercher un étudiant..."
-        />
-
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <label className="mb-2 block text-sm font-medium text-zinc-700">Étudiant</label>
-          <select
-            value={studentId}
-            onChange={(event) => setStudentId(event.target.value)}
-            className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-          >
-            <option value="">Sélectionner</option>
-            {(students?.data ?? []).map((student) => (
-              <option key={student.id} value={student.id}>
-                {student.full_name} · {student.student_number}
-              </option>
-            ))}
-          </select>
+          <StudentSearch
+            value={selectedStudentLabel}
+            onSelect={(student) => {
+              setStudentId(student.id);
+              setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
+            }}
+            onClear={() => {
+              setStudentId("");
+              setSelectedStudentLabel("");
+            }}
+            placeholder="Rechercher par nom ou matricule..."
+          />
 
           <div className="mt-6">
             {studentId ? (
