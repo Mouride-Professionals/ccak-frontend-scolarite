@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
+import RichTextEditor from "@/components/shared/rich-text-editor";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { useCourses } from "@/hooks/use-courses";
 import { useCourseLogsForCourse, useUpdateCourseLog } from "@/hooks/use-course-logs";
 import type { CourseLog } from "@/types/course-log";
@@ -13,8 +15,15 @@ import type { CourseLog } from "@/types/course-log";
 const formatList = (items?: string[]) => (items?.length ? items.join(", ") : "");
 const formatTopics = (topics?: string[]) => formatList(topics);
 
+const parseList = (value: string) =>
+  value
+    .split(/\n|,/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
 export default function CourseLogHistoryPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -71,22 +80,9 @@ export default function CourseLogHistoryPage() {
       await updateLog.mutateAsync({
         id: editingLog.id,
         input: {
-          topics: editForm.topics
-            .split(/\n|,/)
-            .map((entry) => entry.trim())
-            .filter(Boolean),
-          chapters: editForm.chapters
-            ? editForm.chapters
-                .split(/\n|,/)
-                .map((entry) => entry.trim())
-                .filter(Boolean)
-            : undefined,
-          objectives: editForm.objectives
-            ? editForm.objectives
-                .split(/\n|,/)
-                .map((entry) => entry.trim())
-                .filter(Boolean)
-            : undefined,
+          topics: parseList(editForm.topics),
+          chapters: editForm.chapters ? parseList(editForm.chapters) : undefined,
+          objectives: editForm.objectives ? parseList(editForm.objectives) : undefined,
           notes: editForm.notes || undefined,
         },
       });
@@ -95,6 +91,61 @@ export default function CourseLogHistoryPage() {
     } catch {
       setToast({ isOpen: true, message: "Erreur lors de la mise à jour.", type: "error" });
     }
+  };
+
+  const handlePrint = () => {
+    if (!filteredLogs.length) return;
+
+    const printWindow = window.open("", "_blank", "width=1000,height=800");
+    if (!printWindow) return;
+
+    const rows = filteredLogs
+      .map(
+        (log) => `
+          <tr>
+            <td>${new Date(log.session_date).toLocaleDateString("fr-FR")}</td>
+            <td>${formatTopics(log.topics)}</td>
+            <td>${formatList(log.chapters)}</td>
+            <td>${formatList(log.objectives)}</td>
+            <td>${sanitizeHtml(log.notes ?? "-")}</td>
+          </tr>
+        `
+      )
+      .join("");
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Historique cahier de texte</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            h1 { margin-bottom: 12px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border: 1px solid #d4d4d8; padding: 8px; vertical-align: top; }
+            th { background: #eef2f7; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <h1>Historique des cahiers de texte</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sujets</th>
+                <th>Chapitres</th>
+                <th>Objectifs</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   };
 
   return (
@@ -122,6 +173,14 @@ export default function CourseLogHistoryPage() {
                 }
                 className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
               />
+              <button
+                type="button"
+                onClick={handlePrint}
+                disabled={filteredLogs.length === 0}
+                className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-[#00365F] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Imprimer
+              </button>
             </div>
           }
         />
@@ -174,22 +233,56 @@ export default function CourseLogHistoryPage() {
                     </thead>
                     <tbody className="divide-y divide-zinc-100">
                       {filteredLogs.map((log) => (
-                        <tr key={log.id}>
-                          <td className="px-4 py-3">
-                            {new Date(log.session_date).toLocaleDateString("fr-FR")}
-                          </td>
-                          <td className="px-4 py-3">{formatTopics(log.topics)}</td>
-                          <td className="px-4 py-3 text-zinc-500">{log.notes || "—"}</td>
-                          <td className="px-4 py-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(log)}
-                              className="text-sm font-medium text-[#00365F]"
-                            >
-                              Modifier
-                            </button>
-                          </td>
-                        </tr>
+                        <Fragment key={log.id}>
+                          <tr>
+                            <td className="px-4 py-3">{new Date(log.session_date).toLocaleDateString("fr-FR")}</td>
+                            <td className="px-4 py-3">{formatTopics(log.topics)}</td>
+                            <td className="px-4 py-3 text-zinc-500">{log.notes ? "Notes disponibles" : "—"}</td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="inline-flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExpandedLogId((prev) => (prev === log.id ? null : log.id))
+                                  }
+                                  className="text-sm font-medium text-zinc-600"
+                                >
+                                  {expandedLogId === log.id ? "Masquer" : "Détails"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleEdit(log)}
+                                  className="text-sm font-medium text-[#00365F]"
+                                >
+                                  Modifier
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {expandedLogId === log.id && (
+                            <tr>
+                              <td colSpan={4} className="bg-zinc-50 px-4 py-3">
+                                <div className="grid gap-3 md:grid-cols-2">
+                                  <div>
+                                    <p className="text-xs font-semibold uppercase text-zinc-500">Chapitres</p>
+                                    <p className="text-sm text-zinc-700">{formatList(log.chapters) || "-"}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-semibold uppercase text-zinc-500">Objectifs</p>
+                                    <p className="text-sm text-zinc-700">{formatList(log.objectives) || "-"}</p>
+                                  </div>
+                                </div>
+                                <div className="mt-3">
+                                  <p className="text-xs font-semibold uppercase text-zinc-500">Notes</p>
+                                  <div
+                                    className="mt-1 rounded-md border border-zinc-200 bg-white p-2 text-sm text-zinc-700"
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(log.notes || "-") }}
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -197,7 +290,7 @@ export default function CourseLogHistoryPage() {
               )
             ) : (
               <div className="text-sm text-zinc-500">
-                Sélectionnez un cours pour afficher l'historique.
+                Sélectionnez un cours pour afficher l&apos;historique.
               </div>
             )}
 
@@ -219,14 +312,10 @@ export default function CourseLogHistoryPage() {
             {editingLog ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">
-                    Sujets abordés
-                  </label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">Sujets abordés</label>
                   <textarea
                     value={editForm.topics}
-                    onChange={(event) =>
-                      setEditForm((prev) => ({ ...prev, topics: event.target.value }))
-                    }
+                    onChange={(event) => setEditForm((prev) => ({ ...prev, topics: event.target.value }))}
                     rows={4}
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
@@ -235,9 +324,7 @@ export default function CourseLogHistoryPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Chapitres</label>
                   <input
                     value={editForm.chapters}
-                    onChange={(event) =>
-                      setEditForm((prev) => ({ ...prev, chapters: event.target.value }))
-                    }
+                    onChange={(event) => setEditForm((prev) => ({ ...prev, chapters: event.target.value }))}
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>
@@ -254,13 +341,11 @@ export default function CourseLogHistoryPage() {
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Notes</label>
-                  <textarea
+                  <RichTextEditor
                     value={editForm.notes}
-                    onChange={(event) =>
-                      setEditForm((prev) => ({ ...prev, notes: event.target.value }))
-                    }
-                    rows={3}
-                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+                    onChange={(value) => setEditForm((prev) => ({ ...prev, notes: value }))}
+                    placeholder="Notes de séance..."
+                    minHeightClassName="min-h-[150px]"
                   />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -281,9 +366,7 @@ export default function CourseLogHistoryPage() {
                 </div>
               </div>
             ) : (
-              <p className="mt-4 text-sm text-zinc-500">
-                Sélectionnez une séance pour modifier son contenu.
-              </p>
+              <p className="mt-4 text-sm text-zinc-500">Sélectionnez une séance pour modifier son contenu.</p>
             )}
           </div>
         </div>

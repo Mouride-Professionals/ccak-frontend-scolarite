@@ -1,6 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import AttendanceStatusBadge from "@/components/attendance/attendance-status-badge";
@@ -8,6 +20,8 @@ import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import { useCourses } from "@/hooks/use-courses";
 import { useCourseAttendance } from "@/hooks/use-attendance";
+
+const COLORS = ["#0A8F3D", "#E11D48", "#D97706", "#083B66"];
 
 export default function CourseAttendanceReportPage() {
   const { data: courses } = useCourses({ page: 1, limit: 100 });
@@ -23,6 +37,35 @@ export default function CourseAttendanceReportPage() {
     limit: filters.limit,
     session_date: filters.session_date || undefined,
   });
+
+  const stats = useMemo(() => {
+    const records = attendance?.data ?? [];
+    const present = records.filter((record) => record.status === "PRESENT").length;
+    const absent = records.filter((record) => record.status === "ABSENT").length;
+    const late = records.filter((record) => record.status === "LATE").length;
+    const excused = records.filter((record) => record.status === "EXCUSED").length;
+    const total = records.length;
+    const attendanceRate = total > 0 ? Math.round(((present + excused) / total) * 100) : 0;
+
+    return {
+      present,
+      absent,
+      late,
+      excused,
+      total,
+      attendanceRate,
+    };
+  }, [attendance?.data]);
+
+  const chartData = useMemo(
+    () => [
+      { name: "Présent", value: stats.present },
+      { name: "Absent", value: stats.absent },
+      { name: "Retard", value: stats.late },
+      { name: "Excusé", value: stats.excused },
+    ],
+    [stats]
+  );
 
   const handleExport = () => {
     const records = attendance?.data ?? [];
@@ -91,6 +134,69 @@ export default function CourseAttendanceReportPage() {
           </select>
         </div>
 
+        {courseId && (
+          <>
+            <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm">
+                Présents: <span className="font-semibold text-[#0A8F3D]">{stats.present}</span>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm">
+                Absents: <span className="font-semibold text-[#E11D48]">{stats.absent}</span>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm">
+                Retards: <span className="font-semibold text-amber-600">{stats.late}</span>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm">
+                Dispensés: <span className="font-semibold text-[#083B66]">{stats.excused}</span>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm">
+                Taux: <span className="font-semibold text-[#00365F]">{stats.attendanceRate}%</span>
+              </div>
+            </div>
+
+            <div className="mb-6 grid gap-6 xl:grid-cols-2">
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-[#00365F]">Distribution des statuts</h3>
+                <div className="mt-3 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-[#00365F]">Comparatif des statuts</h3>
+                <div className="mt-3 h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#083B66" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           {courseId ? (
             isLoading ? (
@@ -115,17 +221,11 @@ export default function CourseAttendanceReportPage() {
                     {(attendance?.data ?? []).map((record) => (
                       <tr key={record.id}>
                         <td className="px-4 py-3">
-                          <div className="font-medium text-zinc-800">
-                            {record.student?.full_name ?? record.student_id}
-                          </div>
-                          <div className="text-xs text-zinc-500">
-                            {record.student?.student_number ?? ""}
-                          </div>
+                          <div className="font-medium text-zinc-800">{record.student?.full_name ?? record.student_id}</div>
+                          <div className="text-xs text-zinc-500">{record.student?.student_number ?? ""}</div>
                         </td>
                         <td className="px-4 py-3">
-                          {record.marked_at
-                            ? new Date(record.marked_at).toLocaleDateString("fr-FR")
-                            : "—"}
+                          {record.marked_at ? new Date(record.marked_at).toLocaleDateString("fr-FR") : "—"}
                         </td>
                         <td className="px-4 py-3">
                           <AttendanceStatusBadge status={record.status} />

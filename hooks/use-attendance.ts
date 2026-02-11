@@ -30,11 +30,15 @@ export function useCourseAttendance(courseId: string, filters?: AttendanceFilter
   });
 }
 
-export function useStudentDispensations(studentId: string) {
+export function useStudentDispensations(
+  studentId: string,
+  options?: { enabled?: boolean; refetchInterval?: number }
+) {
   return useQuery({
     queryKey: attendanceKeys.dispensations(studentId),
     queryFn: () => attendanceApi.getStudentDispensations(studentId),
-    enabled: !!studentId,
+    enabled: (options?.enabled ?? true) && !!studentId,
+    refetchInterval: options?.refetchInterval,
   });
 }
 
