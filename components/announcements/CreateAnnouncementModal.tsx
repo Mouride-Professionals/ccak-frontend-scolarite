@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import type { CreateAnnouncementPayload, Announcement } from "@/lib/api/announcements";
 import Portal from "@/components/ui/Portal";
+import RichTextEditor from "@/components/shared/rich-text-editor";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 interface CreateAnnouncementModalProps {
   isOpen: boolean;
@@ -17,14 +19,14 @@ const priorities = [
   { value: "medium", label: "Moyenne", color: "text-blue-600" },
   { value: "high", label: "Haute", color: "text-orange-600" },
   { value: "critical", label: "Critique", color: "text-red-600" },
-];
+] as const;
 
 const roles = [
   { value: "STUDENT", label: "Étudiants" },
   { value: "FACULTY", label: "Enseignants" },
   { value: "ADMIN", label: "Administrateurs" },
   { value: "STAFF", label: "Personnel" },
-];
+] as const;
 
 export default function CreateAnnouncementModal({
   isOpen,
@@ -33,6 +35,7 @@ export default function CreateAnnouncementModal({
   announcement,
   isLoading,
 }: CreateAnnouncementModalProps) {
+  const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState<CreateAnnouncementPayload>({
     title: "",
     content: "",
@@ -43,6 +46,7 @@ export default function CreateAnnouncementModal({
 
   useEffect(() => {
     if (announcement) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: announcement.title,
         content: announcement.content,
@@ -60,6 +64,10 @@ export default function CreateAnnouncementModal({
         target_audience: { roles: [] },
         is_draft: true,
       });
+    }
+
+    if (!isOpen) {
+      setShowPreview(false);
     }
   }, [announcement, isOpen]);
 
@@ -100,7 +108,6 @@ export default function CreateAnnouncementModal({
             aria-hidden="true"
           />
 
-          {/* Center the modal */}
           <span className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
             &#8203;
           </span>
@@ -120,7 +127,6 @@ export default function CreateAnnouncementModal({
                 </div>
 
                 <div className="space-y-4">
-                  {/* Title */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Titre <span className="text-red-500">*</span>
@@ -134,22 +140,42 @@ export default function CreateAnnouncementModal({
                     />
                   </div>
 
-                  {/* Content */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Contenu <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      required
-                      rows={6}
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#00365F] focus:outline-none focus:ring-[#00365F]"
-                    />
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Contenu <span className="text-red-500">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPreview((prev) => !prev)}
+                        className="text-xs font-medium text-[#00365F] transition-colors hover:text-[#0A8F3D]"
+                      >
+                        {showPreview ? "Modifier" : "Prévisualiser"}
+                      </button>
+                    </div>
+
+                    {!showPreview ? (
+                      <RichTextEditor
+                        value={formData.content}
+                        onChange={(value) => setFormData({ ...formData, content: value })}
+                        placeholder="Rédigez le contenu de l'annonce..."
+                        minHeightClassName="min-h-[220px]"
+                      />
+                    ) : (
+                      <div className="min-h-[220px] rounded-lg border border-zinc-300 bg-white p-3 text-sm">
+                        {formData.content.trim().length === 0 ? (
+                          <p className="text-zinc-500">Aucun contenu à prévisualiser.</p>
+                        ) : (
+                          <div
+                            className="text-zinc-800"
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(formData.content) }}
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Priority */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Priorité</label>
                       <select
@@ -157,7 +183,7 @@ export default function CreateAnnouncementModal({
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            priority: e.target.value as any,
+                            priority: e.target.value as "low" | "medium" | "high" | "critical",
                           })
                         }
                         className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#00365F] focus:outline-none focus:ring-[#00365F]"
@@ -170,7 +196,6 @@ export default function CreateAnnouncementModal({
                       </select>
                     </div>
 
-                    {/* Draft */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Statut</label>
                       <select
@@ -189,9 +214,8 @@ export default function CreateAnnouncementModal({
                     </div>
                   </div>
 
-                  {/* Target Roles */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="mb-2 block text-sm font-medium text-gray-700">
                       Public cible (laisser vide pour tous)
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -210,7 +234,6 @@ export default function CreateAnnouncementModal({
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Publish At */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         Date de publication
@@ -223,10 +246,9 @@ export default function CreateAnnouncementModal({
                       />
                     </div>
 
-                    {/* Expire At */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Date d'expiration
+                        Date d&apos;expiration
                       </label>
                       <input
                         type="datetime-local"

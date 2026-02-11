@@ -7,7 +7,7 @@ export interface Notification {
   channel: string;
   title: string;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   is_read: boolean;
   read_at: string | null;
   created_at: string;
@@ -20,7 +20,7 @@ export interface SendNotificationPayload {
   message: string;
   type: string;
   channels?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationListResponse {

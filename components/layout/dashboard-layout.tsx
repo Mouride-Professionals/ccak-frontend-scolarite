@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Sidebar from "./sidebar";
 import Navbar from "./navbar";
+import AnnouncementBanner from "@/components/announcements/announcement-banner";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -36,7 +37,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
         <Navbar title={title} onMenuToggle={handleToggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         {/* Page Content */}
-        <main className="mt-16 p-4 md:p-8">{children}</main>
+        <main className="mt-16 p-4 md:p-8">
+          <AnnouncementBanner />
+          {children}
+        </main>
       </div>
     </div>
   );
