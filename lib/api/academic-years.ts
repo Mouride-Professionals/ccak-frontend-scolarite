@@ -13,7 +13,9 @@ import type {
   UpdateAcademicYearInput,
 } from "@/types/academic-year";
 
-export async function getAcademicYears(filters?: AcademicYearFilters): Promise<AcademicYearsResponse> {
+export async function getAcademicYears(
+  filters?: AcademicYearFilters
+): Promise<AcademicYearsResponse> {
   const params = new URLSearchParams();
   if (filters?.page) params.append("page", filters.page.toString());
   if (filters?.limit) params.append("per_page", filters.limit.toString());
@@ -38,7 +40,10 @@ export async function createAcademicYear(input: CreateAcademicYearInput): Promis
   return unwrapData<AcademicYear>(response);
 }
 
-export async function updateAcademicYear({ id, input }: UpdateAcademicYearInput): Promise<AcademicYear> {
+export async function updateAcademicYear({
+  id,
+  input,
+}: UpdateAcademicYearInput): Promise<AcademicYear> {
   const response = await api.put(
     `/academic-years/${id}`,
     input as unknown as Record<string, unknown>

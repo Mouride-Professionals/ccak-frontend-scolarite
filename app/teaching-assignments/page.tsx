@@ -51,14 +51,7 @@ export default function TeachingAssignmentsPage() {
   const assignments = data?.data ?? [];
 
   const handleExport = () => {
-    const header = [
-      "Enseignant",
-      "Cours",
-      "Année académique",
-      "Rôle",
-      "Heures",
-      "Taux horaire",
-    ];
+    const header = ["Enseignant", "Cours", "Année académique", "Rôle", "Heures", "Taux horaire"];
     const csvRows = assignments.map((item) =>
       [
         item.faculty_name,

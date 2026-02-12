@@ -97,24 +97,20 @@ export default function EnrollmentForm({
             <input type="hidden" id="student_id" {...register("student_id")} />
             <StudentSearch
               value={displayedStudentLabel}
-              onSelect={(student) =>
-                {
-                  setValue("student_id", student.id, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
-                  setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
-                }
-              }
-              onClear={() =>
-                {
-                  setValue("student_id", "", {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
-                  setSelectedStudentLabel("");
-                }
-              }
+              onSelect={(student) => {
+                setValue("student_id", student.id, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setSelectedStudentLabel(`${student.full_name} · ${student.student_number}`);
+              }}
+              onClear={() => {
+                setValue("student_id", "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                setSelectedStudentLabel("");
+              }}
               placeholder="Rechercher par nom ou matricule..."
               disabled={isLoading}
             />
@@ -161,7 +157,9 @@ export default function EnrollmentForm({
               id="academic_program_id"
               {...register("academic_program_id")}
               aria-invalid={!!errors.academic_program_id}
-              aria-describedby={errors.academic_program_id ? "academic_program_id-error" : undefined}
+              aria-describedby={
+                errors.academic_program_id ? "academic_program_id-error" : undefined
+              }
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_program_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -261,7 +259,9 @@ export default function EnrollmentForm({
               id="registration_fee_paid"
               {...register("registration_fee_paid", { valueAsNumber: true })}
               aria-invalid={!!errors.registration_fee_paid}
-              aria-describedby={errors.registration_fee_paid ? "registration_fee_paid-error" : undefined}
+              aria-describedby={
+                errors.registration_fee_paid ? "registration_fee_paid-error" : undefined
+              }
               placeholder="| Saisir"
               min="0"
               step="1000"

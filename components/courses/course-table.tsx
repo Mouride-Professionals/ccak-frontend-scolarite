@@ -35,10 +35,15 @@ export default function CourseTable({
         {courses.map((course) => {
           const prerequisites = getPrerequisiteLabels(course, courses);
           return (
-            <div key={course.id} className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <div
+              key={course.id}
+              className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{course.code}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    {course.code}
+                  </p>
                   <h3 className="mt-1 text-sm font-semibold text-zinc-900">{course.name}</h3>
                 </div>
                 <span
@@ -50,11 +55,17 @@ export default function CourseTable({
                 </span>
               </div>
 
-              <p className="mt-3 text-xs text-zinc-500 line-clamp-2">{course.description || "Sans description"}</p>
+              <p className="mt-3 text-xs text-zinc-500 line-clamp-2">
+                {course.description || "Sans description"}
+              </p>
 
               <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-zinc-600">
-                <div>Crédits: <span className="font-medium">{course.credits}</span></div>
-                <div>Coeff: <span className="font-medium">{course.coefficient}</span></div>
+                <div>
+                  Crédits: <span className="font-medium">{course.credits}</span>
+                </div>
+                <div>
+                  Coeff: <span className="font-medium">{course.coefficient}</span>
+                </div>
                 <div className="col-span-2">
                   Heures: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}
                 </div>
@@ -65,7 +76,10 @@ export default function CourseTable({
                 {prerequisites.length > 0 ? (
                   <div className="mt-1 flex flex-wrap gap-1">
                     {prerequisites.slice(0, 2).map((label) => (
-                      <span key={label} className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700">
+                      <span
+                        key={label}
+                        className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700"
+                      >
                         {label}
                       </span>
                     ))}
@@ -115,7 +129,9 @@ export default function CourseTable({
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Code</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Nom</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Crédits</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Heures (CM/TD/TP)</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">
+              Heures (CM/TD/TP)
+            </th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Coefficient</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Prérequis</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Statut</th>
@@ -145,7 +161,10 @@ export default function CourseTable({
                   {prerequisites.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {prerequisites.slice(0, 2).map((label) => (
-                        <span key={label} className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700">
+                        <span
+                          key={label}
+                          className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700"
+                        >
                           {label}
                         </span>
                       ))}
@@ -175,7 +194,12 @@ export default function CourseTable({
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Éditer"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -189,7 +213,12 @@ export default function CourseTable({
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Voir"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -209,7 +238,12 @@ export default function CourseTable({
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Supprimer"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"

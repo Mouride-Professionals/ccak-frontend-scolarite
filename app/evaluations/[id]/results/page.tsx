@@ -74,7 +74,8 @@ export default function EvaluationResultsPage() {
   const averageRating = Number(
     results?.average_rating ??
       (ratingDetails.length
-        ? ratingDetails.reduce((sum, item) => sum + Number(item.average || 0), 0) / ratingDetails.length
+        ? ratingDetails.reduce((sum, item) => sum + Number(item.average || 0), 0) /
+          ratingDetails.length
         : 0)
   );
   const benchmarkAverage = Number(results?.benchmark_average ?? 3.5);
@@ -152,10 +153,13 @@ export default function EvaluationResultsPage() {
       headStyles: { fillColor: [0, 54, 95] },
     });
 
-    const lastY = (doc as jsPDF & { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? 60;
+    const lastY =
+      (doc as jsPDF & { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? 60;
     doc.text("Commentaires marquants", 14, lastY + 10);
 
-    const commentPreview = comments.length ? comments.slice(0, 8) : ["Aucun commentaire disponible."];
+    const commentPreview = comments.length
+      ? comments.slice(0, 8)
+      : ["Aucun commentaire disponible."];
     autoTable(doc, {
       startY: lastY + 14,
       head: [["Commentaire"]],
@@ -194,7 +198,9 @@ export default function EvaluationResultsPage() {
 
           <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
             <p className="text-xs text-zinc-500">Note moyenne</p>
-            <p className="mt-2 text-3xl font-semibold text-[#00365F]">{averageRating.toFixed(2)}/5</p>
+            <p className="mt-2 text-3xl font-semibold text-[#00365F]">
+              {averageRating.toFixed(2)}/5
+            </p>
             <p className="mt-2 text-xs text-zinc-500">
               Comparatif attendu: {benchmarkAverage.toFixed(2)}/5
             </p>
@@ -207,7 +213,8 @@ export default function EvaluationResultsPage() {
               Cours: {evaluation?.course?.name ?? evaluation?.course_id ?? "-"}
             </p>
             <p className="text-xs text-zinc-500">
-              Enseignant: {evaluation?.faculty_member?.full_name ?? evaluation?.faculty_member_id ?? "-"}
+              Enseignant:{" "}
+              {evaluation?.faculty_member?.full_name ?? evaluation?.faculty_member_id ?? "-"}
             </p>
           </div>
         </div>
@@ -333,7 +340,9 @@ export default function EvaluationResultsPage() {
               })}
             </div>
           ) : (
-            <p className="mt-4 text-sm text-zinc-500">Aucun commentaire exploitable pour le nuage de mots.</p>
+            <p className="mt-4 text-sm text-zinc-500">
+              Aucun commentaire exploitable pour le nuage de mots.
+            </p>
           )}
         </div>
       </DashboardLayout>

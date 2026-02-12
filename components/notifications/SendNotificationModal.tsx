@@ -183,7 +183,10 @@ export default function SendNotificationModal({
                 <div className="space-y-4">
                   {/* Recipient IDs */}
                   <div>
-                    <label htmlFor="recipient_ids" className="block text-sm font-medium text-zinc-800">
+                    <label
+                      htmlFor="recipient_ids"
+                      className="block text-sm font-medium text-zinc-800"
+                    >
                       IDs des destinataires (séparés par des virgules)
                     </label>
                     <input
@@ -209,14 +212,20 @@ export default function SendNotificationModal({
 
                   {/* Type */}
                   <div>
-                    <label htmlFor="notification_type" className="block text-sm font-medium text-zinc-800">
+                    <label
+                      htmlFor="notification_type"
+                      className="block text-sm font-medium text-zinc-800"
+                    >
                       Type de notification
                     </label>
                     <select
                       id="notification_type"
                       value={formData.type}
                       onChange={(e) =>
-                        updateField("type", e.target.value as (typeof NOTIFICATION_TYPE_VALUES)[number])
+                        updateField(
+                          "type",
+                          e.target.value as (typeof NOTIFICATION_TYPE_VALUES)[number]
+                        )
                       }
                       className={`mt-1 block w-full rounded-md border bg-white px-3 py-2 text-zinc-900 shadow-sm focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
                         errors.type ? "border-red-300" : "border-zinc-300"
@@ -239,7 +248,10 @@ export default function SendNotificationModal({
 
                   {/* Title */}
                   <div>
-                    <label htmlFor="notification_title" className="block text-sm font-medium text-zinc-800">
+                    <label
+                      htmlFor="notification_title"
+                      className="block text-sm font-medium text-zinc-800"
+                    >
                       Titre
                     </label>
                     <input
@@ -262,7 +274,10 @@ export default function SendNotificationModal({
 
                   {/* Message */}
                   <div>
-                    <label htmlFor="notification_message" className="block text-sm font-medium text-zinc-800">
+                    <label
+                      htmlFor="notification_message"
+                      className="block text-sm font-medium text-zinc-800"
+                    >
                       Message
                     </label>
                     <textarea

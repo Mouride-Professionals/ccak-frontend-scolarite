@@ -9,8 +9,10 @@ import { useCourseAvailabilities } from "@/hooks/use-course-enrollments";
 import { useCourseBasketStore } from "@/stores/course-basket-store";
 import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 
-export interface CreateCourseEnrollmentBatchInput
-  extends Omit<CreateCourseEnrollmentInput, "course_id"> {
+export interface CreateCourseEnrollmentBatchInput extends Omit<
+  CreateCourseEnrollmentInput,
+  "course_id"
+> {
   course_ids: string[];
 }
 
@@ -420,7 +422,10 @@ export default function CourseEnrollmentForm({
           ) : (
             <div className="mt-4 space-y-2">
               {basketItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2"
+                >
                   <div>
                     <p className="text-sm font-medium text-zinc-900">{item.code}</p>
                     <p className="text-xs text-zinc-500">{item.credits} crédits</p>

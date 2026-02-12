@@ -37,7 +37,9 @@ export default function DashboardPage() {
       trendQuery.error ??
       validationQuery.error ??
       activitiesQuery.error;
-    return firstError ? toUserError(firstError, "Erreur de chargement du tableau de bord.").message : null;
+    return firstError
+      ? toUserError(firstError, "Erreur de chargement du tableau de bord.").message
+      : null;
   }, [
     overviewQuery.error,
     levelsQuery.error,
@@ -55,7 +57,10 @@ export default function DashboardPage() {
         </div>
 
         {globalError && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          <div
+            className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            role="alert"
+          >
             {globalError}
           </div>
         )}
@@ -66,7 +71,9 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-zinc-700">Total Étudiants</p>
                 <p className="mt-2 text-3xl font-bold text-zinc-900">
-                  {overviewQuery.isLoading ? "..." : (overviewQuery.data?.total_students ?? 0).toLocaleString("fr-FR")}
+                  {overviewQuery.isLoading
+                    ? "..."
+                    : (overviewQuery.data?.total_students ?? 0).toLocaleString("fr-FR")}
                 </p>
               </div>
               <div className="rounded-lg bg-blue-100 p-3">
@@ -92,7 +99,9 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-zinc-700">Inscriptions</p>
                 <p className="mt-2 text-3xl font-bold text-zinc-900">
-                  {overviewQuery.isLoading ? "..." : (overviewQuery.data?.total_enrollments ?? 0).toLocaleString("fr-FR")}
+                  {overviewQuery.isLoading
+                    ? "..."
+                    : (overviewQuery.data?.total_enrollments ?? 0).toLocaleString("fr-FR")}
                 </p>
               </div>
               <div className="rounded-lg bg-green-100 p-3">
@@ -118,7 +127,9 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-zinc-700">Délibérations</p>
                 <p className="mt-2 text-3xl font-bold text-zinc-900">
-                  {overviewQuery.isLoading ? "..." : (overviewQuery.data?.total_deliberations ?? 0).toLocaleString("fr-FR")}
+                  {overviewQuery.isLoading
+                    ? "..."
+                    : (overviewQuery.data?.total_deliberations ?? 0).toLocaleString("fr-FR")}
                 </p>
               </div>
               <div className="rounded-lg bg-purple-100 p-3">
@@ -144,7 +155,9 @@ export default function DashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-zinc-700">En attente</p>
                 <p className="mt-2 text-3xl font-bold text-zinc-900">
-                  {overviewQuery.isLoading ? "..." : (overviewQuery.data?.pending_items ?? 0).toLocaleString("fr-FR")}
+                  {overviewQuery.isLoading
+                    ? "..."
+                    : (overviewQuery.data?.pending_items ?? 0).toLocaleString("fr-FR")}
                 </p>
               </div>
               <div className="rounded-lg bg-amber-100 p-3">

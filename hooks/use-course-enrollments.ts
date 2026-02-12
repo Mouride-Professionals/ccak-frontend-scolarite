@@ -127,20 +127,20 @@ export function useCourseAvailabilities(
   const results = useQueries({
     queries: courses.map((course) => ({
       queryKey: courseEnrollmentKeys.availability(course.id, academicYearId, semester),
-      queryFn: () => courseEnrollmentsApi.checkCourseAvailability(course.id, academicYearId, semester),
+      queryFn: () =>
+        courseEnrollmentsApi.checkCourseAvailability(course.id, academicYearId, semester),
       enabled: enabled && !!academicYearId && semester > 0,
       staleTime: 30000,
     })),
   });
 
-  return results.reduce<Record<string, Awaited<ReturnType<typeof courseEnrollmentsApi.checkCourseAvailability>>>>(
-    (acc, result, index) => {
-      const course = courses[index];
-      if (course && result.data) {
-        acc[course.id] = result.data;
-      }
-      return acc;
-    },
-    {}
-  );
+  return results.reduce<
+    Record<string, Awaited<ReturnType<typeof courseEnrollmentsApi.checkCourseAvailability>>>
+  >((acc, result, index) => {
+    const course = courses[index];
+    if (course && result.data) {
+      acc[course.id] = result.data;
+    }
+    return acc;
+  }, {});
 }

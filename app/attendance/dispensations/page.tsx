@@ -22,10 +22,11 @@ export default function DispensationsPage() {
     type: "success" as "success" | "error",
   });
 
-  const { data: dispensations, isLoading, dataUpdatedAt } = useStudentDispensations(
-    selectedStudent?.id || "",
-    { refetchInterval: 30_000 }
-  );
+  const {
+    data: dispensations,
+    isLoading,
+    dataUpdatedAt,
+  } = useStudentDispensations(selectedStudent?.id || "", { refetchInterval: 30_000 });
 
   const notifyMutation = useMutation({
     mutationFn: (message: string) => {
@@ -81,7 +82,11 @@ export default function DispensationsPage() {
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">Étudiant</label>
               <StudentSearch
-                value={selectedStudent ? `${selectedStudent.full_name} · ${selectedStudent.student_number}` : ""}
+                value={
+                  selectedStudent
+                    ? `${selectedStudent.full_name} · ${selectedStudent.student_number}`
+                    : ""
+                }
                 onSelect={(student) => setSelectedStudent(student)}
                 onClear={() => setSelectedStudent(null)}
                 placeholder="Rechercher et sélectionner..."
@@ -115,9 +120,7 @@ export default function DispensationsPage() {
           {selectedStudent && (
             <p className="mt-3 text-xs text-zinc-500">
               Dernière actualisation:{" "}
-              {dataUpdatedAt
-                ? new Date(dataUpdatedAt).toLocaleTimeString("fr-FR")
-                : "n/a"}
+              {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("fr-FR") : "n/a"}
             </p>
           )}
 
@@ -131,7 +134,8 @@ export default function DispensationsPage() {
                 <div className="space-y-3">
                   {alerts.length > 0 && (
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-                      {alerts.length} alerte(s) détectée(s) au-dessus du seuil de {threshold} absences.
+                      {alerts.length} alerte(s) détectée(s) au-dessus du seuil de {threshold}{" "}
+                      absences.
                     </div>
                   )}
 

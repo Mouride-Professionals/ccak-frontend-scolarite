@@ -16,11 +16,11 @@ export default function VerifyDocumentPage() {
   const [submittedDocumentNumber, setSubmittedDocumentNumber] = useState(routeDocumentNumber);
   const [studentId, setStudentId] = useState<string>("");
 
-  const { data: verification, isLoading, error } = useVerifyDocument(
-    submittedDocumentNumber,
-    studentId || undefined,
-    !!submittedDocumentNumber
-  );
+  const {
+    data: verification,
+    isLoading,
+    error,
+  } = useVerifyDocument(submittedDocumentNumber, studentId || undefined, !!submittedDocumentNumber);
 
   const handleVerify = () => {
     const normalized = documentNumberInput.trim();
@@ -34,7 +34,12 @@ export default function VerifyDocumentPage() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
-            <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-8 w-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -54,7 +59,10 @@ export default function VerifyDocumentPage() {
 
           <div className="space-y-6 p-6">
             <div>
-              <label htmlFor="documentNumber" className="mb-2 block text-sm font-medium text-zinc-700">
+              <label
+                htmlFor="documentNumber"
+                className="mb-2 block text-sm font-medium text-zinc-700"
+              >
                 Numéro du document
               </label>
               <div className="flex gap-2">
@@ -100,7 +108,9 @@ export default function VerifyDocumentPage() {
             {error && !isLoading && submittedDocumentNumber && (
               <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
                 <h3 className="text-lg font-semibold text-red-900">Document invalide</h3>
-                <p className="mt-2 text-sm text-red-700">Ce document n&apos;existe pas ou n&apos;est pas valide.</p>
+                <p className="mt-2 text-sm text-red-700">
+                  Ce document n&apos;existe pas ou n&apos;est pas valide.
+                </p>
               </div>
             )}
 
@@ -112,7 +122,9 @@ export default function VerifyDocumentPage() {
                 </div>
 
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-6">
-                  <h3 className="mb-4 text-lg font-semibold text-[#00365F]">Informations du Document</h3>
+                  <h3 className="mb-4 text-lg font-semibold text-[#00365F]">
+                    Informations du Document
+                  </h3>
                   <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <dt className="text-sm font-medium text-zinc-500">Type</dt>
@@ -146,7 +158,8 @@ export default function VerifyDocumentPage() {
                       <div>
                         <dt className="text-sm font-medium text-zinc-500">Étudiant</dt>
                         <dd className="mt-1 text-sm text-zinc-900">
-                          {verification.document.student.full_name || verification.document.student.email}
+                          {verification.document.student.full_name ||
+                            verification.document.student.email}
                         </dd>
                       </div>
                     )}

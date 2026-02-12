@@ -235,9 +235,13 @@ export default function CourseLogHistoryPage() {
                       {filteredLogs.map((log) => (
                         <Fragment key={log.id}>
                           <tr>
-                            <td className="px-4 py-3">{new Date(log.session_date).toLocaleDateString("fr-FR")}</td>
+                            <td className="px-4 py-3">
+                              {new Date(log.session_date).toLocaleDateString("fr-FR")}
+                            </td>
                             <td className="px-4 py-3">{formatTopics(log.topics)}</td>
-                            <td className="px-4 py-3 text-zinc-500">{log.notes ? "Notes disponibles" : "—"}</td>
+                            <td className="px-4 py-3 text-zinc-500">
+                              {log.notes ? "Notes disponibles" : "—"}
+                            </td>
                             <td className="px-4 py-3 text-right">
                               <div className="inline-flex gap-2">
                                 <button
@@ -264,19 +268,31 @@ export default function CourseLogHistoryPage() {
                               <td colSpan={4} className="bg-zinc-50 px-4 py-3">
                                 <div className="grid gap-3 md:grid-cols-2">
                                   <div>
-                                    <p className="text-xs font-semibold uppercase text-zinc-500">Chapitres</p>
-                                    <p className="text-sm text-zinc-700">{formatList(log.chapters) || "-"}</p>
+                                    <p className="text-xs font-semibold uppercase text-zinc-500">
+                                      Chapitres
+                                    </p>
+                                    <p className="text-sm text-zinc-700">
+                                      {formatList(log.chapters) || "-"}
+                                    </p>
                                   </div>
                                   <div>
-                                    <p className="text-xs font-semibold uppercase text-zinc-500">Objectifs</p>
-                                    <p className="text-sm text-zinc-700">{formatList(log.objectives) || "-"}</p>
+                                    <p className="text-xs font-semibold uppercase text-zinc-500">
+                                      Objectifs
+                                    </p>
+                                    <p className="text-sm text-zinc-700">
+                                      {formatList(log.objectives) || "-"}
+                                    </p>
                                   </div>
                                 </div>
                                 <div className="mt-3">
-                                  <p className="text-xs font-semibold uppercase text-zinc-500">Notes</p>
+                                  <p className="text-xs font-semibold uppercase text-zinc-500">
+                                    Notes
+                                  </p>
                                   <div
                                     className="mt-1 rounded-md border border-zinc-200 bg-white p-2 text-sm text-zinc-700"
-                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(log.notes || "-") }}
+                                    dangerouslySetInnerHTML={{
+                                      __html: sanitizeHtml(log.notes || "-"),
+                                    }}
                                   />
                                 </div>
                               </td>
@@ -312,10 +328,14 @@ export default function CourseLogHistoryPage() {
             {editingLog ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">Sujets abordés</label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Sujets abordés
+                  </label>
                   <textarea
                     value={editForm.topics}
-                    onChange={(event) => setEditForm((prev) => ({ ...prev, topics: event.target.value }))}
+                    onChange={(event) =>
+                      setEditForm((prev) => ({ ...prev, topics: event.target.value }))
+                    }
                     rows={4}
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
@@ -324,7 +344,9 @@ export default function CourseLogHistoryPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Chapitres</label>
                   <input
                     value={editForm.chapters}
-                    onChange={(event) => setEditForm((prev) => ({ ...prev, chapters: event.target.value }))}
+                    onChange={(event) =>
+                      setEditForm((prev) => ({ ...prev, chapters: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>
@@ -366,7 +388,9 @@ export default function CourseLogHistoryPage() {
                 </div>
               </div>
             ) : (
-              <p className="mt-4 text-sm text-zinc-500">Sélectionnez une séance pour modifier son contenu.</p>
+              <p className="mt-4 text-sm text-zinc-500">
+                Sélectionnez une séance pour modifier son contenu.
+              </p>
             )}
           </div>
         </div>

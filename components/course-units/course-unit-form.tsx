@@ -23,7 +23,10 @@ const CourseUnitFormSchema = z.object({
     .trim()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(20, "Le code ne peut pas dépasser 20 caractères")
-    .regex(COURSE_UNIT_CODE_REGEX, "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"),
+    .regex(
+      COURSE_UNIT_CODE_REGEX,
+      "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"
+    ),
   name: z
     .string()
     .trim()

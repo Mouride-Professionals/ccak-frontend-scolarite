@@ -210,31 +210,31 @@ export default function EnrollmentsPage() {
           <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-zinc-500">Total inscriptions</p>
             <p className="mt-2 text-2xl font-semibold text-[#00365F]">
-              {loadingDashboard ? "..." : dashboardData?.kpis.total_enrollments ?? 0}
+              {loadingDashboard ? "..." : (dashboardData?.kpis.total_enrollments ?? 0)}
             </p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-zinc-500">Actives</p>
             <p className="mt-2 text-2xl font-semibold text-[#0A8F3D]">
-              {loadingDashboard ? "..." : dashboardData?.kpis.active_enrollments ?? 0}
+              {loadingDashboard ? "..." : (dashboardData?.kpis.active_enrollments ?? 0)}
             </p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-zinc-500">En attente</p>
             <p className="mt-2 text-2xl font-semibold text-amber-600">
-              {loadingDashboard ? "..." : dashboardData?.kpis.pending_enrollments ?? 0}
+              {loadingDashboard ? "..." : (dashboardData?.kpis.pending_enrollments ?? 0)}
             </p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-zinc-500">Terminées</p>
             <p className="mt-2 text-2xl font-semibold text-[#083B66]">
-              {loadingDashboard ? "..." : dashboardData?.kpis.completed_enrollments ?? 0}
+              {loadingDashboard ? "..." : (dashboardData?.kpis.completed_enrollments ?? 0)}
             </p>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-xs uppercase tracking-wide text-zinc-500">Retirées</p>
             <p className="mt-2 text-2xl font-semibold text-[#E11D48]">
-              {loadingDashboard ? "..." : dashboardData?.kpis.withdrawn_enrollments ?? 0}
+              {loadingDashboard ? "..." : (dashboardData?.kpis.withdrawn_enrollments ?? 0)}
             </p>
           </div>
         </div>
@@ -287,7 +287,10 @@ export default function EnrollmentsPage() {
           ) : (
             <div className="mt-3 divide-y divide-zinc-100">
               {dashboardData.recent_enrollments.map((enrollment) => (
-                <div key={enrollment.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                <div
+                  key={enrollment.id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-3"
+                >
                   <div>
                     <p className="text-sm font-medium text-zinc-900">
                       {enrollment.student?.full_name ?? "Étudiant"}

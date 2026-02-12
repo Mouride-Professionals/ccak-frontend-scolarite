@@ -213,14 +213,17 @@ export default function CourseLogEntryPage() {
                 </label>
                 <select
                   value={form.schedule_id}
-                  onChange={(event) => setForm((prev) => ({ ...prev, schedule_id: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, schedule_id: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 >
                   <option value="">Sélectionner</option>
                   {scheduleOptions.map((schedule) => (
                     <option key={schedule.id} value={schedule.id}>
-                      {dayLabels[schedule.day_of_week] ?? schedule.day_of_week} · {formatTime(schedule.start_time)}-
-                      {formatTime(schedule.end_time)} · {schedule.course_name ?? schedule.course_id}
+                      {dayLabels[schedule.day_of_week] ?? schedule.day_of_week} ·{" "}
+                      {formatTime(schedule.start_time)}-{formatTime(schedule.end_time)} ·{" "}
+                      {schedule.course_name ?? schedule.course_id}
                     </option>
                   ))}
                 </select>
@@ -230,7 +233,9 @@ export default function CourseLogEntryPage() {
                 <input
                   type="date"
                   value={form.session_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, session_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, session_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>
@@ -241,7 +246,9 @@ export default function CourseLogEntryPage() {
             <h2 className="text-sm font-semibold text-[#00365F]">Contenu pédagogique</h2>
             <div className="mt-4 space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Sujets abordés</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Sujets abordés
+                </label>
                 <textarea
                   value={form.topics}
                   onChange={(event) => setForm((prev) => ({ ...prev, topics: event.target.value }))}
@@ -254,16 +261,22 @@ export default function CourseLogEntryPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Chapitres</label>
                 <textarea
                   value={form.chapters}
-                  onChange={(event) => setForm((prev) => ({ ...prev, chapters: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, chapters: event.target.value }))
+                  }
                   rows={2}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Objectifs pédagogiques</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Objectifs pédagogiques
+                </label>
                 <textarea
                   value={form.objectives}
-                  onChange={(event) => setForm((prev) => ({ ...prev, objectives: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, objectives: event.target.value }))
+                  }
                   rows={3}
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />

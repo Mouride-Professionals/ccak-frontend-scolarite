@@ -246,10 +246,15 @@ export default function CourseForm({
               <>
                 <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                   {prerequisiteChoices.length === 0 ? (
-                    <p className="text-sm text-zinc-500">Aucun cours disponible pour les prérequis.</p>
+                    <p className="text-sm text-zinc-500">
+                      Aucun cours disponible pour les prérequis.
+                    </p>
                   ) : (
                     prerequisiteChoices.map((course) => (
-                      <label key={course.id} className="flex items-center gap-2 text-sm text-zinc-700">
+                      <label
+                        key={course.id}
+                        className="flex items-center gap-2 text-sm text-zinc-700"
+                      >
                         <input
                           type="checkbox"
                           checked={selectedPrerequisites.includes(course.id)}

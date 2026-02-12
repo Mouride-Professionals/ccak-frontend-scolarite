@@ -67,10 +67,7 @@ const FacultyRegistrationSchema = z
       .regex(ISO_DATE_REGEX, "La date de début doit être au format YYYY-MM-DD"),
     contract_end: z.preprocess(
       toOptionalTrimmedString,
-      z
-        .string()
-        .regex(ISO_DATE_REGEX, "La date de fin doit être au format YYYY-MM-DD")
-        .optional()
+      z.string().regex(ISO_DATE_REGEX, "La date de fin doit être au format YYYY-MM-DD").optional()
     ),
     salary: z.preprocess(
       (value) => {
@@ -90,7 +87,10 @@ const FacultyRegistrationSchema = z
     ),
     contract_terms: z.preprocess(
       toOptionalTrimmedString,
-      z.string().max(2000, "Les termes du contrat ne peuvent pas dépasser 2000 caractères").optional()
+      z
+        .string()
+        .max(2000, "Les termes du contrat ne peuvent pas dépasser 2000 caractères")
+        .optional()
     ),
   })
   .superRefine((data, ctx) => {
@@ -413,9 +413,7 @@ export default function FacultyRegistrationPage() {
       }, 1200);
     } catch (error) {
       console.error("Error creating faculty member:", error);
-      setFormError(
-        toUserError(error, "Erreur lors de la création de l'enseignant.").message
-      );
+      setFormError(toUserError(error, "Erreur lors de la création de l'enseignant.").message);
     }
   };
 
@@ -439,7 +437,10 @@ export default function FacultyRegistrationPage() {
           </div>
 
           {formError && (
-            <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            <div
+              className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
               {formError}
             </div>
           )}
@@ -448,7 +449,10 @@ export default function FacultyRegistrationPage() {
             {step === 1 && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="full_name" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="full_name"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Nom complet *
                   </label>
                   <input
@@ -534,7 +538,10 @@ export default function FacultyRegistrationPage() {
             {step === 2 && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="department_id" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="department_id"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Département *
                   </label>
                   <select
@@ -545,7 +552,9 @@ export default function FacultyRegistrationPage() {
                       fieldErrors.department_id ? "border-red-300" : "border-zinc-300"
                     }`}
                     aria-invalid={Boolean(fieldErrors.department_id)}
-                    aria-describedby={fieldErrors.department_id ? getErrorId("department_id") : undefined}
+                    aria-describedby={
+                      fieldErrors.department_id ? getErrorId("department_id") : undefined
+                    }
                   >
                     <option value="">Sélectionner</option>
                     {departmentsData?.data?.map((department) => (
@@ -567,9 +576,7 @@ export default function FacultyRegistrationPage() {
                   <select
                     id="rank"
                     value={formData.rank}
-                    onChange={(event) =>
-                      setFieldValue("rank", event.target.value as FacultyRank)
-                    }
+                    onChange={(event) => setFieldValue("rank", event.target.value as FacultyRank)}
                     className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
                       fieldErrors.rank ? "border-red-300" : "border-zinc-300"
                     }`}
@@ -589,7 +596,10 @@ export default function FacultyRegistrationPage() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="hire_date" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="hire_date"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Date d&apos;embauche *
                   </label>
                   <input
@@ -623,7 +633,10 @@ export default function FacultyRegistrationPage() {
             {step === 3 && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="contract_type" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="contract_type"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Type de contrat *
                   </label>
                   <select
@@ -636,7 +649,9 @@ export default function FacultyRegistrationPage() {
                       fieldErrors.contract_type ? "border-red-300" : "border-zinc-300"
                     }`}
                     aria-invalid={Boolean(fieldErrors.contract_type)}
-                    aria-describedby={fieldErrors.contract_type ? getErrorId("contract_type") : undefined}
+                    aria-describedby={
+                      fieldErrors.contract_type ? getErrorId("contract_type") : undefined
+                    }
                   >
                     {Object.values(FacultyContractType).map((type) => (
                       <option key={type} value={type}>
@@ -672,7 +687,10 @@ export default function FacultyRegistrationPage() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="contract_start" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="contract_start"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Début de contrat *
                   </label>
                   <input
@@ -684,7 +702,9 @@ export default function FacultyRegistrationPage() {
                       fieldErrors.contract_start ? "border-red-300" : "border-zinc-300"
                     }`}
                     aria-invalid={Boolean(fieldErrors.contract_start)}
-                    aria-describedby={fieldErrors.contract_start ? getErrorId("contract_start") : undefined}
+                    aria-describedby={
+                      fieldErrors.contract_start ? getErrorId("contract_start") : undefined
+                    }
                   />
                   {fieldErrors.contract_start && (
                     <p id={getErrorId("contract_start")} className="mt-1 text-xs text-red-600">
@@ -693,7 +713,10 @@ export default function FacultyRegistrationPage() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="contract_end" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="contract_end"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Fin de contrat
                   </label>
                   <input
@@ -705,7 +728,9 @@ export default function FacultyRegistrationPage() {
                       fieldErrors.contract_end ? "border-red-300" : "border-zinc-300"
                     }`}
                     aria-invalid={Boolean(fieldErrors.contract_end)}
-                    aria-describedby={fieldErrors.contract_end ? getErrorId("contract_end") : undefined}
+                    aria-describedby={
+                      fieldErrors.contract_end ? getErrorId("contract_end") : undefined
+                    }
                   />
                   {fieldErrors.contract_end && (
                     <p id={getErrorId("contract_end")} className="mt-1 text-xs text-red-600">
@@ -714,7 +739,10 @@ export default function FacultyRegistrationPage() {
                   )}
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="contract_terms" className="mb-2 block text-sm font-medium text-zinc-700">
+                  <label
+                    htmlFor="contract_terms"
+                    className="mb-2 block text-sm font-medium text-zinc-700"
+                  >
                     Termes du contrat
                   </label>
                   <textarea
@@ -726,7 +754,9 @@ export default function FacultyRegistrationPage() {
                       fieldErrors.contract_terms ? "border-red-300" : "border-zinc-300"
                     }`}
                     aria-invalid={Boolean(fieldErrors.contract_terms)}
-                    aria-describedby={fieldErrors.contract_terms ? getErrorId("contract_terms") : undefined}
+                    aria-describedby={
+                      fieldErrors.contract_terms ? getErrorId("contract_terms") : undefined
+                    }
                   />
                   {fieldErrors.contract_terms && (
                     <p id={getErrorId("contract_terms")} className="mt-1 text-xs text-red-600">
@@ -747,7 +777,10 @@ export default function FacultyRegistrationPage() {
                   {DOCUMENT_FIELDS.map((doc) => {
                     const selectedFile = formData.documents[doc.key];
                     return (
-                      <div key={doc.key} className="rounded-lg border border-zinc-200 bg-zinc-50/70 p-4">
+                      <div
+                        key={doc.key}
+                        className="rounded-lg border border-zinc-200 bg-zinc-50/70 p-4"
+                      >
                         <div className="mb-3">
                           <label
                             htmlFor={`document-${doc.key}`}

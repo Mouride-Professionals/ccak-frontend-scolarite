@@ -155,7 +155,8 @@ export default function AttendanceMarkingPage() {
                 <option value="">Sélectionner</option>
                 {(logs?.data ?? []).map((log) => (
                   <option key={log.id} value={log.id}>
-                    {new Date(log.session_date).toLocaleDateString("fr-FR")} · {log.course?.name ?? log.course_id}
+                    {new Date(log.session_date).toLocaleDateString("fr-FR")} ·{" "}
+                    {log.course?.name ?? log.course_id}
                   </option>
                 ))}
               </select>
@@ -185,7 +186,10 @@ export default function AttendanceMarkingPage() {
           {evidenceFiles.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {evidenceFiles.map((file, index) => (
-                <div key={`${file.name}-${index}`} className="rounded-md border border-zinc-200 px-3 py-1 text-xs text-zinc-600">
+                <div
+                  key={`${file.name}-${index}`}
+                  className="rounded-md border border-zinc-200 px-3 py-1 text-xs text-zinc-600"
+                >
                   {file.name}
                 </div>
               ))}

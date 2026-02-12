@@ -12,19 +12,21 @@ interface AcademicYearFormProps {
   isLoading?: boolean;
 }
 
-const AcademicYearSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(255, "Le nom ne doit pas depasser 255 caracteres"),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  is_current: z.boolean().default(false),
-  is_active: z.boolean().default(true),
-}).refine(
-  (data) => !data.start_date || !data.end_date || data.end_date >= data.start_date,
-  {
+const AcademicYearSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, "Le nom est requis")
+      .max(255, "Le nom ne doit pas depasser 255 caracteres"),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
+    is_current: z.boolean().default(false),
+    is_active: z.boolean().default(true),
+  })
+  .refine((data) => !data.start_date || !data.end_date || data.end_date >= data.start_date, {
     message: "La date de fin doit etre posterieure ou egale a la date de debut.",
     path: ["end_date"],
-  }
-);
+  });
 
 type AcademicYearFormData = z.input<typeof AcademicYearSchema>;
 
@@ -62,7 +64,10 @@ export default function AcademicYearForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div>
-        <label htmlFor="academic-year-name" className="mb-2 block text-sm font-medium text-zinc-700">
+        <label
+          htmlFor="academic-year-name"
+          className="mb-2 block text-sm font-medium text-zinc-700"
+        >
           Nom de l&apos;annee academique *
         </label>
         <input

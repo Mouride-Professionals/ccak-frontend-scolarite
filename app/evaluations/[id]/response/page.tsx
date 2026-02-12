@@ -124,7 +124,12 @@ export default function EvaluationResponsePage() {
         {isSubmitted ? (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
-              <svg className="h-7 w-7 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="h-7 w-7 text-emerald-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -133,7 +138,9 @@ export default function EvaluationResponsePage() {
                 />
               </svg>
             </div>
-            <h2 className="mt-4 text-xl font-semibold text-emerald-900">Merci pour votre réponse</h2>
+            <h2 className="mt-4 text-xl font-semibold text-emerald-900">
+              Merci pour votre réponse
+            </h2>
             <p className="mt-2 text-sm text-emerald-800">
               Votre évaluation a bien été prise en compte.
             </p>
@@ -186,21 +193,27 @@ export default function EvaluationResponsePage() {
                       {evaluation.course?.name ?? evaluation.course_id}
                     </h2>
                     <p className="text-sm text-zinc-500">
-                      Enseignant: {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
+                      Enseignant:{" "}
+                      {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
                     </p>
                     <p className="mt-1 text-xs text-zinc-500">
                       Échelle: {ratingMin} à {ratingMax}
-                      {(evaluation.rating_scale_low_label || evaluation.rating_scale_high_label) && (
+                      {(evaluation.rating_scale_low_label ||
+                        evaluation.rating_scale_high_label) && (
                         <>
                           {" "}
-                          ({evaluation.rating_scale_low_label || "-"} → {evaluation.rating_scale_high_label || "-"})
+                          ({evaluation.rating_scale_low_label || "-"} →{" "}
+                          {evaluation.rating_scale_high_label || "-"})
                         </>
                       )}
                     </p>
                   </div>
 
                   {questions.map((question, index) => (
-                    <div key={`${question}-${index}`} className="rounded-lg border border-zinc-200 p-4">
+                    <div
+                      key={`${question}-${index}`}
+                      className="rounded-lg border border-zinc-200 p-4"
+                    >
                       <div className="text-sm font-medium text-zinc-800">{question}</div>
                       {renderQuestion(question, index)}
                     </div>

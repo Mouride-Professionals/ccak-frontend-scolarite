@@ -259,10 +259,9 @@ export async function getStudentDeliberationHistory(
   );
 
   const sessionMap = new Map(
-    sessions.filter((session): session is DeliberationSession => session !== null).map((session) => [
-      session.id,
-      session,
-    ])
+    sessions
+      .filter((session): session is DeliberationSession => session !== null)
+      .map((session) => [session.id, session])
   );
 
   const data: StudentDeliberationHistoryItem[] = results

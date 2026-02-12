@@ -26,7 +26,10 @@ export function useDashboardStudentsByLevel(filters?: DashboardFilters) {
   });
 }
 
-export function useDashboardEnrollmentsTrend(period: DashboardTrendPeriod, filters?: DashboardFilters) {
+export function useDashboardEnrollmentsTrend(
+  period: DashboardTrendPeriod,
+  filters?: DashboardFilters
+) {
   return useQuery({
     queryKey: ["dashboard", "enrollments-trend", period, filters],
     queryFn: () => getEnrollmentsTrend(period, filters),
@@ -49,4 +52,3 @@ export function useDashboardRecentActivities(limit = 10, filters?: DashboardFilt
     staleTime: 30000,
   });
 }
-

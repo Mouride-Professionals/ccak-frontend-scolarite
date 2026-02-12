@@ -113,9 +113,7 @@ export default function RoomsPage() {
                   setFilters((prev) => ({
                     ...prev,
                     is_available:
-                      event.target.value === ""
-                        ? undefined
-                        : event.target.value === "true",
+                      event.target.value === "" ? undefined : event.target.value === "true",
                     page: 1,
                   }))
                 }
@@ -178,7 +176,9 @@ export default function RoomsPage() {
                               </span>
                             ))}
                             {(room.equipment || []).length > 3 && (
-                              <span className="text-xs text-zinc-500">+{(room.equipment || []).length - 3}</span>
+                              <span className="text-xs text-zinc-500">
+                                +{(room.equipment || []).length - 3}
+                              </span>
                             )}
                           </div>
                         </td>

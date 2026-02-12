@@ -231,7 +231,10 @@ export default function CreateAnnouncementModal({
 
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="announcement_title" className="block text-sm font-medium text-zinc-800">
+                    <label
+                      htmlFor="announcement_title"
+                      className="block text-sm font-medium text-zinc-800"
+                    >
                       Titre <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -294,7 +297,10 @@ export default function CreateAnnouncementModal({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="announcement_priority" className="block text-sm font-medium text-zinc-800">
+                      <label
+                        htmlFor="announcement_priority"
+                        className="block text-sm font-medium text-zinc-800"
+                      >
                         Priorité
                       </label>
                       <select
@@ -329,9 +335,7 @@ export default function CreateAnnouncementModal({
                       <label className="block text-sm font-medium text-zinc-800">Statut</label>
                       <select
                         value={formData.is_draft ? "draft" : "published"}
-                        onChange={(e) =>
-                          updateField("is_draft", e.target.value === "draft")
-                        }
+                        onChange={(e) => updateField("is_draft", e.target.value === "draft")}
                         className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 shadow-sm focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
                       >
                         <option value="draft">Brouillon</option>
@@ -361,7 +365,10 @@ export default function CreateAnnouncementModal({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="announcement_publish_at" className="block text-sm font-medium text-zinc-800">
+                      <label
+                        htmlFor="announcement_publish_at"
+                        className="block text-sm font-medium text-zinc-800"
+                      >
                         Date de publication
                       </label>
                       <input
@@ -383,7 +390,10 @@ export default function CreateAnnouncementModal({
                     </div>
 
                     <div>
-                      <label htmlFor="announcement_expire_at" className="block text-sm font-medium text-zinc-800">
+                      <label
+                        htmlFor="announcement_expire_at"
+                        className="block text-sm font-medium text-zinc-800"
+                      >
                         Date d&apos;expiration
                       </label>
                       <input

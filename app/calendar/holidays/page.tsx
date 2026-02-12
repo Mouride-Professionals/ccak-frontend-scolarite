@@ -298,7 +298,9 @@ export default function HolidaysPage() {
                 />
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Année académique</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Année académique
+                </label>
                 <select
                   value={form.academic_year_id}
                   onChange={(event) =>
@@ -361,7 +363,10 @@ export default function HolidaysPage() {
           <h2 className="text-sm font-semibold text-[#00365F]">Vue calendrier mensuelle</h2>
           <div className="mt-4 grid grid-cols-7 gap-2 text-xs">
             {dayHeaders.map((header) => (
-              <div key={header} className="rounded bg-zinc-100 px-2 py-1 text-center font-semibold text-zinc-600">
+              <div
+                key={header}
+                className="rounded bg-zinc-100 px-2 py-1 text-center font-semibold text-zinc-600"
+              >
                 {header}
               </div>
             ))}

@@ -182,7 +182,9 @@ export default function StudentAttendancePage() {
                         <tr key={record.id}>
                           <td className="px-4 py-3">{record.course?.name ?? record.course?.id}</td>
                           <td className="px-4 py-3">
-                            {record.marked_at ? new Date(record.marked_at).toLocaleDateString("fr-FR") : "—"}
+                            {record.marked_at
+                              ? new Date(record.marked_at).toLocaleDateString("fr-FR")
+                              : "—"}
                           </td>
                           <td className="px-4 py-3">
                             <AttendanceStatusBadge status={record.status} />
@@ -209,7 +211,9 @@ export default function StudentAttendancePage() {
           </div>
 
           <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-[#00365F]">Vue calendrier (30 derniers pointages)</h2>
+            <h2 className="text-sm font-semibold text-[#00365F]">
+              Vue calendrier (30 derniers pointages)
+            </h2>
             {!studentId ? (
               <p className="mt-4 text-sm text-zinc-500">Sélectionnez un étudiant.</p>
             ) : calendarItems.length === 0 ? (

@@ -18,7 +18,8 @@ export async function getTeachingAssignments(
   if (filters?.faculty_member_id)
     params.append("filter[faculty_member_id]", filters.faculty_member_id);
   if (filters?.course_id) params.append("filter[course_id]", filters.course_id);
-  if (filters?.academic_year_id) params.append("filter[academic_year_id]", filters.academic_year_id);
+  if (filters?.academic_year_id)
+    params.append("filter[academic_year_id]", filters.academic_year_id);
   if (filters?.role) params.append("filter[role]", filters.role);
 
   const response = await api.get(`/teaching-assignments${params.toString() ? `?${params}` : ""}`);

@@ -28,7 +28,10 @@ const toOptionalTrimmedString = (value: unknown) => {
 
 const optionalAcademicYearSchema = z.preprocess(
   toOptionalTrimmedString,
-  z.string().regex(ACADEMIC_YEAR_REGEX, "L'année académique doit être au format AAAA-AAAA").optional()
+  z
+    .string()
+    .regex(ACADEMIC_YEAR_REGEX, "L'année académique doit être au format AAAA-AAAA")
+    .optional()
 );
 
 const baseDocumentSchema = z.object({
@@ -246,7 +249,10 @@ export default function GenerateDocumentForm({
             )}
           </div>
           <div>
-            <label htmlFor="graduation_date" className="mb-2 block text-sm font-medium text-zinc-700">
+            <label
+              htmlFor="graduation_date"
+              className="mb-2 block text-sm font-medium text-zinc-700"
+            >
               Date de graduation (optionnel)
             </label>
             <input
@@ -258,9 +264,7 @@ export default function GenerateDocumentForm({
                 errors.graduation_date ? "border-red-300" : "border-zinc-300"
               }`}
               aria-invalid={Boolean(errors.graduation_date)}
-              aria-describedby={
-                errors.graduation_date ? getErrorId("graduation_date") : undefined
-              }
+              aria-describedby={errors.graduation_date ? getErrorId("graduation_date") : undefined}
             />
             {errors.graduation_date && (
               <p id={getErrorId("graduation_date")} className="mt-1 text-xs text-red-600">
@@ -351,7 +355,14 @@ export default function GenerateDocumentForm({
           {isLoading ? (
             <span className="flex items-center gap-2">
               <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
                 <path
                   className="opacity-75"
                   fill="currentColor"

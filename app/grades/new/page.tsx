@@ -32,8 +32,7 @@ export default function NewDeliberationPage() {
     } catch (error) {
       console.error("Error creating deliberation session:", error);
       setSubmitError(
-        toUserError(error, "Erreur lors de la création de la session. Veuillez réessayer.")
-          .message
+        toUserError(error, "Erreur lors de la création de la session. Veuillez réessayer.").message
       );
     }
   };

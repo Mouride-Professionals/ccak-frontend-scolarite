@@ -136,7 +136,9 @@ export default function TemplatePreviewModal({
                           {variable}
                         </code>
                         {sampleData[variable] && (
-                          <span className="text-xs text-gray-500">= &quot;{sampleData[variable]}&quot;</span>
+                          <span className="text-xs text-gray-500">
+                            = &quot;{sampleData[variable]}&quot;
+                          </span>
                         )}
                       </div>
                     ))}

@@ -66,7 +66,9 @@ export default function FacultySchedulePage() {
       <DashboardLayout title="Emploi du temps enseignant">
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-            <label className="mb-2 block text-sm font-medium text-zinc-700">Rechercher un enseignant</label>
+            <label className="mb-2 block text-sm font-medium text-zinc-700">
+              Rechercher un enseignant
+            </label>
             <FacultySearch
               value={facultyName}
               onSelect={(faculty) => {
@@ -117,12 +119,17 @@ export default function FacultySchedulePage() {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {Object.entries(summary.byDay).map(([day, hours]) => (
-                <span key={day} className="rounded-full bg-zinc-100 px-3 py-1 text-xs text-zinc-700">
+                <span
+                  key={day}
+                  className="rounded-full bg-zinc-100 px-3 py-1 text-xs text-zinc-700"
+                >
                   {day}: {hours.toFixed(1)}h
                 </span>
               ))}
               {Object.keys(summary.byDay).length === 0 && (
-                <span className="text-xs text-zinc-500">Aucune donnée horaire pour le filtre courant.</span>
+                <span className="text-xs text-zinc-500">
+                  Aucune donnée horaire pour le filtre courant.
+                </span>
               )}
             </div>
           </div>

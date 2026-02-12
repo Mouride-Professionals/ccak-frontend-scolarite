@@ -56,42 +56,43 @@ export default function RecentActivitiesTable({
       ) : activities.length === 0 ? (
         <div className="py-8 text-center text-sm text-zinc-500">Aucune activité récente.</div>
       ) : (
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-t text-zinc-700">
-            <th className="py-2 text-left">Étudiant</th>
-            <th className="text-left">Action</th>
-            <th className="text-left">Cours</th>
-            <th className="text-left">Date</th>
-            <th className="text-left">Statut</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {activities.map((a) => {
-            const color = statusToColor(a.status);
-            return (
-            <tr key={a.id} className="border-b last:border-0">
-              <td className="py-3 flex items-center gap-2">
-                <span className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-700">
-                  {getInitials(a.name)}
-                </span>
-                <span className="font-medium text-zinc-900">{a.name}</span>
-              </td>
-              <td className="text-zinc-700">{a.action}</td>
-              <td className="text-zinc-700">{a.context}</td>
-              <td className="text-zinc-600">{formatRelative(a.occurred_at)}</td>
-              <td>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[color]}`}
-                >
-                  {statusToLabel(a.status)}
-                </span>
-              </td>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-t text-zinc-700">
+              <th className="py-2 text-left">Étudiant</th>
+              <th className="text-left">Action</th>
+              <th className="text-left">Cours</th>
+              <th className="text-left">Date</th>
+              <th className="text-left">Statut</th>
             </tr>
-          );})}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {activities.map((a) => {
+              const color = statusToColor(a.status);
+              return (
+                <tr key={a.id} className="border-b last:border-0">
+                  <td className="py-3 flex items-center gap-2">
+                    <span className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-700">
+                      {getInitials(a.name)}
+                    </span>
+                    <span className="font-medium text-zinc-900">{a.name}</span>
+                  </td>
+                  <td className="text-zinc-700">{a.action}</td>
+                  <td className="text-zinc-700">{a.context}</td>
+                  <td className="text-zinc-600">{formatRelative(a.occurred_at)}</td>
+                  <td>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[color]}`}
+                    >
+                      {statusToLabel(a.status)}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       )}
     </Card>
   );

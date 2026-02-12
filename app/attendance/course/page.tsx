@@ -221,11 +221,17 @@ export default function CourseAttendanceReportPage() {
                     {(attendance?.data ?? []).map((record) => (
                       <tr key={record.id}>
                         <td className="px-4 py-3">
-                          <div className="font-medium text-zinc-800">{record.student?.full_name ?? record.student_id}</div>
-                          <div className="text-xs text-zinc-500">{record.student?.student_number ?? ""}</div>
+                          <div className="font-medium text-zinc-800">
+                            {record.student?.full_name ?? record.student_id}
+                          </div>
+                          <div className="text-xs text-zinc-500">
+                            {record.student?.student_number ?? ""}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
-                          {record.marked_at ? new Date(record.marked_at).toLocaleDateString("fr-FR") : "—"}
+                          {record.marked_at
+                            ? new Date(record.marked_at).toLocaleDateString("fr-FR")
+                            : "—"}
                         </td>
                         <td className="px-4 py-3">
                           <AttendanceStatusBadge status={record.status} />

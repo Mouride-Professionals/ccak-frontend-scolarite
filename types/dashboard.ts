@@ -45,4 +45,3 @@ export interface DashboardRecentActivity {
   occurred_at: string;
   status: DashboardActivityStatus;
 }
-

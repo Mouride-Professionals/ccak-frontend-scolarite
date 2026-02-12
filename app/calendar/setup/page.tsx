@@ -127,7 +127,9 @@ export default function CalendarSetupPage() {
         <div className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">Année académique</label>
+              <label className="mb-2 block text-sm font-medium text-zinc-700">
+                Année académique
+              </label>
               <select
                 value={yearId}
                 onChange={(event) => setYearId(event.target.value)}
@@ -156,7 +158,9 @@ export default function CalendarSetupPage() {
                 <input
                   type="date"
                   value={form.end_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, end_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, end_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 />
               </div>
@@ -326,7 +330,10 @@ export default function CalendarSetupPage() {
                   {form.hour_slots.map((slot, index) => {
                     const isBreak = overlapsBreak(slot, form.breaks || []);
                     return (
-                      <tr key={`${slot.start}-${slot.end}-${index}`} className="border-b border-zinc-100">
+                      <tr
+                        key={`${slot.start}-${slot.end}-${index}`}
+                        className="border-b border-zinc-100"
+                      >
                         <td className="px-2 py-2 font-medium text-zinc-700">
                           {slot.start} - {slot.end}
                         </td>

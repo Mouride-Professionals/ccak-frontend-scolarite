@@ -154,7 +154,9 @@ export default function EvaluationsManagementPage() {
                 <tbody className="divide-y divide-zinc-100">
                   {evaluationsList.map((evaluation) => (
                     <tr key={evaluation.id}>
-                      <td className="px-4 py-3">{evaluation.course?.name ?? evaluation.course_id}</td>
+                      <td className="px-4 py-3">
+                        {evaluation.course?.name ?? evaluation.course_id}
+                      </td>
                       <td className="px-4 py-3">
                         {evaluation.faculty_member?.full_name ?? evaluation.faculty_member_id}
                       </td>
@@ -163,7 +165,9 @@ export default function EvaluationsManagementPage() {
                           {(responseRateById[evaluation.id] ?? 0).toFixed(1)}%
                         </span>
                       </td>
-                      <td className="px-4 py-3">{evaluation.is_published ? "Publié" : "Brouillon"}</td>
+                      <td className="px-4 py-3">
+                        {evaluation.is_published ? "Publié" : "Brouillon"}
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex flex-wrap justify-end gap-2">
                           <Link

@@ -33,13 +33,7 @@ export default function NotificationListInfinite({
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
     queryKey: [...notificationsKeys.all, "infinite", onlyUnread],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
@@ -145,7 +139,9 @@ export default function NotificationListInfinite({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-[#083B66]">{notification.title}</p>
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{notification.message}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-zinc-600">
+                      {notification.message}
+                    </p>
                     <p className="mt-2 text-xs text-zinc-500">
                       {formatDistanceToNow(new Date(notification.created_at), {
                         addSuffix: true,

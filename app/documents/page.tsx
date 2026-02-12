@@ -59,14 +59,18 @@ export default function DocumentsPage() {
   const [isRequestConfirmOpen, setIsRequestConfirmOpen] = useState(false);
 
   const [generateType, setGenerateType] = useState<DocumentType | null>(null);
-  const [pendingGenerateData, setPendingGenerateData] = useState<Record<string, unknown> | null>(null);
+  const [pendingGenerateData, setPendingGenerateData] = useState<Record<string, unknown> | null>(
+    null
+  );
   const [requestType, setRequestType] = useState<DocumentType>(DocType.TRANSCRIPT);
 
   const [bulkType, setBulkType] = useState<DocumentType>(DocType.TRANSCRIPT);
   const [bulkStudentSearch, setBulkStudentSearch] = useState("");
   const [bulkSelectedStudentIds, setBulkSelectedStudentIds] = useState<string[]>([]);
 
-  const [lastGeneratedDocument, setLastGeneratedDocument] = useState<GeneratedDocument | null>(null);
+  const [lastGeneratedDocument, setLastGeneratedDocument] = useState<GeneratedDocument | null>(
+    null
+  );
 
   const [toast, setToast] = useState<{
     isOpen: boolean;
@@ -78,7 +82,11 @@ export default function DocumentsPage() {
     type: "success",
   });
 
-  const { data: documents, isLoading, error } = useAllDocuments({
+  const {
+    data: documents,
+    isLoading,
+    error,
+  } = useAllDocuments({
     ...filters,
     student_id: selectedStudentId || undefined,
   });
@@ -169,7 +177,11 @@ export default function DocumentsPage() {
       setToast({ isOpen: true, message: "Document révoqué avec succès", type: "success" });
     } catch (err) {
       console.error("Error revoking document:", err);
-      setToast({ isOpen: true, message: "Erreur lors de la révocation du document", type: "error" });
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la révocation du document",
+        type: "error",
+      });
     }
   };
 
@@ -214,7 +226,11 @@ export default function DocumentsPage() {
       setPendingGenerateData(null);
     } catch (err) {
       console.error("Error generating document:", err);
-      setToast({ isOpen: true, message: "Erreur lors de la génération du document", type: "error" });
+      setToast({
+        isOpen: true,
+        message: "Erreur lors de la génération du document",
+        type: "error",
+      });
     }
   };
 
@@ -243,7 +259,10 @@ export default function DocumentsPage() {
     }
   };
 
-  const visibleBulkStudentIds = useMemo(() => bulkStudents.map((student) => student.id), [bulkStudents]);
+  const visibleBulkStudentIds = useMemo(
+    () => bulkStudents.map((student) => student.id),
+    [bulkStudents]
+  );
 
   const toggleBulkStudent = (studentId: string) => {
     setBulkSelectedStudentIds((prev) =>
@@ -290,7 +309,9 @@ export default function DocumentsPage() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-[#00365F]">Documents</h1>
-              <p className="mt-1 text-sm text-zinc-600">Gérez les documents académiques des étudiants</p>
+              <p className="mt-1 text-sm text-zinc-600">
+                Gérez les documents académiques des étudiants
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {selectedStudentId && (
@@ -382,7 +403,9 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label htmlFor="type" className="mb-2 block text-sm font-medium text-zinc-700">Type</label>
+                <label htmlFor="type" className="mb-2 block text-sm font-medium text-zinc-700">
+                  Type
+                </label>
                 <select
                   id="type"
                   value={filters.type ?? ""}
@@ -399,7 +422,9 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label htmlFor="status" className="mb-2 block text-sm font-medium text-zinc-700">Statut</label>
+                <label htmlFor="status" className="mb-2 block text-sm font-medium text-zinc-700">
+                  Statut
+                </label>
                 <select
                   id="status"
                   value={filters.status ?? ""}
@@ -414,7 +439,9 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label htmlFor="search" className="mb-2 block text-sm font-medium text-zinc-700">Recherche</label>
+                <label htmlFor="search" className="mb-2 block text-sm font-medium text-zinc-700">
+                  Recherche
+                </label>
                 <input
                   id="search"
                   type="text"
@@ -434,7 +461,9 @@ export default function DocumentsPage() {
             </div>
           ) : error ? (
             <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-              <p className="text-sm text-red-700">Erreur lors du chargement des documents. Veuillez réessayer.</p>
+              <p className="text-sm text-red-700">
+                Erreur lors du chargement des documents. Veuillez réessayer.
+              </p>
             </div>
           ) : (
             <DocumentTable
@@ -493,7 +522,9 @@ export default function DocumentsPage() {
           >
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Type de document</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Type de document
+                </label>
                 <select
                   value={bulkType}
                   onChange={(event) => setBulkType(event.target.value as DocumentType)}
@@ -508,7 +539,9 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Rechercher un étudiant</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Rechercher un étudiant
+                </label>
                 <input
                   type="text"
                   value={bulkStudentSearch}
@@ -536,7 +569,10 @@ export default function DocumentsPage() {
                 ) : (
                   <div className="space-y-2">
                     {bulkStudents.map((student) => (
-                      <label key={student.id} className="flex items-center gap-2 text-sm text-zinc-700">
+                      <label
+                        key={student.id}
+                        className="flex items-center gap-2 text-sm text-zinc-700"
+                      >
                         <input
                           type="checkbox"
                           checked={bulkSelectedStudentIds.includes(student.id)}

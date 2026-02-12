@@ -165,11 +165,7 @@ export const FacultySchema = z.object({
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(20, "Le code ne peut pas dépasser 20 caractères")
     .regex(CODE_REGEX, "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"),
-  dean_id: z
-    .string()
-    .uuid("L'identifiant du doyen doit être un UUID valide")
-    .optional()
-    .nullable(),
+  dean_id: z.string().uuid("L'identifiant du doyen doit être un UUID valide").optional().nullable(),
   is_active: z.boolean().default(true),
 });
 
@@ -233,11 +229,7 @@ export const EvaluationSchema = z.object({
   course_id: z.string().min(1, "Le cours est requis"),
   evaluation_type: z.enum(["exam", "quiz", "assignment", "project", "presentation"]),
   date: z.string().min(1, "La date est requise"),
-  duration_minutes: z
-    .number({ error: "La durée est requise" })
-    .int()
-    .min(1)
-    .max(600),
+  duration_minutes: z.number({ error: "La durée est requise" }).int().min(1).max(600),
   total_marks: z.number({ error: "Le total des points est requis" }).min(1).max(100),
 });
 

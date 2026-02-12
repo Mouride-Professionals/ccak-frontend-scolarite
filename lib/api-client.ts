@@ -76,14 +76,7 @@ async function handleResponse<T>(
 }
 
 export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
-  const {
-    path,
-    expectJson = true,
-    suppressErrorLogging = false,
-    headers,
-    body,
-    ...rest
-  } = options;
+  const { path, expectJson = true, suppressErrorLogging = false, headers, body, ...rest } = options;
 
   if (!path.startsWith("http") && !BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_BASE_URL is required for relative API paths.");

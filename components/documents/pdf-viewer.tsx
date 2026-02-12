@@ -128,7 +128,9 @@ export default function PdfViewer({
     <div className="flex h-full flex-col bg-zinc-50">
       <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-zinc-900">{documentNumber || "Document PDF"}</h3>
+          <h3 className="text-sm font-semibold text-zinc-900">
+            {documentNumber || "Document PDF"}
+          </h3>
         </div>
 
         <div className="flex items-center gap-2">
@@ -140,7 +142,12 @@ export default function PdfViewer({
               title="Page précédente"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
 
@@ -165,7 +172,12 @@ export default function PdfViewer({
               title="Page suivante"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -273,7 +285,12 @@ export default function PdfViewer({
       </div>
 
       <div className="flex-1 overflow-auto bg-zinc-200 p-4" style={{ position: "relative" }}>
-        <iframe ref={iframeRef} src={viewerUrl} className="h-[100vh] w-full border-0 shadow-lg" title="PDF Viewer" />
+        <iframe
+          ref={iframeRef}
+          src={viewerUrl}
+          className="h-[100vh] w-full border-0 shadow-lg"
+          title="PDF Viewer"
+        />
       </div>
     </div>
   );

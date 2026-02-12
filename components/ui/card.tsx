@@ -13,7 +13,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn("rounded-lg border border-zinc-200 bg-white text-zinc-900 shadow-sm", className)}
+        className={cn(
+          "rounded-lg border border-zinc-200 bg-white text-zinc-900 shadow-sm",
+          className
+        )}
         {...props}
       >
         {hasHeader ? (

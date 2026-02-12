@@ -144,7 +144,9 @@ export default function AvailabilityPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Salle</label>
                 <select
                   value={form.room_id}
-                  onChange={(event) => setForm((prev) => ({ ...prev, room_id: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, room_id: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 >
                   <option value="">Toutes les salles</option>
@@ -156,7 +158,9 @@ export default function AvailabilityPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Enseignant (optionnel)</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Enseignant (optionnel)
+                </label>
                 <FacultySearch
                   value={form.faculty_name}
                   onSelect={(faculty) =>
@@ -175,7 +179,9 @@ export default function AvailabilityPage() {
                   <input
                     type="time"
                     value={form.start_time}
-                    onChange={(event) => setForm((prev) => ({ ...prev, start_time: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, start_time: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>
@@ -184,7 +190,9 @@ export default function AvailabilityPage() {
                   <input
                     type="time"
                     value={form.end_time}
-                    onChange={(event) => setForm((prev) => ({ ...prev, end_time: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, end_time: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>
@@ -218,7 +226,9 @@ export default function AvailabilityPage() {
           <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
             <h2 className="text-sm font-semibold text-[#00365F]">Résultat</h2>
             {!result ? (
-              <p className="mt-4 text-sm text-zinc-500">Lancez une vérification pour voir les disponibilités.</p>
+              <p className="mt-4 text-sm text-zinc-500">
+                Lancez une vérification pour voir les disponibilités.
+              </p>
             ) : result.available ? (
               <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
                 Créneau disponible.
@@ -237,7 +247,9 @@ export default function AvailabilityPage() {
                 </ul>
                 {result.suggestions && result.suggestions.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-[#00365F]">Suggestions disponibles</h3>
+                    <h3 className="text-sm font-semibold text-[#00365F]">
+                      Suggestions disponibles
+                    </h3>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {result.suggestions.map((suggestion, index) => (
                         <span
@@ -256,7 +268,9 @@ export default function AvailabilityPage() {
         </div>
 
         <div className="mt-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-[#00365F]">Heatmap de charge (créneaux occupés)</h2>
+          <h2 className="text-sm font-semibold text-[#00365F]">
+            Heatmap de charge (créneaux occupés)
+          </h2>
           <p className="mt-1 text-xs text-zinc-500">
             Visualisation des créneaux disponibles/occupés pour la date sélectionnée.
           </p>
@@ -264,7 +278,9 @@ export default function AvailabilityPage() {
           {heatmapLoading ? (
             <p className="mt-4 text-sm text-zinc-500">Calcul de la heatmap...</p>
           ) : heatmap.length === 0 ? (
-            <p className="mt-4 text-sm text-zinc-500">Renseignez une date pour afficher la heatmap.</p>
+            <p className="mt-4 text-sm text-zinc-500">
+              Renseignez une date pour afficher la heatmap.
+            </p>
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {heatmap.map((slot) => (

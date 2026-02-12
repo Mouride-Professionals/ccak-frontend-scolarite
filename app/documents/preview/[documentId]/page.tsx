@@ -86,7 +86,12 @@ export default function DocumentPreviewPage() {
       {error && !isLoading && (
         <div className="flex h-full items-center justify-center">
           <div className="max-w-md text-center">
-            <svg className="mx-auto mb-4 h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="mx-auto mb-4 h-16 w-16 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

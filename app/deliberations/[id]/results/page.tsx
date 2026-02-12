@@ -107,7 +107,9 @@ export default function DeliberationResultsPage() {
 
   const stats = useMemo(() => {
     const admitted = results.filter((result) => isAdmittedDecision(result.decision)).length;
-    const failed = results.filter((result) => result.decision === DeliberationDecision.FAILED).length;
+    const failed = results.filter(
+      (result) => result.decision === DeliberationDecision.FAILED
+    ).length;
     const pending = results.filter((result) => !result.decision).length;
     return { total: results.length, admitted, failed, pending };
   }, [results]);
@@ -426,7 +428,7 @@ export default function DeliberationResultsPage() {
                                 patchResult(result.id, {
                                   is_with_honors: event.target.checked,
                                   honor_level: event.target.checked
-                                    ? result.honor_level ?? HonorLevel.PASSABLE
+                                    ? (result.honor_level ?? HonorLevel.PASSABLE)
                                     : null,
                                 })
                               }
@@ -544,7 +546,9 @@ export default function DeliberationResultsPage() {
                           </td>
                           <td className="px-3 py-2">{formatDecision(result.decision)}</td>
                           <td className="px-3 py-2">
-                            {result.is_with_honors ? formatHonor(result.honor_level) : "Sans mention"}
+                            {result.is_with_honors
+                              ? formatHonor(result.honor_level)
+                              : "Sans mention"}
                           </td>
                           <td className="px-3 py-2">{result.jury_remarks || "-"}</td>
                         </tr>
@@ -671,7 +675,9 @@ export default function DeliberationResultsPage() {
               <div>
                 <p className="text-zinc-500">Mention</p>
                 <p className="font-medium text-zinc-900">
-                  {detailResult.is_with_honors ? formatHonor(detailResult.honor_level) : "Sans mention"}
+                  {detailResult.is_with_honors
+                    ? formatHonor(detailResult.honor_level)
+                    : "Sans mention"}
                 </p>
               </div>
               <div>

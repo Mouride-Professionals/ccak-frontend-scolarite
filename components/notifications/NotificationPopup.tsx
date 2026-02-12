@@ -27,7 +27,10 @@ export default function NotificationPopup() {
   });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { notifications, unreadCount, isLoading } = useNotificationsPolling(session?.user?.id, true);
+  const { notifications, unreadCount, isLoading } = useNotificationsPolling(
+    session?.user?.id,
+    true
+  );
   const markReadMutation = useMarkNotificationRead();
 
   const topNotifications = useMemo(() => notifications.slice(0, 5), [notifications]);
@@ -138,7 +141,9 @@ export default function NotificationPopup() {
                       }`}
                     >
                       <p className="text-sm font-semibold text-[#083B66]">{notification.title}</p>
-                      <p className="mt-1 line-clamp-2 text-xs text-zinc-600">{notification.message}</p>
+                      <p className="mt-1 line-clamp-2 text-xs text-zinc-600">
+                        {notification.message}
+                      </p>
                       <p className="mt-2 text-[11px] text-zinc-500">
                         {formatDistanceToNow(new Date(notification.created_at), {
                           addSuffix: true,

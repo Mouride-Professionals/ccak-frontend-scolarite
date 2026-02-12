@@ -7,10 +7,7 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
 import { useDepartments } from "@/hooks/use-departments";
-import {
-  useFacultyMember,
-  useUpdateFacultyMember,
-} from "@/hooks/use-faculty-members-management";
+import { useFacultyMember, useUpdateFacultyMember } from "@/hooks/use-faculty-members-management";
 import { FacultyContractType, FacultyRank } from "@/types/academic";
 
 export default function FacultyMemberEditPage() {

@@ -180,7 +180,9 @@ export default function EvaluationFormPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Cours</label>
                 <select
                   value={form.course_id}
-                  onChange={(event) => setForm((prev) => ({ ...prev, course_id: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, course_id: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 >
                   <option value="">Sélectionner</option>
@@ -207,7 +209,9 @@ export default function EvaluationFormPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Année académique</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Année académique
+                </label>
                 <select
                   value={form.academic_year_id}
                   onChange={(event) =>
@@ -230,7 +234,9 @@ export default function EvaluationFormPage() {
                 <input
                   type="date"
                   value={form.start_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, start_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, start_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>
@@ -240,13 +246,17 @@ export default function EvaluationFormPage() {
                 <input
                   type="date"
                   value={form.end_date}
-                  onChange={(event) => setForm((prev) => ({ ...prev, end_date: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, end_date: event.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Date limite de réponse</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Date limite de réponse
+                </label>
                 <input
                   type="date"
                   value={form.response_deadline}
@@ -330,7 +340,8 @@ export default function EvaluationFormPage() {
                 />
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600">
-                Échelle configurée: {form.rating_scale_min} à {form.rating_scale_max} · {form.rating_scale_low_label || "-"} / {form.rating_scale_high_label || "-"}
+                Échelle configurée: {form.rating_scale_min} à {form.rating_scale_max} ·{" "}
+                {form.rating_scale_low_label || "-"} / {form.rating_scale_high_label || "-"}
               </div>
             </div>
 
@@ -392,28 +403,39 @@ export default function EvaluationFormPage() {
           <div className="space-y-4">
             <div className="rounded-lg border border-zinc-200 p-4 text-sm text-zinc-700">
               <p>
-                <span className="font-semibold text-[#00365F]">Cours:</span> {selectedCourse?.name || "-"}
+                <span className="font-semibold text-[#00365F]">Cours:</span>{" "}
+                {selectedCourse?.name || "-"}
               </p>
               <p>
-                <span className="font-semibold text-[#00365F]">Enseignant:</span> {form.faculty_name || "-"}
+                <span className="font-semibold text-[#00365F]">Enseignant:</span>{" "}
+                {form.faculty_name || "-"}
               </p>
               <p>
-                <span className="font-semibold text-[#00365F]">Échelle:</span> {form.rating_scale_min} à {form.rating_scale_max} ({form.rating_scale_low_label || "-"} → {form.rating_scale_high_label || "-"})
+                <span className="font-semibold text-[#00365F]">Échelle:</span>{" "}
+                {form.rating_scale_min} à {form.rating_scale_max} (
+                {form.rating_scale_low_label || "-"} → {form.rating_scale_high_label || "-"})
               </p>
             </div>
 
             <ul className="space-y-2">
               {sanitizedQuestions.length > 0 ? (
                 sanitizedQuestions.map((question, index) => (
-                  <li key={`${question}-${index}`} className="rounded-md border border-zinc-200 p-3 text-sm">
-                    <p className="font-medium text-zinc-800">Q{index + 1}. {question}</p>
+                  <li
+                    key={`${question}-${index}`}
+                    className="rounded-md border border-zinc-200 p-3 text-sm"
+                  >
+                    <p className="font-medium text-zinc-800">
+                      Q{index + 1}. {question}
+                    </p>
                     <p className="mt-2 text-xs text-zinc-500">
                       Notation prévue: {form.rating_scale_min} à {form.rating_scale_max}
                     </p>
                   </li>
                 ))
               ) : (
-                <li className="text-sm text-zinc-500">Ajoutez au moins une question pour prévisualiser.</li>
+                <li className="text-sm text-zinc-500">
+                  Ajoutez au moins une question pour prévisualiser.
+                </li>
               )}
             </ul>
           </div>

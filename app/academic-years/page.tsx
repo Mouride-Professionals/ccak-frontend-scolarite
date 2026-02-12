@@ -143,7 +143,8 @@ export default function AcademicYearsPage() {
     } catch (error) {
       setToast({
         isOpen: true,
-        message: error instanceof Error ? error.message : "Erreur lors de la mise a jour du statut.",
+        message:
+          error instanceof Error ? error.message : "Erreur lors de la mise a jour du statut.",
         type: "error",
       });
     } finally {

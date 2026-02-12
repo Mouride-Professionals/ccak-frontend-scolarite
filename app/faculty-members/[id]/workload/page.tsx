@@ -37,7 +37,7 @@ export default function FacultyWorkloadPage() {
             <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
               <p className="text-xs uppercase text-zinc-400">Cours assignés</p>
               <p className="mt-2 text-2xl font-semibold text-[#00365F]">
-                {isLoading ? "..." : workload?.assigned_courses ?? 0}
+                {isLoading ? "..." : (workload?.assigned_courses ?? 0)}
               </p>
             </div>
             <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">

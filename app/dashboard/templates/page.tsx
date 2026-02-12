@@ -11,7 +11,11 @@ import { toUserError } from "@/lib/error-handler";
 export default function TemplatesPage() {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
-  const { data: templates, isLoading, error } = useQuery({
+  const {
+    data: templates,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["email-templates"],
     queryFn: () => templatesApi.getTemplates(),
   });

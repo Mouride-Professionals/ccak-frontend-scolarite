@@ -29,7 +29,9 @@ export default function StudentSchedulePage() {
     week: week || undefined,
   });
 
-  const selectedStudent = (students?.data ?? []).find((student) => student.id === selectedStudentId);
+  const selectedStudent = (students?.data ?? []).find(
+    (student) => student.id === selectedStudentId
+  );
 
   const handleExportPdf = async () => {
     if (!schedule || schedule.length === 0) return;
@@ -74,7 +76,9 @@ export default function StudentSchedulePage() {
         />
 
         <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-          <label className="mb-2 block text-sm font-medium text-zinc-700">Sélectionner un étudiant</label>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">
+            Sélectionner un étudiant
+          </label>
           <select
             value={selectedStudentId}
             onChange={(event) => setSelectedStudentId(event.target.value)}
@@ -87,7 +91,9 @@ export default function StudentSchedulePage() {
               </option>
             ))}
           </select>
-          <p className="mt-2 text-xs text-zinc-500">Utilisez la recherche pour filtrer rapidement les étudiants.</p>
+          <p className="mt-2 text-xs text-zinc-500">
+            Utilisez la recherche pour filtrer rapidement les étudiants.
+          </p>
         </div>
 
         {!selectedStudentId ? (

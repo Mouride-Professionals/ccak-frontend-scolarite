@@ -143,7 +143,9 @@ export default function ProgramSchedulePage() {
         />
 
         <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-          <label className="mb-2 block text-sm font-medium text-zinc-700">Sélectionner un programme</label>
+          <label className="mb-2 block text-sm font-medium text-zinc-700">
+            Sélectionner un programme
+          </label>
           <select
             value={programId}
             onChange={(event) => setProgramId(event.target.value)}
@@ -224,7 +226,9 @@ export default function ProgramSchedulePage() {
                   <input
                     type="time"
                     value={editForm.end_time}
-                    onChange={(event) => setEditForm((prev) => ({ ...prev, end_time: event.target.value }))}
+                    onChange={(event) =>
+                      setEditForm((prev) => ({ ...prev, end_time: event.target.value }))
+                    }
                     className="rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>

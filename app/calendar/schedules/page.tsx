@@ -158,7 +158,11 @@ export default function ScheduleCreationPage() {
   const handleAddDraft = () => {
     const selectedCourse = (coursesData?.data ?? []).find((course) => course.id === form.course_id);
     if (!selectedCourse) {
-      setToast({ isOpen: true, message: "Sélectionnez un cours pour le brouillon.", type: "error" });
+      setToast({
+        isOpen: true,
+        message: "Sélectionnez un cours pour le brouillon.",
+        type: "error",
+      });
       return;
     }
 
@@ -171,7 +175,11 @@ export default function ScheduleCreationPage() {
     };
 
     setPlannerDrafts((prev) => [draft, ...prev]);
-    setToast({ isOpen: true, message: "Cours ajouté au panier de planification.", type: "success" });
+    setToast({
+      isOpen: true,
+      message: "Cours ajouté au panier de planification.",
+      type: "success",
+    });
   };
 
   const handleDropOnCell = async (
@@ -214,7 +222,11 @@ export default function ScheduleCreationPage() {
 
       const courseId = payload.type === "course" ? payload.course_id : draft?.course_id;
       if (!courseId) {
-        setToast({ isOpen: true, message: "Cours introuvable pour la planification.", type: "error" });
+        setToast({
+          isOpen: true,
+          message: "Cours introuvable pour la planification.",
+          type: "error",
+        });
         return;
       }
 
@@ -236,7 +248,11 @@ export default function ScheduleCreationPage() {
 
       setToast({ isOpen: true, message: "Séance planifiée par glisser-déposer.", type: "success" });
     } catch {
-      setToast({ isOpen: true, message: "Erreur pendant la planification drag/drop.", type: "error" });
+      setToast({
+        isOpen: true,
+        message: "Erreur pendant la planification drag/drop.",
+        type: "error",
+      });
     }
   };
 
@@ -269,7 +285,9 @@ export default function ScheduleCreationPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Cours</label>
                   <select
                     value={form.course_id}
-                    onChange={(event) => setForm((prev) => ({ ...prev, course_id: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, course_id: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   >
                     <option value="">Sélectionner</option>
@@ -284,7 +302,9 @@ export default function ScheduleCreationPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Salle</label>
                   <select
                     value={form.room_id}
-                    onChange={(event) => setForm((prev) => ({ ...prev, room_id: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, room_id: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   >
                     <option value="">Sélectionner</option>
@@ -296,7 +316,9 @@ export default function ScheduleCreationPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">Type d&apos;activité</label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Type d&apos;activité
+                  </label>
                   <select
                     value={form.activity_type_id}
                     onChange={(event) =>
@@ -313,7 +335,9 @@ export default function ScheduleCreationPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">Année académique</label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Année académique
+                  </label>
                   <select
                     value={form.academic_year_id}
                     onChange={(event) =>
@@ -363,7 +387,9 @@ export default function ScheduleCreationPage() {
                     <input
                       type="time"
                       value={form.end_time}
-                      onChange={(event) => setForm((prev) => ({ ...prev, end_time: event.target.value }))}
+                      onChange={(event) =>
+                        setForm((prev) => ({ ...prev, end_time: event.target.value }))
+                      }
                       className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                     />
                   </div>
@@ -373,7 +399,9 @@ export default function ScheduleCreationPage() {
                   <input
                     type="number"
                     value={form.semester}
-                    onChange={(event) => setForm((prev) => ({ ...prev, semester: event.target.value }))}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, semester: event.target.value }))
+                    }
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
                   />
                 </div>
@@ -413,7 +441,9 @@ export default function ScheduleCreationPage() {
               <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Cours</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      Cours
+                    </h4>
                     <div className="mt-2 space-y-2 rounded-lg border border-zinc-200 p-2">
                       {(coursesData?.data ?? []).slice(0, 12).map((course) => (
                         <button
@@ -435,7 +465,9 @@ export default function ScheduleCreationPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Panier</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      Panier
+                    </h4>
                     <div className="mt-2 space-y-2 rounded-lg border border-zinc-200 p-2">
                       {plannerDrafts.length === 0 ? (
                         <p className="text-xs text-zinc-400">Aucun brouillon.</p>
@@ -468,18 +500,21 @@ export default function ScheduleCreationPage() {
                 <div className="overflow-x-auto">
                   <div className="min-w-[720px]">
                     <div className="grid grid-cols-7 gap-2 text-xs">
-                      <div className="rounded bg-zinc-100 p-2 font-semibold text-zinc-600">Créneau</div>
+                      <div className="rounded bg-zinc-100 p-2 font-semibold text-zinc-600">
+                        Créneau
+                      </div>
                       {dayOptions.map((day) => (
-                        <div key={day.value} className="rounded bg-zinc-100 p-2 font-semibold text-zinc-600">
+                        <div
+                          key={day.value}
+                          className="rounded bg-zinc-100 p-2 font-semibold text-zinc-600"
+                        >
                           {day.label}
                         </div>
                       ))}
 
                       {plannerSlots.map((slot) => (
                         <Fragment key={`slot-row-${slot.start}-${slot.end}`}>
-                          <div
-                            className="rounded border border-zinc-200 p-2 text-xs font-medium text-zinc-700"
-                          >
+                          <div className="rounded border border-zinc-200 p-2 text-xs font-medium text-zinc-700">
                             {slot.start} - {slot.end}
                           </div>
                           {dayOptions.map((day) => {
@@ -501,7 +536,10 @@ export default function ScheduleCreationPage() {
                                       onDragStart={(event) =>
                                         event.dataTransfer.setData(
                                           "application/ccak-schedule",
-                                          payloadToString({ type: "schedule", schedule_id: item.id })
+                                          payloadToString({
+                                            type: "schedule",
+                                            schedule_id: item.id,
+                                          })
                                         )
                                       }
                                       className="rounded border border-zinc-200 bg-[#00365F]/5 p-1 text-[10px] text-zinc-700"
@@ -556,7 +594,9 @@ export default function ScheduleCreationPage() {
               <ul className="mt-4 space-y-3">
                 {(schedules?.data ?? []).map((item) => (
                   <li key={item.id} className="rounded-lg border border-zinc-200 p-3 text-sm">
-                    <div className="font-medium text-[#00365F]">{item.course_name || item.course_id}</div>
+                    <div className="font-medium text-[#00365F]">
+                      {item.course_name || item.course_id}
+                    </div>
                     <div className="text-xs text-zinc-500">
                       {item.day_of_week} · {item.start_time} - {item.end_time}
                     </div>

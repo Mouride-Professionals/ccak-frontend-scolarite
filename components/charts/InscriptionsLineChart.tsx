@@ -13,7 +13,11 @@ export default function InscriptionsLineChart({
   isLoading = false,
 }: InscriptionsLineChartProps) {
   if (isLoading) {
-    return <div className="flex h-[260px] items-center justify-center text-sm text-zinc-500">Chargement...</div>;
+    return (
+      <div className="flex h-[260px] items-center justify-center text-sm text-zinc-500">
+        Chargement...
+      </div>
+    );
   }
 
   if (data.length === 0) {

@@ -25,7 +25,9 @@ function toQuery(filters?: DashboardFilters) {
   return params;
 }
 
-export async function getDashboardOverview(filters?: DashboardFilters): Promise<DashboardOverviewData> {
+export async function getDashboardOverview(
+  filters?: DashboardFilters
+): Promise<DashboardOverviewData> {
   const params = toQuery(filters);
   const response = await api.get(`/dashboard/overview${params.toString() ? `?${params}` : ""}`);
   return unwrapData<DashboardOverviewData>(response);
@@ -70,4 +72,3 @@ export async function getRecentActivities(
   const response = await api.get(`/dashboard/recent-activities?${params}`);
   return unwrapData<DashboardRecentActivity[]>(response);
 }
-

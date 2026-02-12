@@ -138,8 +138,9 @@ export interface CreateDeliberationResultInput {
   honor_level?: HonorLevel;
 }
 
-export interface UpdateDeliberationResultInput
-  extends Partial<Omit<CreateDeliberationResultInput, "decision" | "jury_remarks" | "honor_level">> {
+export interface UpdateDeliberationResultInput extends Partial<
+  Omit<CreateDeliberationResultInput, "decision" | "jury_remarks" | "honor_level">
+> {
   decision?: DeliberationDecision | null;
   jury_remarks?: string | null;
   honor_level?: HonorLevel | null;

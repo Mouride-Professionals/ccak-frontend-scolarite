@@ -122,7 +122,10 @@ export default function StudentDeliberationHistoryPage() {
           <div className="relative space-y-6">
             <div className="absolute bottom-0 left-[17px] top-0 w-0.5 bg-zinc-200"></div>
             {history.map((item) => (
-              <div key={item.id} className="relative rounded-lg border border-zinc-200 bg-white p-5">
+              <div
+                key={item.id}
+                className="relative rounded-lg border border-zinc-200 bg-white p-5"
+              >
                 <div className="absolute left-3 top-6 h-3 w-3 rounded-full bg-[#008D36]"></div>
                 <div className="ml-6">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -147,7 +150,9 @@ export default function StudentDeliberationHistoryPage() {
                     </div>
                     <div>
                       <p className="text-xs text-zinc-500">Moyenne</p>
-                      <p className="font-medium text-zinc-900">{item.semester_average ?? "-"} / 20</p>
+                      <p className="font-medium text-zinc-900">
+                        {item.semester_average ?? "-"} / 20
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-zinc-500">Crédits</p>
