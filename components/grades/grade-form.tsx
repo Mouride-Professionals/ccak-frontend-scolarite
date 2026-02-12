@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Student, Course, EvaluationTypeOption, CreateGradeInput } from "@/types/grade";
 import { GradeStatus } from "@/types/grade";
 import { GradeSchema, type GradeFormData } from "@/lib/validations/schemas";
-import { toUserError } from "@/lib/error-handler";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 
 interface GradeFormProps {
   onSubmit: (data: CreateGradeInput) => Promise<void>;
@@ -30,7 +31,7 @@ export default function GradeForm({
     register,
     handleSubmit,
     setValue,
-    watch,
+    setError,
     formState: { errors },
   } = useForm<GradeFormData>({
     resolver: zodResolver(GradeSchema),
@@ -45,12 +46,23 @@ export default function GradeForm({
       comments: initialData?.comments || "",
     },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFormSubmit = async (data: GradeFormData) => {
+    setSubmitError(null);
     try {
       await onSubmit(data as CreateGradeInput);
     } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof GradeFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
       const userError = toUserError(error);
+      setSubmitError(userError.message);
       console.error("Form submission error:", userError.message);
     }
   };
@@ -79,6 +91,8 @@ export default function GradeForm({
             <select
               id="student"
               {...register("student_id")}
+              aria-invalid={!!errors.student_id}
+              aria-describedby={errors.student_id ? "student_id-error" : undefined}
               className={`block w-full appearance-none rounded-md border ${
                 errors.student_id ? "border-red-300" : "border-zinc-300"
               } bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
@@ -92,7 +106,9 @@ export default function GradeForm({
               ))}
             </select>
             {errors.student_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.student_id.message}</p>
+              <p id="student_id-error" className="mt-1.5 text-xs text-red-600">
+                {errors.student_id.message}
+              </p>
             )}
           </div>
 
@@ -104,6 +120,8 @@ export default function GradeForm({
             <select
               id="course"
               {...register("course_id")}
+              aria-invalid={!!errors.course_id}
+              aria-describedby={errors.course_id ? "course_id-error" : undefined}
               className={`block w-full appearance-none rounded-md border ${
                 errors.course_id ? "border-red-300" : "border-zinc-300"
               } bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
@@ -116,7 +134,11 @@ export default function GradeForm({
                 </option>
               ))}
             </select>
-            {errors.course_id && <p className="mt-1.5 text-xs text-red-600">{errors.course_id.message}</p>}
+            {errors.course_id && (
+              <p id="course_id-error" className="mt-1.5 text-xs text-red-600">
+                {errors.course_id.message}
+              </p>
+            )}
           </div>
 
           {/* Evaluation Type */}
@@ -128,6 +150,8 @@ export default function GradeForm({
               id="type"
               {...register("type")}
               onChange={(e) => handleEvaluationTypeChange(e.target.value)}
+              aria-invalid={!!errors.type}
+              aria-describedby={errors.type ? "type-error" : undefined}
               className={`block w-full appearance-none rounded-md border ${
                 errors.type ? "border-red-300" : "border-zinc-300"
               } bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
@@ -140,7 +164,11 @@ export default function GradeForm({
                 </option>
               ))}
             </select>
-            {errors.type && <p className="mt-1.5 text-xs text-red-600">{errors.type.message}</p>}
+            {errors.type && (
+              <p id="type-error" className="mt-1.5 text-xs text-red-600">
+                {errors.type.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -158,6 +186,8 @@ export default function GradeForm({
               type="number"
               id="score"
               {...register("score", { valueAsNumber: true })}
+              aria-invalid={!!errors.score}
+              aria-describedby={errors.score ? "score-error" : undefined}
               min="0"
               step="0.5"
               placeholder="0"
@@ -166,7 +196,11 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.score && <p className="mt-1.5 text-xs text-red-600">{errors.score.message}</p>}
+            {errors.score && (
+              <p id="score-error" className="mt-1.5 text-xs text-red-600">
+                {errors.score.message}
+              </p>
+            )}
           </div>
 
           {/* Max Score */}
@@ -178,6 +212,8 @@ export default function GradeForm({
               type="number"
               id="max_score"
               {...register("max_score", { valueAsNumber: true })}
+              aria-invalid={!!errors.max_score}
+              aria-describedby={errors.max_score ? "max_score-error" : undefined}
               min="1"
               step="0.5"
               placeholder="20"
@@ -186,7 +222,11 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.max_score && <p className="mt-1.5 text-xs text-red-600">{errors.max_score.message}</p>}
+            {errors.max_score && (
+              <p id="max_score-error" className="mt-1.5 text-xs text-red-600">
+                {errors.max_score.message}
+              </p>
+            )}
           </div>
 
           {/* Weight */}
@@ -198,6 +238,8 @@ export default function GradeForm({
               type="number"
               id="weight"
               {...register("weight", { valueAsNumber: true })}
+              aria-invalid={!!errors.weight}
+              aria-describedby={errors.weight ? "weight-error" : undefined}
               min="0"
               max="1"
               step="0.1"
@@ -207,7 +249,11 @@ export default function GradeForm({
               } bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]`}
               disabled={isLoading}
             />
-            {errors.weight && <p className="mt-1.5 text-xs text-red-600">{errors.weight.message}</p>}
+            {errors.weight && (
+              <p id="weight-error" className="mt-1.5 text-xs text-red-600">
+                {errors.weight.message}
+              </p>
+            )}
             <p className="mt-1 text-xs text-zinc-500">Entre 0 et 1 (ex: 0.3 pour 30%)</p>
           </div>
 
@@ -243,16 +289,28 @@ export default function GradeForm({
           <textarea
             id="comments"
             {...register("comments")}
+            aria-invalid={!!errors.comments}
+            aria-describedby={errors.comments ? "comments-error" : undefined}
             rows={4}
             placeholder="| Saisir des commentaires..."
             className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
             disabled={isLoading}
           />
+          {errors.comments && (
+            <p id="comments-error" className="mt-1.5 text-xs text-red-600">
+              {errors.comments.message}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Footer Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-zinc-200 pt-6">
+        {submitError && (
+          <p className="mr-auto text-sm text-red-600" role="alert">
+            {submitError}
+          </p>
+        )}
         <button
           type="button"
           onClick={onCancel}

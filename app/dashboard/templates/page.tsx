@@ -6,11 +6,12 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import { templatesApi, type EmailTemplate } from "@/lib/api/templates";
 import TemplateCard from "@/components/templates/TemplateCard";
 import TemplatePreviewModal from "@/components/templates/TemplatePreviewModal";
+import { toUserError } from "@/lib/error-handler";
 
 export default function TemplatesPage() {
   const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null);
 
-  const { data: templates, isLoading } = useQuery({
+  const { data: templates, isLoading, error } = useQuery({
     queryKey: ["email-templates"],
     queryFn: () => templatesApi.getTemplates(),
   });
@@ -19,9 +20,9 @@ export default function TemplatesPage() {
     <DashboardLayout title="Templates d'Emails">
       <div className="p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Templates d'Emails</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Templates d&apos;Emails</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Gérer les templates d'emails utilisés pour les notifications
+            Gérer les templates d&apos;emails utilisés pour les notifications
           </p>
         </div>
 
@@ -48,6 +49,15 @@ export default function TemplatesPage() {
             </div>
           </div>
         </div>
+
+        {error && (
+          <div
+            className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            role="alert"
+          >
+            {toUserError(error, "Erreur lors du chargement des templates.").message}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
@@ -156,6 +166,8 @@ export default function TemplatesPage() {
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#00365F]"></div>
               </div>
+            ) : (templates?.length ?? 0) === 0 ? (
+              <p className="py-8 text-center text-sm text-zinc-500">Aucun template disponible.</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {templates?.map((template) => (

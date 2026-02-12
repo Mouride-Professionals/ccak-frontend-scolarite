@@ -48,5 +48,6 @@ yarn-error.log*
 next-env.d.ts
 
 # docs (keep generated/reference docs ignored; allow remediation plan tracking)
-/docs/*
+/docs
 !/docs/frontend-audit-remediation-plan.md
+AUDIT_REPORT.md

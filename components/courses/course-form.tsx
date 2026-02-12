@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateCourseInput, Course } from "@/types/course";
 import type { CourseUnit } from "@/types/course-unit";
 import { CourseSchema, type CourseFormData } from "@/lib/validations/schemas";
-import { toUserError } from "@/lib/error-handler";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 
 interface CourseFormProps {
   onSubmit: (data: CreateCourseInput) => Promise<void>;
@@ -28,6 +29,7 @@ export default function CourseForm({
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors },
   } = useForm<CourseFormData>({
     resolver: zodResolver(CourseSchema),
@@ -45,13 +47,24 @@ export default function CourseForm({
       is_active: initialData?.is_active !== false,
     },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const prerequisiteChoices = availableCourses.filter((course) => course.id !== initialData?.id);
 
   const handleFormSubmit = async (data: CourseFormData) => {
+    setSubmitError(null);
     try {
       await onSubmit(data as CreateCourseInput);
     } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof CourseFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
       const userError = toUserError(error);
+      setSubmitError(userError.message);
       console.error("Form submission error:", userError.message);
     }
   };
@@ -284,6 +297,7 @@ export default function CourseForm({
       </div>
 
       {/* Actions */}
+      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div className="flex justify-end gap-3 border-t border-zinc-200 pt-6">
         <button
           type="button"

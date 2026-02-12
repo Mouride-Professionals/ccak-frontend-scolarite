@@ -1,21 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFacultyMembersList } from "@/hooks/use-faculty-members-management";
 import type { FacultyMember } from "@/types/academic";
 
 interface FacultySearchProps {
   value?: string;
   onSelect: (faculty: FacultyMember) => void;
+  onClear?: () => void;
   placeholder?: string;
   disabled?: boolean;
+  minQueryLength?: number;
 }
 
 export default function FacultySearch({
   value = "",
   onSelect,
+  onClear,
   placeholder = "Rechercher un enseignant...",
   disabled = false,
+  minQueryLength = 2,
 }: FacultySearchProps) {
   const [query, setQuery] = useState(value);
   const [debouncedQuery, setDebouncedQuery] = useState(value);
@@ -50,10 +54,40 @@ export default function FacultySearch({
       limit: 10,
       search: debouncedQuery || undefined,
     },
-    { enabled: debouncedQuery.length >= 2 && !disabled }
+    { enabled: debouncedQuery.length >= minQueryLength && !disabled }
   );
 
-  const results = data?.data ?? [];
+  const { data: fallbackData, isLoading: isLoadingFallback } = useFacultyMembersList(
+    {
+      page: 1,
+      limit: 100,
+    },
+    { enabled: debouncedQuery.length >= minQueryLength && !disabled }
+  );
+
+  const results = useMemo(() => {
+    const primaryResults = data?.data ?? [];
+    if (primaryResults.length > 0) {
+      return primaryResults;
+    }
+
+    const term = debouncedQuery.trim().toLowerCase();
+    if (!term) return [];
+
+    return (fallbackData?.data ?? []).filter((member) => {
+      const haystack = [
+        member.full_name,
+        member.staff_number,
+        member.department?.name,
+        member.department?.code,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(term);
+    });
+  }, [data?.data, fallbackData?.data, debouncedQuery]);
 
   const handleSelect = (faculty: FacultyMember) => {
     setQuery(faculty.full_name);
@@ -100,9 +134,15 @@ export default function FacultySearch({
           type="text"
           value={query}
           onChange={(event) => {
-            setQuery(event.target.value);
+            const nextValue = event.target.value;
+            setQuery(nextValue);
             setIsOpen(true);
             setActiveIndex(0);
+            if (value && nextValue !== value) {
+              onClear?.();
+            } else if (!nextValue.trim()) {
+              onClear?.();
+            }
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
@@ -112,9 +152,9 @@ export default function FacultySearch({
         />
       </div>
 
-      {isOpen && debouncedQuery.length >= 2 && (
+      {isOpen && debouncedQuery.length >= minQueryLength && (
         <div className="absolute z-20 mt-2 w-full rounded-lg border border-zinc-200 bg-white shadow-lg">
-          {isLoading ? (
+          {isLoading || isLoadingFallback ? (
             <div className="px-4 py-3 text-sm text-zinc-500">Recherche...</div>
           ) : results.length === 0 ? (
             <div className="px-4 py-3 text-sm text-zinc-500">Aucun résultat</div>
@@ -133,7 +173,8 @@ export default function FacultySearch({
                   >
                     <span className="font-medium">{faculty.full_name}</span>
                     <span className="text-xs text-zinc-500">
-                      {faculty.department?.name || "—"} · {faculty.rank}
+                      {faculty.staff_number || "—"} · {faculty.department?.name || "—"} ·{" "}
+                      {faculty.department?.code || "—"}
                     </span>
                   </button>
                 </li>

@@ -79,7 +79,7 @@ Required env vars (see .env.example):
 
 - NEXTAUTH_URL, NEXTAUTH_SECRET
 - KEYCLOAK_BASE_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID
-- NEXT_PUBLIC_API_BASE_URL (defaults to https://api.ucak.edu.sn)
+- NEXT_PUBLIC_API_BASE_URL (defaults to https://si-api.ucak.sn)
 
 ## Security
 

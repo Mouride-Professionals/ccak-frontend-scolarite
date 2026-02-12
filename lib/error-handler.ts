@@ -8,6 +8,8 @@ export type UserFacingError = {
   code?: string;
 };
 
+export type ValidationErrorMap = Record<string, string>;
+
 type ApiError = {
   message?: string;
   error?: string;
@@ -121,6 +123,49 @@ export function toUserError(error: unknown, fallback = ERROR_MESSAGES.UNKNOWN): 
 
   // Default fallback for unknown error types
   return { message: fallback };
+}
+
+/**
+ * Extracts backend validation field errors from API error payloads.
+ * Supports Laravel-style payload: { message: string, errors: { field: string[] } }.
+ */
+export function extractValidationErrors(error: unknown): ValidationErrorMap {
+  if (!error || typeof error !== "object") {
+    return {};
+  }
+
+  const maybeStatus = "status" in error ? (error as { status?: unknown }).status : undefined;
+  if (maybeStatus !== 422) {
+    return {};
+  }
+
+  const maybeBody = "body" in error ? (error as { body?: unknown }).body : undefined;
+  if (!maybeBody || typeof maybeBody !== "object" || !("errors" in maybeBody)) {
+    return {};
+  }
+
+  const rawErrors = (maybeBody as { errors?: unknown }).errors;
+  if (!rawErrors || typeof rawErrors !== "object") {
+    return {};
+  }
+
+  const fieldErrors: ValidationErrorMap = {};
+
+  for (const [field, details] of Object.entries(rawErrors as Record<string, unknown>)) {
+    if (Array.isArray(details) && details.length > 0) {
+      const firstMessage = details.find((item) => typeof item === "string");
+      if (typeof firstMessage === "string" && firstMessage.trim().length > 0) {
+        fieldErrors[field] = firstMessage;
+      }
+      continue;
+    }
+
+    if (typeof details === "string" && details.trim().length > 0) {
+      fieldErrors[field] = details;
+    }
+  }
+
+  return fieldErrors;
 }
 
 /**

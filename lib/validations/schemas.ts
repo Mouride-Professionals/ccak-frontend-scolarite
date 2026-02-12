@@ -6,6 +6,7 @@
 import { z } from "zod";
 import { Gender } from "@/types/student";
 import { EnrollmentStatus } from "@/types/enrollment";
+import { AcademicLevel } from "@/types/academic";
 
 // Common validation patterns
 const PHONE_REGEX = /^\+221\d{9}$/;
@@ -70,14 +71,29 @@ export const CourseSchema = z.object({
     .max(1000, "La description ne peut pas dépasser 1000 caractères")
     .optional(),
   credits: z
-    .number()
+    .number({ error: "Les crédits sont requis" })
     .int("Les crédits doivent être un nombre entier")
     .min(1, "Les crédits doivent être au moins 1")
     .max(30, "Les crédits ne peuvent pas dépasser 30"),
-  hours_lecture: z.number().int().min(0, "Les heures doivent être positives").max(200),
-  hours_td: z.number().int().min(0, "Les heures doivent être positives").max(200),
-  hours_tp: z.number().int().min(0, "Les heures doivent être positives").max(200),
-  coefficient: z.number().min(0, "Le coefficient doit être positif").max(10),
+  hours_lecture: z
+    .number({ error: "Les heures de CM sont requises" })
+    .int()
+    .min(0, "Les heures doivent être positives")
+    .max(200),
+  hours_td: z
+    .number({ error: "Les heures de TD sont requises" })
+    .int()
+    .min(0, "Les heures doivent être positives")
+    .max(200),
+  hours_tp: z
+    .number({ error: "Les heures de TP sont requises" })
+    .int()
+    .min(0, "Les heures doivent être positives")
+    .max(200),
+  coefficient: z
+    .number({ error: "Le coefficient est requis" })
+    .min(0, "Le coefficient doit être positif")
+    .max(10),
   prerequisites: z.array(z.string()).optional(),
   is_active: z.boolean().default(true),
 });
@@ -91,13 +107,13 @@ export const EnrollmentSchema = z.object({
   academic_program_id: z.string().min(1, "Le programme académique est requis"),
   academic_year_id: z.string().min(1, "L'année académique est requise"),
   current_semester: z
-    .number()
+    .number({ error: "Le semestre est requis" })
     .int("Le semestre doit être un nombre entier")
     .min(1, "Le semestre doit être compris entre 1 et 6")
     .max(6, "Le semestre doit être compris entre 1 et 6"),
   enrollment_date: z.string().min(1, "La date d'inscription est requise"),
   registration_fee_paid: z
-    .number()
+    .number({ error: "Le montant des frais est requis" })
     .min(0, "Les frais d'inscription ne peuvent pas être négatifs"),
   is_scholarship: z.boolean().default(false),
   status: z.nativeEnum(EnrollmentStatus).default(EnrollmentStatus.PENDING),
@@ -112,10 +128,14 @@ export const GradeSchema = z
     student_id: z.string().min(1, "L'étudiant est requis"),
     course_id: z.string().min(1, "Le cours est requis"),
     type: z.string().min(1, "Le type d'évaluation est requis"),
-    score: z.number().min(0, "La note ne peut pas être négative"),
-    max_score: z.number().min(1, "La note maximale doit être positive"),
+    score: z
+      .number({ error: "La note obtenue est requise" })
+      .min(0, "La note ne peut pas être négative"),
+    max_score: z
+      .number({ error: "La note maximale est requise" })
+      .min(1, "La note maximale doit être positive"),
     weight: z
-      .number()
+      .number({ error: "Le coefficient est requis" })
       .min(0, "Le coefficient doit être positif")
       .max(1, "Le coefficient ne peut pas dépasser 1"),
     status: z.string().optional(),
@@ -134,13 +154,22 @@ export const GradeSchema = z
 // ============================================================================
 
 export const FacultySchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(200),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Le nom de la faculté doit contenir au moins 2 caractères")
+    .max(200, "Le nom de la faculté ne peut pas dépasser 200 caractères"),
   code: z
     .string()
+    .trim()
     .min(2, "Le code doit contenir au moins 2 caractères")
-    .max(20)
+    .max(20, "Le code ne peut pas dépasser 20 caractères")
     .regex(CODE_REGEX, "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"),
-  dean_id: z.string().optional().nullable(),
+  dean_id: z
+    .string()
+    .uuid("L'identifiant du doyen doit être un UUID valide")
+    .optional()
+    .nullable(),
   is_active: z.boolean().default(true),
 });
 
@@ -149,14 +178,23 @@ export const FacultySchema = z.object({
 // ============================================================================
 
 export const DepartmentSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(200),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Le nom du département doit contenir au moins 2 caractères")
+    .max(200, "Le nom du département ne peut pas dépasser 200 caractères"),
   code: z
     .string()
+    .trim()
     .min(2, "Le code doit contenir au moins 2 caractères")
-    .max(20)
+    .max(20, "Le code ne peut pas dépasser 20 caractères")
     .regex(CODE_REGEX, "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"),
   faculty_id: z.string().min(1, "La faculté est requise"),
-  head_id: z.string().optional().nullable(),
+  head_id: z
+    .string()
+    .uuid("L'identifiant du chef de département doit être un UUID valide")
+    .optional()
+    .nullable(),
   is_active: z.boolean().default(true),
 });
 
@@ -165,16 +203,23 @@ export const DepartmentSchema = z.object({
 // ============================================================================
 
 export const ProgrammeSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(200),
-  code: z
+  name: z
     .string()
-    .min(2, "Le code doit contenir au moins 2 caractères")
-    .max(20)
-    .regex(CODE_REGEX, "Le code ne peut contenir que des lettres majuscules, chiffres et tirets"),
+    .trim()
+    .min(3, "Le nom du programme doit contenir au moins 3 caractères")
+    .max(200, "Le nom du programme ne peut pas dépasser 200 caractères"),
   department_id: z.string().min(1, "Le département est requis"),
-  level: z.enum(["L1", "L2", "L3", "M1", "M2", "D"]),
-  duration_years: z.number().int().min(1).max(10),
-  total_credits: z.number().int().min(1).max(500),
+  level: z.nativeEnum(AcademicLevel),
+  duration_semesters: z
+    .number({ error: "La durée du programme est requise" })
+    .int("La durée doit être un nombre entier")
+    .min(1, "La durée doit être d'au moins 1 semestre")
+    .max(20, "La durée ne peut pas dépasser 20 semestres"),
+  total_credits_required: z
+    .number({ error: "Le nombre total de crédits est requis" })
+    .int("Le nombre de crédits doit être un entier")
+    .min(1, "Le nombre de crédits doit être d'au moins 1")
+    .max(500, "Le nombre de crédits ne peut pas dépasser 500"),
   is_active: z.boolean().default(true),
 });
 
@@ -188,16 +233,20 @@ export const EvaluationSchema = z.object({
   course_id: z.string().min(1, "Le cours est requis"),
   evaluation_type: z.enum(["exam", "quiz", "assignment", "project", "presentation"]),
   date: z.string().min(1, "La date est requise"),
-  duration_minutes: z.number().int().min(1).max(600),
-  total_marks: z.number().min(1).max(100),
+  duration_minutes: z
+    .number({ error: "La durée est requise" })
+    .int()
+    .min(1)
+    .max(600),
+  total_marks: z.number({ error: "Le total des points est requis" }).min(1).max(100),
 });
 
 // Export type inference helpers
-export type StudentFormData = z.infer<typeof StudentSchema>;
-export type CourseFormData = z.infer<typeof CourseSchema>;
-export type EnrollmentFormData = z.infer<typeof EnrollmentSchema>;
-export type GradeFormData = z.infer<typeof GradeSchema>;
-export type FacultyFormData = z.infer<typeof FacultySchema>;
-export type DepartmentFormData = z.infer<typeof DepartmentSchema>;
-export type ProgrammeFormData = z.infer<typeof ProgrammeSchema>;
-export type EvaluationFormData = z.infer<typeof EvaluationSchema>;
+export type StudentFormData = z.input<typeof StudentSchema>;
+export type CourseFormData = z.input<typeof CourseSchema>;
+export type EnrollmentFormData = z.input<typeof EnrollmentSchema>;
+export type GradeFormData = z.input<typeof GradeSchema>;
+export type FacultyFormData = z.input<typeof FacultySchema>;
+export type DepartmentFormData = z.input<typeof DepartmentSchema>;
+export type ProgrammeFormData = z.input<typeof ProgrammeSchema>;
+export type EvaluationFormData = z.input<typeof EvaluationSchema>;

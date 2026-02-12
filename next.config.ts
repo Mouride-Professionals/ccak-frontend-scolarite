@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.ucak.edu.sn";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://si-api.ucak.sn";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const requiredEnv = [
   "NEXTAUTH_URL",
@@ -18,11 +19,26 @@ if (isProd) {
   }
 }
 
-const connectSrc = new Set<string>([
-  "'self'",
-  "https://api.ucak.edu.sn",
-  apiBaseUrl.replace(/\/$/, ""),
-]);
+const toConnectSources = (rawUrl: string) => {
+  const normalized = rawUrl.trim().replace(/\/$/, "");
+
+  try {
+    const parsed = new URL(normalized);
+    return [parsed.origin, normalized];
+  } catch {
+    return [normalized];
+  }
+};
+
+const connectSrc = new Set<string>(["'self'", "https://si-api.ucak.sn"]);
+
+for (const value of [apiBaseUrl, apiUrl]) {
+  if (value) {
+    for (const source of toConnectSources(value)) {
+      connectSrc.add(source);
+    }
+  }
+}
 
 // CSP is report-only in dev, enforced in prod.
 const csp = [

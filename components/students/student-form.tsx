@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateStudentInput, Student } from "@/types/student";
 import { Gender, DocumentType } from "@/types/student";
 import DocumentUploader from "./document-uploader";
 import { StudentSchema, type StudentFormData } from "@/lib/validations/schemas";
-import { toUserError } from "@/lib/error-handler";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 
 interface StudentFormProps {
   onSubmit: (data: CreateStudentInput) => void;
@@ -25,6 +26,7 @@ export default function StudentForm({
     register,
     handleSubmit,
     setValue,
+    setError,
     watch,
     formState: { errors },
   } = useForm<StudentFormData>({
@@ -42,6 +44,7 @@ export default function StudentForm({
       documents: [],
     },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleDocumentUpload = (files: File[], type: DocumentType) => {
     const currentDocs = watch("documents") || [];
@@ -49,10 +52,20 @@ export default function StudentForm({
   };
 
   const handleFormSubmit = async (data: StudentFormData) => {
+    setSubmitError(null);
     try {
       await onSubmit(data as CreateStudentInput);
     } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof StudentFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
       const userError = toUserError(error);
+      setSubmitError(userError.message);
       console.error("Form submission error:", userError.message);
     }
   };
@@ -259,6 +272,7 @@ export default function StudentForm({
       </div>
 
       {/* Footer */}
+      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div className="flex items-center justify-end gap-3 border-t border-zinc-200 pt-6">
         {onCancel && (
           <button

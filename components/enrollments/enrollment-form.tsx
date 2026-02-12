@@ -11,7 +11,7 @@ import type {
 } from "@/types/enrollment";
 import { EnrollmentStatus } from "@/types/enrollment";
 import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
-import { toUserError } from "@/lib/error-handler";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 import StudentSearch from "@/components/students/student-search";
 
 interface EnrollmentFormProps {
@@ -37,6 +37,7 @@ export default function EnrollmentForm({
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(EnrollmentSchema),
@@ -52,12 +53,23 @@ export default function EnrollmentForm({
     },
   });
   const [selectedStudentLabel, setSelectedStudentLabel] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFormSubmit = async (data: EnrollmentFormData) => {
+    setSubmitError(null);
     try {
       await onSubmit(data as CreateEnrollmentInput);
     } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof EnrollmentFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
       const userError = toUserError(error);
+      setSubmitError(userError.message);
       console.error("Form submission error:", userError.message);
     }
   };
@@ -120,11 +132,15 @@ export default function EnrollmentForm({
               type="date"
               id="enrollment_date"
               {...register("enrollment_date")}
+              aria-invalid={!!errors.enrollment_date}
+              aria-describedby={errors.enrollment_date ? "enrollment_date-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.enrollment_date ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.enrollment_date && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_date.message}</p>
+              <p id="enrollment_date-error" className="mt-1.5 text-xs text-red-600">
+                {errors.enrollment_date.message}
+              </p>
             )}
           </div>
         </div>
@@ -144,6 +160,8 @@ export default function EnrollmentForm({
             <select
               id="academic_program_id"
               {...register("academic_program_id")}
+              aria-invalid={!!errors.academic_program_id}
+              aria-describedby={errors.academic_program_id ? "academic_program_id-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_program_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -155,7 +173,9 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_program_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_program_id.message}</p>
+              <p id="academic_program_id-error" className="mt-1.5 text-xs text-red-600">
+                {errors.academic_program_id.message}
+              </p>
             )}
           </div>
 
@@ -167,6 +187,8 @@ export default function EnrollmentForm({
             <select
               id="academic_year_id"
               {...register("academic_year_id")}
+              aria-invalid={!!errors.academic_year_id}
+              aria-describedby={errors.academic_year_id ? "academic_year_id-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_year_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -178,7 +200,9 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_year_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id.message}</p>
+              <p id="academic_year_id-error" className="mt-1.5 text-xs text-red-600">
+                {errors.academic_year_id.message}
+              </p>
             )}
           </div>
 
@@ -190,6 +214,8 @@ export default function EnrollmentForm({
             <select
               id="current_semester"
               {...register("current_semester", { valueAsNumber: true })}
+              aria-invalid={!!errors.current_semester}
+              aria-describedby={errors.current_semester ? "current_semester-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.current_semester ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -200,7 +226,9 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.current_semester && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.current_semester.message}</p>
+              <p id="current_semester-error" className="mt-1.5 text-xs text-red-600">
+                {errors.current_semester.message}
+              </p>
             )}
           </div>
 
@@ -232,6 +260,8 @@ export default function EnrollmentForm({
               type="number"
               id="registration_fee_paid"
               {...register("registration_fee_paid", { valueAsNumber: true })}
+              aria-invalid={!!errors.registration_fee_paid}
+              aria-describedby={errors.registration_fee_paid ? "registration_fee_paid-error" : undefined}
               placeholder="| Saisir"
               min="0"
               step="1000"
@@ -239,7 +269,9 @@ export default function EnrollmentForm({
               disabled={isLoading}
             />
             {errors.registration_fee_paid && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.registration_fee_paid.message}</p>
+              <p id="registration_fee_paid-error" className="mt-1.5 text-xs text-red-600">
+                {errors.registration_fee_paid.message}
+              </p>
             )}
           </div>
 
@@ -261,6 +293,11 @@ export default function EnrollmentForm({
 
       {/* ACTIONS */}
       <div className="flex items-center justify-end gap-3 border-t border-zinc-200 pt-6">
+        {submitError && (
+          <p className="mr-auto text-sm text-red-600" role="alert">
+            {submitError}
+          </p>
+        )}
         {onCancel && (
           <button
             type="button"

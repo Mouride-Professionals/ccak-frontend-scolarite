@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import type { Course, CreateCourseEnrollmentInput } from "@/types/course-enrollment";
 import { CourseEnrollmentStatus } from "@/types/course-enrollment";
 import type { Enrollment, AcademicYear } from "@/types/enrollment";
 import { useCourseAvailabilities } from "@/hooks/use-course-enrollments";
 import { useCourseBasketStore } from "@/stores/course-basket-store";
+import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 
 export interface CreateCourseEnrollmentBatchInput
   extends Omit<CreateCourseEnrollmentInput, "course_id"> {
@@ -23,6 +25,25 @@ interface CourseEnrollmentFormProps {
   initialData?: CreateCourseEnrollmentInput;
 }
 
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+const CourseEnrollmentFormSchema = z.object({
+  enrollment_id: z.string().min(1, "L'inscription au programme est requise"),
+  academic_year_id: z.string().min(1, "L'année académique est requise"),
+  semester: z
+    .number({ error: "Le semestre est requis" })
+    .int("Le semestre doit être un nombre entier")
+    .min(1, "Le semestre doit être compris entre 1 et 6")
+    .max(6, "Le semestre doit être compris entre 1 et 6"),
+  enrollment_date: z
+    .string()
+    .min(1, "La date d'inscription est requise")
+    .regex(ISO_DATE_REGEX, "La date d'inscription doit être au format YYYY-MM-DD"),
+  status: z.nativeEnum(CourseEnrollmentStatus),
+});
+
+type CourseEnrollmentFormData = z.infer<typeof CourseEnrollmentFormSchema>;
+
 export default function CourseEnrollmentForm({
   onSubmit,
   onCancel,
@@ -34,14 +55,15 @@ export default function CourseEnrollmentForm({
   initialData,
 }: CourseEnrollmentFormProps) {
   const [search, setSearch] = useState("");
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CourseEnrollmentFormData>({
     enrollment_id: initialData?.enrollment_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
     semester: initialData?.semester ?? 1,
     enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
     status: initialData?.status ?? CourseEnrollmentStatus.ENROLLED,
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const getErrorId = (field: keyof CourseEnrollmentFormData | "basket") => `${field}-error`;
 
   const basketItems = useCourseBasketStore((state) => state.items);
   const addCourse = useCourseBasketStore((state) => state.addCourse);
@@ -49,6 +71,11 @@ export default function CourseEnrollmentForm({
   const clearBasket = useCourseBasketStore((state) => state.clear);
   const hasCourse = useCourseBasketStore((state) => state.hasCourse);
   const totalCredits = useCourseBasketStore((state) => state.totalCredits);
+  const canSubmit =
+    formData.enrollment_id.trim().length > 0 &&
+    formData.academic_year_id.trim().length > 0 &&
+    formData.enrollment_date.trim().length > 0 &&
+    basketItems.length > 0;
 
   const availabilityByCourseId = useCourseAvailabilities(
     courses,
@@ -82,15 +109,16 @@ export default function CourseEnrollmentForm({
     return prerequisites.filter((requiredId) => !takenOrSelectedCourseIds.has(requiredId));
   };
 
-  const handleChange = (
-    field: "enrollment_id" | "academic_year_id" | "semester" | "enrollment_date" | "status",
-    value: string | number
+  const handleChange = <K extends keyof CourseEnrollmentFormData>(
+    field: K,
+    value: CourseEnrollmentFormData[K]
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
+    const fieldKey = String(field);
+    if (errors[fieldKey]) {
       setErrors((prev) => {
         const next = { ...prev };
-        delete next[field];
+        delete next[fieldKey];
         return next;
       });
     }
@@ -124,43 +152,28 @@ export default function CourseEnrollmentForm({
     });
   };
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.enrollment_id) {
-      newErrors.enrollment_id = "L'inscription de programme est requise";
-    }
-
-    if (!formData.academic_year_id) {
-      newErrors.academic_year_id = "L'année académique est requise";
-    }
-
-    if (!formData.semester || formData.semester < 1 || formData.semester > 10) {
-      newErrors.semester = "Le semestre doit être entre 1 et 10";
-    }
-
-    if (!formData.enrollment_date) {
-      newErrors.enrollment_date = "La date d'inscription est requise";
-    }
-
-    if (basketItems.length === 0) {
-      newErrors.basket = "Ajoutez au moins un cours dans le panier";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!validate()) return;
+    const parsed = CourseEnrollmentFormSchema.safeParse(formData);
+    const nextErrors = parsed.success ? {} : zodErrorToFieldErrors(parsed.error);
+
+    if (basketItems.length === 0) {
+      nextErrors.basket = "Ajoutez au moins un cours dans le panier";
+    }
+
+    if (!parsed.success || Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setErrors({});
 
     onSubmit({
-      enrollment_id: formData.enrollment_id,
-      academic_year_id: formData.academic_year_id,
-      semester: formData.semester,
-      enrollment_date: formData.enrollment_date,
-      status: formData.status,
+      enrollment_id: parsed.data.enrollment_id,
+      academic_year_id: parsed.data.academic_year_id,
+      semester: parsed.data.semester,
+      enrollment_date: parsed.data.enrollment_date,
+      status: parsed.data.status,
       course_ids: basketItems.map((item) => item.id),
     });
   };
@@ -184,8 +197,12 @@ export default function CourseEnrollmentForm({
               id="enrollment_id"
               value={formData.enrollment_id}
               onChange={(e) => handleChange("enrollment_id", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
+                errors.enrollment_id ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.enrollment_id)}
+              aria-describedby={errors.enrollment_id ? getErrorId("enrollment_id") : undefined}
             >
               <option value="">| Sélectionner une inscription</option>
               {enrollments.map((enrollment) => (
@@ -195,7 +212,11 @@ export default function CourseEnrollmentForm({
                 </option>
               ))}
             </select>
-            {errors.enrollment_id && <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_id}</p>}
+            {errors.enrollment_id && (
+              <p id={getErrorId("enrollment_id")} className="mt-1.5 text-xs text-red-600">
+                {errors.enrollment_id}
+              </p>
+            )}
           </div>
 
           <div>
@@ -206,8 +227,14 @@ export default function CourseEnrollmentForm({
               id="academic_year_id"
               value={formData.academic_year_id}
               onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
+                errors.academic_year_id ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.academic_year_id)}
+              aria-describedby={
+                errors.academic_year_id ? getErrorId("academic_year_id") : undefined
+              }
             >
               <option value="">| Sélectionner une année</option>
               {years.map((year) => (
@@ -217,7 +244,9 @@ export default function CourseEnrollmentForm({
               ))}
             </select>
             {errors.academic_year_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id}</p>
+              <p id={getErrorId("academic_year_id")} className="mt-1.5 text-xs text-red-600">
+                {errors.academic_year_id}
+              </p>
             )}
           </div>
 
@@ -228,9 +257,13 @@ export default function CourseEnrollmentForm({
             <select
               id="semester"
               value={formData.semester}
-              onChange={(e) => handleChange("semester", parseInt(e.target.value, 10))}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              onChange={(e) => handleChange("semester", Number.parseInt(e.target.value, 10))}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
+                errors.semester ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.semester)}
+              aria-describedby={errors.semester ? getErrorId("semester") : undefined}
             >
               {[1, 2, 3, 4, 5, 6].map((sem) => (
                 <option key={sem} value={sem}>
@@ -238,7 +271,11 @@ export default function CourseEnrollmentForm({
                 </option>
               ))}
             </select>
-            {errors.semester && <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>}
+            {errors.semester && (
+              <p id={getErrorId("semester")} className="mt-1.5 text-xs text-red-600">
+                {errors.semester}
+              </p>
+            )}
           </div>
 
           <div>
@@ -250,11 +287,17 @@ export default function CourseEnrollmentForm({
               id="enrollment_date"
               value={formData.enrollment_date}
               onChange={(e) => handleChange("enrollment_date", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
+                errors.enrollment_date ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.enrollment_date)}
+              aria-describedby={errors.enrollment_date ? getErrorId("enrollment_date") : undefined}
             />
             {errors.enrollment_date && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_date}</p>
+              <p id={getErrorId("enrollment_date")} className="mt-1.5 text-xs text-red-600">
+                {errors.enrollment_date}
+              </p>
             )}
           </div>
 
@@ -266,13 +309,22 @@ export default function CourseEnrollmentForm({
               id="status"
               value={formData.status}
               onChange={(e) => handleChange("status", e.target.value as CourseEnrollmentStatus)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
+                errors.status ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.status)}
+              aria-describedby={errors.status ? getErrorId("status") : undefined}
             >
               <option value={CourseEnrollmentStatus.ENROLLED}>Inscrit</option>
               <option value={CourseEnrollmentStatus.DROPPED}>Abandon</option>
               <option value={CourseEnrollmentStatus.COMPLETED}>Terminé</option>
             </select>
+            {errors.status && (
+              <p id={getErrorId("status")} className="mt-1.5 text-xs text-red-600">
+                {errors.status}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -392,7 +444,14 @@ export default function CourseEnrollmentForm({
               ))}
               <button
                 type="button"
-                onClick={clearBasket}
+                onClick={() => {
+                  clearBasket();
+                  setErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.basket;
+                    return next;
+                  });
+                }}
                 className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
               >
                 Vider le panier
@@ -402,7 +461,11 @@ export default function CourseEnrollmentForm({
         </div>
       </div>
 
-      {errors.basket && <p className="text-sm text-red-600">{errors.basket}</p>}
+      {errors.basket && (
+        <p id={getErrorId("basket")} className="text-sm text-red-600" role="alert">
+          {errors.basket}
+        </p>
+      )}
 
       <div className="flex items-center justify-end gap-3 border-t border-zinc-200 pt-6">
         {onCancel && (
@@ -417,7 +480,7 @@ export default function CourseEnrollmentForm({
         )}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !canSubmit}
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Enregistrement..." : "Valider le panier"}

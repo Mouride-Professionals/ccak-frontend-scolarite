@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateProgrammeInput } from "@/types/programme";
 import type { Department } from "@/types/academic";
 import { AcademicLevel } from "@/types/academic";
 import { ProgrammeSchema, type ProgrammeFormData } from "@/lib/validations/schemas";
-import { toUserError } from "@/lib/error-handler";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 
 interface ProgrammeFormProps {
   onSubmit: (data: CreateProgrammeInput) => void;
@@ -23,27 +24,44 @@ export default function ProgrammeForm({
   isLoading = false,
   initialData,
 }: ProgrammeFormProps) {
+  const initialLevel =
+    initialData?.level && Object.values(AcademicLevel).includes(initialData.level as AcademicLevel)
+      ? (initialData.level as AcademicLevel)
+      : AcademicLevel.LICENCE;
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<ProgrammeFormData>({
     resolver: zodResolver(ProgrammeSchema),
     defaultValues: {
       department_id: initialData?.department_id ?? "",
       name: initialData?.name ?? "",
-      level: initialData?.level ?? AcademicLevel.LICENCE,
+      level: initialLevel,
       duration_semesters: initialData?.duration_semesters ?? 6,
       total_credits_required: initialData?.total_credits_required ?? 180,
       is_active: initialData?.is_active ?? true,
     },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFormSubmit = async (data: ProgrammeFormData) => {
+    setSubmitError(null);
     try {
       await onSubmit(data as CreateProgrammeInput);
     } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof ProgrammeFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
       const userError = toUserError(error);
+      setSubmitError(userError.message);
       console.error("Form submission error:", userError.message);
     }
   };
@@ -83,7 +101,7 @@ export default function ProgrammeForm({
         <input
           type="text"
           id="name"
-          {...register("name")}
+          {...register("name", { setValueAs: (value) => String(value ?? "").trimStart() })}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
             errors.name ? "border-red-300" : "border-zinc-300"
           }`}
@@ -101,13 +119,16 @@ export default function ProgrammeForm({
         <select
           id="level"
           {...register("level")}
-          className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+            errors.level ? "border-red-300" : "border-zinc-300"
+          }`}
           disabled={isLoading}
         >
           <option value={AcademicLevel.LICENCE}>Licence</option>
           <option value={AcademicLevel.MASTER}>Master</option>
           <option value={AcademicLevel.DOCTORAT}>Doctorat</option>
         </select>
+        {errors.level && <p className="mt-1 text-sm text-red-600">{errors.level.message}</p>}
       </div>
 
       {/* Duration */}
@@ -170,6 +191,7 @@ export default function ProgrammeForm({
       </div>
 
       {/* Actions */}
+      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div className="flex justify-end gap-3 border-t border-zinc-200 pt-6">
         {onCancel && (
           <button

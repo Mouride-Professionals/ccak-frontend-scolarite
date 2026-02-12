@@ -57,6 +57,7 @@ function CoursesPageContent() {
 
   // Load form data
   const { data: courseUnits, isLoading: loadingCourseUnits } = useCourseUnits();
+  const courseUnitOptions = courseUnits?.data ?? [];
 
   // Handlers
   const handleEditClick = (id: string) => {
@@ -222,12 +223,11 @@ function CoursesPageContent() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Toutes les unités</option>
-                  {Array.isArray(courseUnits) &&
-                    courseUnits.map((unit) => (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.name}
-                      </option>
-                    ))}
+                  {courseUnitOptions.map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -309,7 +309,7 @@ function CoursesPageContent() {
             <CourseForm
               onSubmit={handleCreateSubmit}
               onCancel={() => setIsCreateModalOpen(false)}
-              courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
+              courseUnits={courseUnitOptions}
               availableCourses={allCoursesData?.data ?? []}
               isLoading={createMutation.isPending}
             />
@@ -337,7 +337,7 @@ function CoursesPageContent() {
             <CourseForm
               onSubmit={handleEditSubmit}
               onCancel={() => setEditCourseId(null)}
-              courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
+              courseUnits={courseUnitOptions}
               availableCourses={allCoursesData?.data ?? []}
               isLoading={updateMutation.isPending}
               initialData={courseToEdit}

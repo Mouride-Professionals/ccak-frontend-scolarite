@@ -61,6 +61,12 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
+        id: "academic-years",
+        label: "Annees Academiques",
+        href: "/academic-years",
+        icon: null as any,
+      },
+      {
         id: "course-units",
         label: "Unités d'Enseignement",
         href: "/course-units",

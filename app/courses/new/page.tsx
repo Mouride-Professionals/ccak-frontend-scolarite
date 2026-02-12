@@ -1,26 +1,33 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import CourseForm from "@/components/courses/course-form";
 import { useCreateCourse, useCourseUnits } from "@/hooks/use-courses";
+import { toUserError } from "@/lib/error-handler";
 import type { CreateCourseInput } from "@/types/course";
 
 export default function NewCoursePage() {
   const router = useRouter();
   const createMutation = useCreateCourse();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Load form data
   const { data: courseUnits, isLoading: loadingCourseUnits } = useCourseUnits();
+  const courseUnitOptions = courseUnits?.data ?? [];
 
   const handleSubmit = async (data: CreateCourseInput) => {
+    setSubmitError(null);
     try {
       await createMutation.mutateAsync(data);
       router.push("/courses");
     } catch (error) {
       console.error("Error creating course:", error);
-      alert("Erreur lors de la création du cours. Veuillez réessayer.");
+      setSubmitError(
+        toUserError(error, "Erreur lors de la création du cours. Veuillez réessayer.").message
+      );
     }
   };
 
@@ -31,6 +38,14 @@ export default function NewCoursePage() {
           <div className="mb-8">
             <p className="text-sm text-zinc-600">Créez un nouveau cours</p>
           </div>
+          {submitError && (
+            <div
+              className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
+              {submitError}
+            </div>
+          )}
 
           {/* Form */}
           <div className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -47,7 +62,7 @@ export default function NewCoursePage() {
               <CourseForm
                 onSubmit={handleSubmit}
                 onCancel={() => router.push("/courses")}
-                courseUnits={Array.isArray(courseUnits) ? courseUnits : []}
+                courseUnits={courseUnitOptions}
                 isLoading={createMutation.isPending}
               />
             )}
