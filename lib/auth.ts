@@ -145,6 +145,9 @@ export const authOptions: NextAuthOptions = {
       return refreshAccessToken(token as RefreshableToken);
     },
     async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub;
+      }
       session.accessToken = token.accessToken as string | undefined;
       session.idToken = token.idToken as string | undefined;
       session.error = token.error as "RefreshAccessTokenError" | undefined;

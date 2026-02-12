@@ -22,9 +22,13 @@ export function useNotificationsPolling(userId?: string, enabled = true) {
     staleTime: 20000,
   });
 
+  const notifications = Array.isArray(data?.data) ? data.data : [];
+  const unreadCount =
+    typeof data?.meta?.total === "number" ? data.meta.total : notifications.length;
+
   return {
-    notifications: data?.data ?? [],
-    unreadCount: data?.meta?.total ?? 0,
+    notifications,
+    unreadCount,
     isLoading,
   };
 }

@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { toPaginated } from "@/lib/api/api-response";
 
 export interface Notification {
   id: string;
@@ -52,7 +53,18 @@ export const notificationsApi = {
 
     const url = `/notifications${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);
-    return response.json();
+    const payload = await response.json();
+    const normalized = toPaginated<Notification>(payload);
+
+    return {
+      data: normalized.data,
+      meta: {
+        current_page: normalized.page,
+        per_page: normalized.limit,
+        total: normalized.total,
+        last_page: normalized.total_pages,
+      },
+    };
   },
 
   // Send notification (admin only)

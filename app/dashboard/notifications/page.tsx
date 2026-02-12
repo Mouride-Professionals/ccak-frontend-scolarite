@@ -62,6 +62,13 @@ export default function NotificationsPage() {
     setFilters({ page: 1, per_page: 15 });
   };
 
+  const notificationMeta = notifications?.meta ?? {
+    current_page: 1,
+    per_page: filters.per_page ?? 15,
+    total: notifications?.data?.length ?? 0,
+    last_page: 1,
+  };
+
   return (
     <DashboardLayout title="Gestion des Notifications">
       <div className="p-6">
@@ -156,7 +163,7 @@ export default function NotificationsPage() {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Total envoyées</dt>
                     <dd className="text-lg font-semibold text-gray-900">
-                      {notifications?.meta?.total || 0}
+                      {notificationMeta.total}
                     </dd>
                   </dl>
                 </div>
@@ -244,10 +251,10 @@ export default function NotificationsPage() {
         {/* Pagination */}
         {notifications && (
           <Pagination
-            page={notifications.meta.current_page}
-            totalPages={notifications.meta.last_page}
-            totalItems={notifications.meta.total}
-            perPage={notifications.meta.per_page}
+            page={notificationMeta.current_page}
+            totalPages={notificationMeta.last_page}
+            totalItems={notificationMeta.total}
+            perPage={notificationMeta.per_page}
             itemLabel="notifications"
             onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
             onPerPageChange={(nextPerPage) =>

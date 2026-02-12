@@ -134,11 +134,10 @@ export default function NotificationPopup() {
                       key={notification.id}
                       type="button"
                       onClick={() => handleOpenNotification(notification)}
-                      className={`mb-2 w-full rounded-lg border p-3 text-left transition-colors ${
-                        notification.is_read
+                      className={`mb-2 w-full rounded-lg border p-3 text-left transition-colors ${notification.is_read
                           ? "border-zinc-200 bg-white hover:bg-zinc-50"
                           : "border-[#0A8F3D]/30 bg-[#0A8F3D]/5 hover:bg-[#0A8F3D]/10"
-                      }`}
+                        }`}
                     >
                       <p className="text-sm font-semibold text-[#083B66]">{notification.title}</p>
                       <p className="mt-1 line-clamp-2 text-xs text-zinc-600">
