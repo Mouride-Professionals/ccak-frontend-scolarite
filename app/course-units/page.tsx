@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -19,7 +19,6 @@ import {
   useCreateCourseUnit,
   useAcademicPrograms,
 } from "@/hooks/use-course-units";
-import type { CourseUnit } from "@/types/course-unit";
 import type { CreateCourseUnitInput, CourseUnitFilters } from "@/types/course-unit";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +30,7 @@ function CourseUnitsPageContent() {
     limit: 10,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editCourseUnitId, setEditCourseUnitId] = useState<string | null>(null);
+  const [editCourseUnitId, setEditCourseUnitId] = useState<string | null>(searchParams.get("edit"));
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -59,14 +58,6 @@ function CourseUnitsPageContent() {
 
   // Load form data
   const { data: academicPrograms, isLoading: loadingPrograms } = useAcademicPrograms();
-
-  // Check for edit parameter in URL
-  useEffect(() => {
-    const editId = searchParams.get("edit");
-    if (editId) {
-      setEditCourseUnitId(editId);
-    }
-  }, [searchParams]);
 
   const handleEditClick = (id: string) => {
     setEditCourseUnitId(id);
@@ -259,14 +250,16 @@ function CourseUnitsPageContent() {
         {error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">
-              Erreur lors du chargement des unités d'enseignement. Veuillez réessayer.
+              Erreur lors du chargement des unités d&apos;enseignement. Veuillez réessayer.
             </p>
           </div>
         ) : isLoading ? (
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">Chargement des unités d'enseignement...</p>
+              <p className="mt-3 text-sm text-zinc-500">
+                Chargement des unités d&apos;enseignement...
+              </p>
             </div>
           </div>
         ) : (

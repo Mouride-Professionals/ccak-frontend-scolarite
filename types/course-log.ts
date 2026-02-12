@@ -47,7 +47,7 @@ export interface CreateCourseLogInput {
   notes?: string;
 }
 
-export interface UpdateCourseLogInput extends Partial<CreateCourseLogInput> {}
+export type UpdateCourseLogInput = Partial<CreateCourseLogInput>;
 
 export interface CourseLogsResponse {
   data: CourseLog[];

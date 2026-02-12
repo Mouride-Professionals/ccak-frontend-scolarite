@@ -183,7 +183,7 @@ export interface CreateFacultyMemberInput {
   is_active?: boolean;
 }
 
-export interface UpdateFacultyMemberInput extends Partial<CreateFacultyMemberInput> {}
+export type UpdateFacultyMemberInput = Partial<CreateFacultyMemberInput>;
 
 export interface CreateFacultyDocumentInput {
   type: FacultyDocumentType;

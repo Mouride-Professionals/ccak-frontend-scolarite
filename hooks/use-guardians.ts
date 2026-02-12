@@ -5,7 +5,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Guardian, CreateGuardianInput, UpdateGuardianInput } from "@/types/student";
+import type { CreateGuardianInput, UpdateGuardianInput } from "@/types/student";
 import * as guardiansApi from "@/lib/api/guardians";
 
 // =====================

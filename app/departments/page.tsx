@@ -10,15 +10,9 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
-import {
-  useDepartments,
-  useDepartment,
-  useCreateDepartment,
-  useUpdateDepartment,
-  useDeleteDepartment,
-} from "@/hooks/use-departments";
+import { useDepartments, useDepartment, useDeleteDepartment } from "@/hooks/use-departments";
 import { useFaculties } from "@/hooks/use-faculties";
-import type { Department, DepartmentFilters, CreateDepartmentInput } from "@/types/department";
+import type { DepartmentFilters } from "@/types/department";
 
 export default function DepartmentsPage() {
   const [filters, setFilters] = useState<DepartmentFilters>({
@@ -57,55 +51,9 @@ export default function DepartmentsPage() {
   const { data: departmentToEdit } = useDepartment(editDepartmentId || "", !!editDepartmentId);
   const { data: facultiesData } = useFaculties();
   const deleteMutation = useDeleteDepartment();
-  const createMutation = useCreateDepartment();
-  const updateMutation = useUpdateDepartment();
 
   const departments = data?.data || [];
   const faculties = facultiesData?.data || [];
-
-  const handleCreateSubmit = (input: CreateDepartmentInput) => {
-    createMutation.mutate(input, {
-      onSuccess: () => {
-        setToast({
-          isOpen: true,
-          message: "Département créé avec succès",
-          type: "success",
-        });
-        setIsCreateModalOpen(false);
-      },
-      onError: (error) => {
-        setToast({
-          isOpen: true,
-          message: `Erreur : ${error.message}`,
-          type: "error",
-        });
-      },
-    });
-  };
-
-  const handleEditSubmit = (input: CreateDepartmentInput) => {
-    if (!editDepartmentId) return;
-    updateMutation.mutate(
-      { id: editDepartmentId, input },
-      {
-        onSuccess: () => {
-          setToast({
-            isOpen: true,
-            message: "Département mis à jour avec succès",
-            type: "success",
-          });
-          setEditDepartmentId(null);
-        },
-        onError: (error) => {
-          setToast({
-            isOpen: true,
-            message: `Erreur : ${error.message}`,
-            type: "error",
-          });
-        },
-      }
-    );
-  };
 
   const handleDeleteConfirm = () => {
     if (!deleteConfirm.departmentId) return;

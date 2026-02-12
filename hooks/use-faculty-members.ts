@@ -5,7 +5,6 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { FacultyMember } from "@/types/academic";
 import { getFacultyMembers } from "@/lib/api/deliberations";
 
 // =====================

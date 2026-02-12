@@ -7,11 +7,7 @@ import {
   deleteCourseUnit,
   getAcademicPrograms,
 } from "@/lib/api/course-units";
-import {
-  CourseUnitFilters,
-  CreateCourseUnitInput,
-  UpdateCourseUnitInput,
-} from "@/types/course-unit";
+import { CourseUnitFilters } from "@/types/course-unit";
 
 // Query keys
 export const courseUnitKeys = {

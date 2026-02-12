@@ -236,6 +236,7 @@ export async function verifyDocument(
   documentNumber: string,
   _studentId?: string
 ): Promise<DocumentVerificationResponse> {
+  void _studentId;
   const response = await api.get(`/generated-documents/verify/${documentNumber}`, {
     headers: {},
   });

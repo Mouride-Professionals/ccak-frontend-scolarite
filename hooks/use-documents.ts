@@ -5,7 +5,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Document, CreateDocumentInput, UpdateDocumentInput } from "@/types/student";
+import type { CreateDocumentInput, UpdateDocumentInput } from "@/types/student";
 import * as documentsApi from "@/lib/api/documents";
 
 // =====================
