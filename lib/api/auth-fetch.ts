@@ -1,4 +1,4 @@
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -33,10 +33,6 @@ export async function authFetch(endpoint: string, options: RequestInit = {}) {
       ...options.headers,
     },
   });
-
-  if (response.status === 401 || response.status === 403) {
-    await signOut({ callbackUrl: "/login" });
-  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({

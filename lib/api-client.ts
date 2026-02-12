@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { sanitizePayload } from "@/lib/sanitize";
 import { logError } from "@/lib/error-handler";
 
@@ -92,10 +92,9 @@ export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
   };
 
   const res = await fetch(url, init);
-  // Force re-auth on unauthorized responses.
-  if (res.status === 401 || res.status === 403) {
-    await signOut({ callbackUrl: "/login" });
-  }
+  // Do not force sign-out at transport layer.
+  // Some endpoints can return 401 for domain/permission mismatches, and global sign-out
+  // here creates redirect loops. Authentication flow is handled by NextAuth middleware/session.
   return handleResponse<T>(res, expectJson);
 }
 
