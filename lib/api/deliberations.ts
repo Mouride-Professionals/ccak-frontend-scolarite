@@ -175,7 +175,10 @@ export async function updateDeliberationResult(
   id: string,
   input: UpdateDeliberationResultInput
 ): Promise<DeliberationResult> {
-  const response = await api.put(`/deliberation-results/${id}`, input);
+  const response = await api.put(
+    `/deliberation-results/${id}`,
+    input as unknown as Record<string, unknown>
+  );
   return unwrapData<DeliberationResult>(response);
 }
 

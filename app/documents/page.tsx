@@ -43,6 +43,10 @@ const requestableTypes: DocumentType[] = [
   DocType.DIPLOMA,
 ];
 
+type GeneratePayload = {
+  student_id: string;
+} & Record<string, unknown>;
+
 export default function DocumentsPage() {
   const router = useRouter();
 
@@ -59,9 +63,7 @@ export default function DocumentsPage() {
   const [isRequestConfirmOpen, setIsRequestConfirmOpen] = useState(false);
 
   const [generateType, setGenerateType] = useState<DocumentType | null>(null);
-  const [pendingGenerateData, setPendingGenerateData] = useState<Record<string, unknown> | null>(
-    null
-  );
+  const [pendingGenerateData, setPendingGenerateData] = useState<GeneratePayload | null>(null);
   const [requestType, setRequestType] = useState<DocumentType>(DocType.TRANSCRIPT);
 
   const [bulkType, setBulkType] = useState<DocumentType>(DocType.TRANSCRIPT);
@@ -129,7 +131,7 @@ export default function DocumentsPage() {
 
   const generateDocumentByType = async (
     type: DocumentType,
-    payload: Record<string, unknown>
+    payload: GeneratePayload
   ): Promise<GeneratedDocument> => {
     switch (type) {
       case DocType.TRANSCRIPT:
@@ -141,7 +143,11 @@ export default function DocumentsPage() {
       case DocType.DIPLOMA:
         return generateDiplomaMutation.mutateAsync(payload as GenerateDiplomaInput);
       case DocType.ATTESTATION:
-        return generateAttestationMutation.mutateAsync(payload as GenerateAttestationInput);
+        return generateAttestationMutation.mutateAsync({
+          student_id: payload.student_id,
+          custom_text:
+            typeof payload.custom_text === "string" ? payload.custom_text : "Attestation",
+        });
       default:
         throw new Error("Type de document non supporté");
     }
@@ -209,7 +215,18 @@ export default function DocumentsPage() {
   };
 
   const handleGenerateSubmit = async (data: Record<string, unknown>) => {
-    setPendingGenerateData(data);
+    if (!selectedStudentId) {
+      setToast({
+        isOpen: true,
+        message: "Sélectionnez d'abord un étudiant.",
+        type: "error",
+      });
+      return;
+    }
+    setPendingGenerateData({
+      ...data,
+      student_id: selectedStudentId,
+    });
     setIsGenerateConfirmOpen(true);
   };
 

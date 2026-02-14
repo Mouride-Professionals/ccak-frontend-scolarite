@@ -12,7 +12,7 @@ type ApiOptions = Omit<RequestInit, "body" | "headers"> & {
   /** When true, do not write failed responses to console logging. */
   suppressErrorLogging?: boolean;
   /** Request body: JSON-serializable object or standard BodyInit */
-  body?: BodyInit | Record<string, unknown> | null;
+  body?: BodyInit | object | null;
   headers?: HeadersInit;
 };
 

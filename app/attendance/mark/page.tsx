@@ -42,9 +42,17 @@ export default function AttendanceMarkingPage() {
   });
 
   const students = useMemo<AttendanceStudent[]>(() => {
-    return (enrollments?.data ?? [])
-      .map((enrollment) => enrollment.enrollment?.student)
-      .filter((student): student is AttendanceStudent => Boolean(student));
+    return (enrollments?.data ?? []).flatMap((enrollment) => {
+      const student = enrollment.enrollment?.student;
+      if (!student) return [];
+      return [
+        {
+          id: student.id,
+          full_name: student.full_name,
+          student_number: student.student_number,
+        },
+      ];
+    });
   }, [enrollments?.data]);
 
   const [records, setRecords] = useState<Record<string, AttendanceStatus>>({});

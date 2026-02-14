@@ -47,7 +47,7 @@ export default function StudentAttendancePage() {
   const dispensationWarnings = useMemo(() => {
     const grouped = new Map<string, { course: string; absences: number }>();
     (attendance?.data ?? []).forEach((record) => {
-      const key = record.course?.id || record.course_id || "unknown";
+      const key = record.course?.id || "unknown";
       if (!grouped.has(key)) {
         grouped.set(key, {
           course: record.course?.name || key,

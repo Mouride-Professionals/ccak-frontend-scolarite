@@ -1,6 +1,6 @@
 import DOMPurify from "dompurify";
 
-const stripTagsConfig = { ALLOWED_TAGS: [], ALLOWED_ATTR: [] } as const;
+const stripTagsConfig = { ALLOWED_TAGS: [] as string[], ALLOWED_ATTR: [] as string[] };
 
 export function sanitizeHtml(input: string): string {
   if (typeof window === "undefined") {
