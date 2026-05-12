@@ -1,31 +1,20 @@
 /**
  * Enrollment Module Types
- * Based on UML diagram for CCAK academic management system
+ * Based on API_Data_Models_FULL_FINAL.pdf
  */
+
+import type { Gender, StudentStatus } from "@/types/student";
 
 // =====================
 // ENUMS
 // =====================
 
-export enum EnrollmentStatus {
-  PENDING = "PENDING",
-  REGISTERED = "REGISTERED",
-  ACTIVE = "ACTIVE",
-  COMPLETED = "COMPLETED",
-  WITHDRAWN = "WITHDRAWN",
-}
-
-export enum StudentStatus {
-  ACTIVE = "ACTIVE",
+export enum RegistrationStatus {
+  DRAFT = "DRAFT",
+  PENDING_VALIDATION = "PENDING_VALIDATION",
+  VALIDATED = "VALIDATED",
   SUSPENDED = "SUSPENDED",
-  GRADUATED = "GRADUATED",
-  WITHDRAWN = "WITHDRAWN",
-  EXPELLED = "EXPELLED",
-}
-
-export enum Gender {
-  M = "M",
-  F = "F",
+  CANCELLED = "CANCELLED",
 }
 
 // =====================
@@ -33,19 +22,29 @@ export enum Gender {
 // =====================
 
 /**
- * Enrollment
- * Represents a student enrollment in a specific program, year, and semester
+ * Enrollment (Inscription)
+ * Represents a student registration in a specific program for an academic year
  */
 export interface Enrollment {
   id: string;
   student_id: string;
   academic_program_id: string;
   academic_year_id: string;
+  level_id: string | null;
   current_semester: number;
-  status: EnrollmentStatus;
-  enrollment_date: string; // ISO date string
+  status: RegistrationStatus;
+  enrollment_date: string;
+  registration_number: string | null;
   registration_fee_paid: number;
-  is_scholarship: boolean;
+  is_scholarship_holder: boolean;
+  scholarship_type: string | null;
+  scholarship_amount: number | null;
+  notes: string | null;
+  is_repeating: boolean;
+  is_medically_fit: boolean;
+  is_registered_elsewhere: boolean;
+  is_willing_to_cancel_other_registration: boolean;
+  certification_file_url: string | null;
   created_at: string;
   updated_at: string;
 
@@ -75,28 +74,11 @@ export interface Enrollment {
     name: string;
     is_current: boolean;
   };
-}
-
-/**
- * Student (full schema)
- */
-export interface Student {
-  id: string;
-  user_id: string;
-  student_number: string;
-  full_name: string;
-  gender: Gender;
-  date_of_birth: string;
-  place_of_birth: string;
-  nationality: string;
-  phone: string;
-  emergency_contact_name: string;
-  emergency_contact_phone: string;
-  address: string;
-  photo_url: string | null;
-  status: StudentStatus;
-  created_at: string;
-  updated_at: string;
+  level?: {
+    id: string;
+    name: string;
+    code: string;
+  };
 }
 
 /**
@@ -128,15 +110,23 @@ export interface CreateEnrollmentInput {
   student_id: string;
   academic_program_id: string;
   academic_year_id: string;
+  level_id?: string | null;
   current_semester: number;
   enrollment_date: string;
   registration_fee_paid: number;
-  is_scholarship: boolean;
-  status?: EnrollmentStatus;
+  is_scholarship_holder: boolean;
+  scholarship_type?: string | null;
+  scholarship_amount?: number | null;
+  notes?: string | null;
+  is_repeating?: boolean;
+  is_medically_fit?: boolean;
+  is_registered_elsewhere?: boolean;
+  is_willing_to_cancel_other_registration?: boolean;
+  status?: RegistrationStatus;
 }
 
 export interface UpdateEnrollmentInput extends Partial<CreateEnrollmentInput> {
-  status?: EnrollmentStatus;
+  status?: RegistrationStatus;
 }
 
 // =====================
@@ -147,9 +137,10 @@ export interface EnrollmentFilters {
   student_id?: string;
   academic_program_id?: string;
   academic_year_id?: string;
+  level_id?: string;
   current_semester?: number;
-  status?: EnrollmentStatus;
-  is_scholarship?: boolean;
+  status?: RegistrationStatus;
+  is_scholarship_holder?: boolean;
   search?: string;
   page?: number;
   limit?: number;
@@ -161,22 +152,21 @@ export interface EnrollmentFilters {
 
 /**
  * Enrollment List Item (simplified for list view)
- * Backend will format and return only these fields for the list
  */
 export interface EnrollmentListItem {
   id: string;
-  student_number: string; // from Student
-  full_name: string; // from Student
-  academic_year_name: string; // from AcademicYear.name
-  current_semester: number; // from Enrollment
-  enrollment_date: string; // from Enrollment (ISO date string)
+  student_number: string;
+  full_name: string;
+  academic_year_name: string;
+  current_semester: number;
+  enrollment_date: string;
 }
 
 /**
  * Enrollments List Response
  */
 export interface EnrollmentsResponse {
-  data: Enrollment[]; // For list view, backend should return EnrollmentListItem[]
+  data: Enrollment[];
   total: number;
   page: number;
   limit: number;

@@ -4,8 +4,8 @@
  */
 
 import { z } from "zod";
-import { Gender } from "@/types/student";
-import { EnrollmentStatus } from "@/types/enrollment";
+import { Gender, Provenance, IDType, AddressType } from "@/types/student";
+import { RegistrationStatus } from "@/types/enrollment";
 import { AcademicLevel } from "@/types/academic";
 
 // Common validation patterns
@@ -18,11 +18,23 @@ const CODE_REGEX = /^[A-Z0-9-]+$/;
 // ============================================================================
 
 export const StudentSchema = z.object({
-  full_name: z
+  first_name: z
     .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
-    .max(100, "Le nom ne peut pas dépasser 100 caractères")
+    .min(1, "Le prénom est requis")
+    .max(50, "Le prénom ne peut pas dépasser 50 caractères")
+    .regex(NAME_REGEX, "Le prénom ne peut contenir que des lettres, espaces, apostrophes et tirets"),
+  last_name: z
+    .string()
+    .min(1, "Le nom est requis")
+    .max(50, "Le nom ne peut pas dépasser 50 caractères")
     .regex(NAME_REGEX, "Le nom ne peut contenir que des lettres, espaces, apostrophes et tirets"),
+  ine: z.string().max(20, "L'INE ne peut pas dépasser 20 caractères").optional().nullable(),
+  registration_number: z
+    .string()
+    .max(50, "Le numéro d'inscription ne peut pas dépasser 50 caractères")
+    .optional()
+    .nullable(),
+  provenance: z.nativeEnum(Provenance).optional().nullable(),
   gender: z.nativeEnum(Gender),
   date_of_birth: z
     .string()
@@ -42,6 +54,15 @@ export const StudentSchema = z.object({
     .string()
     .min(1, "Le numéro de téléphone est requis")
     .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX"),
+  phone_2: z
+    .string()
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
+  email: z.string().email("Adresse email invalide").optional().nullable().or(z.literal("")),
+  type_of_id: z.nativeEnum(IDType).optional().nullable(),
+  id_details: z.string().max(100, "Les détails ne peuvent pas dépasser 100 caractères").optional().nullable(),
   emergency_contact_name: z.string().min(2, "Le nom du contact d'urgence est requis").max(100),
   emergency_contact_phone: z
     .string()
@@ -106,6 +127,7 @@ export const EnrollmentSchema = z.object({
   student_id: z.string().min(1, "L'étudiant est requis"),
   academic_program_id: z.string().min(1, "Le programme académique est requis"),
   academic_year_id: z.string().min(1, "L'année académique est requise"),
+  level_id: z.string().optional().nullable(),
   current_semester: z
     .number({ error: "Le semestre est requis" })
     .int("Le semestre doit être un nombre entier")
@@ -115,8 +137,19 @@ export const EnrollmentSchema = z.object({
   registration_fee_paid: z
     .number({ error: "Le montant des frais est requis" })
     .min(0, "Les frais d'inscription ne peuvent pas être négatifs"),
-  is_scholarship: z.boolean().default(false),
-  status: z.nativeEnum(EnrollmentStatus).default(EnrollmentStatus.PENDING),
+  is_scholarship_holder: z.boolean().default(false),
+  scholarship_type: z.string().max(100).optional().nullable(),
+  scholarship_amount: z
+    .number()
+    .min(0, "Le montant de la bourse ne peut pas être négatif")
+    .optional()
+    .nullable(),
+  notes: z.string().max(1000, "Les notes ne peuvent pas dépasser 1000 caractères").optional().nullable(),
+  is_repeating: z.boolean().default(false),
+  is_medically_fit: z.boolean().default(false),
+  is_registered_elsewhere: z.boolean().default(false),
+  is_willing_to_cancel_other_registration: z.boolean().default(false),
+  status: z.nativeEnum(RegistrationStatus).default(RegistrationStatus.DRAFT),
 });
 
 // ============================================================================
@@ -233,12 +266,102 @@ export const EvaluationSchema = z.object({
   total_marks: z.number({ error: "Le total des points est requis" }).min(1).max(100),
 });
 
+// ============================================================================
+// GUARDIAN VALIDATIONS
+// ============================================================================
+
+export const GuardianSchema = z.object({
+  first_name: z
+    .string()
+    .min(1, "Le prénom est requis")
+    .max(50)
+    .regex(NAME_REGEX, "Caractères invalides")
+    .optional()
+    .nullable(),
+  last_name: z
+    .string()
+    .min(1, "Le nom est requis")
+    .max(50)
+    .regex(NAME_REGEX, "Caractères invalides")
+    .optional()
+    .nullable(),
+  full_name: z.string().max(100).optional().nullable(),
+  relationship: z.string().min(1, "La relation est requise").max(50),
+  phone: z
+    .string()
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
+  phone_2: z
+    .string()
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
+  email: z.string().email("Adresse email invalide").optional().nullable().or(z.literal("")),
+  occupation: z.string().max(100).optional().nullable(),
+});
+
+// ============================================================================
+// STUDENT BAC INFO VALIDATIONS
+// ============================================================================
+
+export const StudentBacInfoSchema = z.object({
+  serie: z.string().min(1, "La série est requise").max(20),
+  year_of_bac: z
+    .number({ error: "L'année est requise" })
+    .int()
+    .min(1950, "Année invalide")
+    .max(new Date().getFullYear(), "Année invalide"),
+  bac_mention: z.string().max(50).optional().nullable(),
+  bac_institution: z.string().max(200).optional().nullable(),
+  average_first_session: z
+    .number()
+    .min(0)
+    .max(20, "La moyenne ne peut pas dépasser 20")
+    .optional()
+    .nullable(),
+  average_second_session: z
+    .number()
+    .min(0)
+    .max(20, "La moyenne ne peut pas dépasser 20")
+    .optional()
+    .nullable(),
+});
+
+// ============================================================================
+// ADDRESS VALIDATIONS
+// ============================================================================
+
+export const AddressSchema = z.object({
+  type: z.nativeEnum(AddressType),
+  street: z.string().max(200).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
+  region: z.string().max(100).optional().nullable(),
+  country: z.string().max(100).optional().nullable(),
+  postal_code: z.string().max(20).optional().nullable(),
+});
+
+// ============================================================================
+// SOCIAL PROFILE VALIDATIONS
+// ============================================================================
+
+export const SocialProfileSchema = z.object({
+  platform: z.string().min(1, "La plateforme est requise").max(50),
+  url: z.string().url("URL invalide").max(500),
+});
+
 // Export type inference helpers
-export type StudentFormData = z.input<typeof StudentSchema>;
+export type StudentFormData = z.infer<typeof StudentSchema>;
 export type CourseFormData = z.input<typeof CourseSchema>;
-export type EnrollmentFormData = z.input<typeof EnrollmentSchema>;
+export type EnrollmentFormData = z.infer<typeof EnrollmentSchema>;
 export type GradeFormData = z.input<typeof GradeSchema>;
 export type FacultyFormData = z.input<typeof FacultySchema>;
 export type DepartmentFormData = z.input<typeof DepartmentSchema>;
 export type ProgrammeFormData = z.input<typeof ProgrammeSchema>;
 export type EvaluationFormData = z.input<typeof EvaluationSchema>;
+export type GuardianFormData = z.infer<typeof GuardianSchema>;
+export type StudentBacInfoFormData = z.infer<typeof StudentBacInfoSchema>;
+export type AddressFormData = z.infer<typeof AddressSchema>;
+export type SocialProfileFormData = z.infer<typeof SocialProfileSchema>;

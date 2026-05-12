@@ -25,9 +25,14 @@ import {
   useApproveDocument,
   useRejectDocument,
 } from "@/hooks/use-documents";
+import {
+  usePriorDiplomas,
+  useCreatePriorDiploma,
+  useDeletePriorDiploma,
+} from "@/hooks/use-prior-diplomas";
 import { DocumentType } from "@/types/student";
 
-type TabType = "info" | "guardians" | "documents" | "status";
+type TabType = "info" | "guardians" | "diplomas" | "documents" | "status";
 
 export default function StudentDetailPage() {
   const router = useRouter();
@@ -61,6 +66,18 @@ export default function StudentDetailPage() {
   const createDocumentMutation = useCreateDocument();
   const approveDocumentMutation = useApproveDocument();
   const rejectDocumentMutation = useRejectDocument();
+
+  // Prior Diplomas
+  const { data: priorDiplomas = [], isLoading: loadingDiplomas } = usePriorDiplomas(studentId);
+  const createDiplomaMutation = useCreatePriorDiploma();
+  const deleteDiplomaMutation = useDeletePriorDiploma();
+  const [showDiplomaForm, setShowDiplomaForm] = useState(false);
+  const [diplomaForm, setDiplomaForm] = useState({
+    name: "",
+    year: "",
+    mention: "",
+    institution: "",
+  });
 
   // Redirect if error
   useEffect(() => {
@@ -182,6 +199,34 @@ export default function StudentDetailPage() {
     }
   };
 
+  const handleAddDiploma = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!diplomaForm.name.trim()) return;
+    try {
+      await createDiplomaMutation.mutateAsync({
+        student_id: studentId,
+        name: diplomaForm.name,
+        year: diplomaForm.year ? parseInt(diplomaForm.year) : null,
+        mention: diplomaForm.mention || null,
+        institution: diplomaForm.institution || null,
+      });
+      setDiplomaForm({ name: "", year: "", mention: "", institution: "" });
+      setShowDiplomaForm(false);
+      setToast({ isOpen: true, message: "Diplôme ajouté avec succès", type: "success" });
+    } catch {
+      setToast({ isOpen: true, message: "Erreur lors de l'ajout du diplôme", type: "error" });
+    }
+  };
+
+  const handleDeleteDiploma = async (id: string) => {
+    try {
+      await deleteDiplomaMutation.mutateAsync({ studentId, id });
+      setToast({ isOpen: true, message: "Diplôme supprimé", type: "success" });
+    } catch {
+      setToast({ isOpen: true, message: "Erreur lors de la suppression", type: "error" });
+    }
+  };
+
   if (isLoading) {
     return (
       <ProtectedRoute>
@@ -204,6 +249,7 @@ export default function StudentDetailPage() {
   const tabs: { id: TabType; label: string; count?: number }[] = [
     { id: "info", label: "Informations" },
     { id: "guardians", label: "Tuteurs", count: guardians.length },
+    { id: "diplomas", label: "Diplômes antérieurs", count: priorDiplomas.length },
     { id: "documents", label: "Documents", count: documents.length },
     { id: "status", label: "Statut" },
   ];
@@ -440,6 +486,148 @@ export default function StudentDetailPage() {
                           </button>
                         </div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Diplomas Tab */}
+          {activeTab === "diplomas" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-zinc-900">Diplômes antérieurs</h3>
+                {!showDiplomaForm && (
+                  <button
+                    onClick={() => setShowDiplomaForm(true)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-[#008D36] border border-transparent rounded-md hover:bg-[#007A2E]"
+                  >
+                    Ajouter un diplôme
+                  </button>
+                )}
+              </div>
+
+              {showDiplomaForm && (
+                <form
+                  onSubmit={handleAddDiploma}
+                  className="rounded-lg border border-zinc-200 bg-white p-6 space-y-4"
+                >
+                  <h4 className="text-sm font-semibold text-zinc-900">Nouveau diplôme</h4>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">
+                        Nom du diplôme <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={diplomaForm.name}
+                        onChange={(e) => setDiplomaForm({ ...diplomaForm, name: e.target.value })}
+                        placeholder="ex: Licence en Informatique"
+                        className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">Année</label>
+                      <input
+                        type="number"
+                        value={diplomaForm.year}
+                        onChange={(e) => setDiplomaForm({ ...diplomaForm, year: e.target.value })}
+                        placeholder="ex: 2022"
+                        min="1950"
+                        max={new Date().getFullYear()}
+                        className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">
+                        Mention
+                      </label>
+                      <input
+                        type="text"
+                        value={diplomaForm.mention}
+                        onChange={(e) =>
+                          setDiplomaForm({ ...diplomaForm, mention: e.target.value })
+                        }
+                        placeholder="ex: Bien"
+                        className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-sm font-medium text-zinc-700 mb-1">
+                        Établissement
+                      </label>
+                      <input
+                        type="text"
+                        value={diplomaForm.institution}
+                        onChange={(e) =>
+                          setDiplomaForm({ ...diplomaForm, institution: e.target.value })
+                        }
+                        placeholder="ex: Université Cheikh Anta Diop"
+                        className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDiplomaForm(false);
+                        setDiplomaForm({ name: "", year: "", mention: "", institution: "" });
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-md hover:bg-zinc-50"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={createDiplomaMutation.isPending}
+                      className="px-4 py-2 text-sm font-medium text-white bg-[#008D36] border border-transparent rounded-md hover:bg-[#007A2E] disabled:opacity-50"
+                    >
+                      {createDiplomaMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {loadingDiplomas ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#008D36]"></div>
+                </div>
+              ) : priorDiplomas.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  Aucun diplôme antérieur enregistré pour cet étudiant.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {priorDiplomas.map((diploma) => (
+                    <div
+                      key={diploma.id}
+                      className="flex items-start justify-between rounded-lg border border-zinc-200 bg-white p-4"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-zinc-900">{diploma.name}</p>
+                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
+                          {diploma.year && <span>Année : {diploma.year}</span>}
+                          {diploma.mention && <span>Mention : {diploma.mention}</span>}
+                          {diploma.institution && <span>Établissement : {diploma.institution}</span>}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteDiploma(diploma.id)}
+                        disabled={deleteDiplomaMutation.isPending}
+                        className="ml-4 text-zinc-400 hover:text-red-600 disabled:opacity-50"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
                     </div>
                   ))}
                 </div>

@@ -5,14 +5,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   CreateEnrollmentInput,
-  Student,
   AcademicProgram,
   AcademicYear,
 } from "@/types/enrollment";
-import { EnrollmentStatus } from "@/types/enrollment";
+import { RegistrationStatus } from "@/types/enrollment";
+import type { Student } from "@/types/student";
 import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
 import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 import StudentSearch from "@/components/students/student-search";
+import { useLevels } from "@/hooks/use-levels";
+import { useDegreeCycles } from "@/hooks/use-degree-cycles";
 
 interface EnrollmentFormProps {
   onSubmit: (data: CreateEnrollmentInput) => Promise<void> | void;
@@ -38,6 +40,7 @@ export default function EnrollmentForm({
     handleSubmit,
     setValue,
     setError,
+    watch,
     formState: { errors },
   } = useForm<EnrollmentFormData>({
     resolver: zodResolver(EnrollmentSchema),
@@ -45,15 +48,31 @@ export default function EnrollmentForm({
       student_id: initialData?.student_id ?? "",
       academic_program_id: initialData?.academic_program_id ?? "",
       academic_year_id: initialData?.academic_year_id ?? "",
+      level_id: initialData?.level_id ?? "",
       current_semester: initialData?.current_semester ?? 1,
       enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
       registration_fee_paid: initialData?.registration_fee_paid ?? 0,
-      is_scholarship: initialData?.is_scholarship ?? false,
-      status: initialData?.status ?? EnrollmentStatus.PENDING,
+      is_scholarship_holder: initialData?.is_scholarship_holder ?? false,
+      scholarship_type: initialData?.scholarship_type ?? "",
+      scholarship_amount: initialData?.scholarship_amount ?? undefined,
+      notes: initialData?.notes ?? "",
+      is_repeating: initialData?.is_repeating ?? false,
+      is_medically_fit: initialData?.is_medically_fit ?? false,
+      is_registered_elsewhere: initialData?.is_registered_elsewhere ?? false,
+      is_willing_to_cancel_other_registration:
+        initialData?.is_willing_to_cancel_other_registration ?? false,
+      status: initialData?.status ?? RegistrationStatus.DRAFT,
     },
   });
   const [selectedStudentLabel, setSelectedStudentLabel] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const { data: levelsData } = useLevels();
+  const { data: degreeCycles } = useDegreeCycles();
+  const levels = levelsData?.data ?? [];
+
+  const isScholarshipHolder = watch("is_scholarship_holder");
+  const isRegisteredElsewhere = watch("is_registered_elsewhere");
 
   const handleFormSubmit = async (data: EnrollmentFormData) => {
     setSubmitError(null);
@@ -129,14 +148,11 @@ export default function EnrollmentForm({
               id="enrollment_date"
               {...register("enrollment_date")}
               aria-invalid={!!errors.enrollment_date}
-              aria-describedby={errors.enrollment_date ? "enrollment_date-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.enrollment_date ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.enrollment_date && (
-              <p id="enrollment_date-error" className="mt-1.5 text-xs text-red-600">
-                {errors.enrollment_date.message}
-              </p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.enrollment_date.message}</p>
             )}
           </div>
         </div>
@@ -156,10 +172,6 @@ export default function EnrollmentForm({
             <select
               id="academic_program_id"
               {...register("academic_program_id")}
-              aria-invalid={!!errors.academic_program_id}
-              aria-describedby={
-                errors.academic_program_id ? "academic_program_id-error" : undefined
-              }
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_program_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -171,9 +183,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_program_id && (
-              <p id="academic_program_id-error" className="mt-1.5 text-xs text-red-600">
-                {errors.academic_program_id.message}
-              </p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.academic_program_id.message}</p>
             )}
           </div>
 
@@ -185,8 +195,6 @@ export default function EnrollmentForm({
             <select
               id="academic_year_id"
               {...register("academic_year_id")}
-              aria-invalid={!!errors.academic_year_id}
-              aria-describedby={errors.academic_year_id ? "academic_year_id-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_year_id ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -198,10 +206,42 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.academic_year_id && (
-              <p id="academic_year_id-error" className="mt-1.5 text-xs text-red-600">
-                {errors.academic_year_id.message}
-              </p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id.message}</p>
             )}
+          </div>
+
+          {/* Level */}
+          <div>
+            <label htmlFor="level_id" className="mb-2 block text-sm text-zinc-900">
+              Niveau
+            </label>
+            <select
+              id="level_id"
+              {...register("level_id")}
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              disabled={isLoading}
+            >
+              <option value="">— Sélectionner un niveau —</option>
+              {degreeCycles && degreeCycles.length > 0
+                ? degreeCycles.map((cycle) => {
+                    const cycleLevels = levels.filter((l) => l.degree_cycle_id === cycle.id);
+                    if (cycleLevels.length === 0) return null;
+                    return (
+                      <optgroup key={cycle.id} label={cycle.name}>
+                        {cycleLevels.map((level) => (
+                          <option key={level.id} value={level.id}>
+                            {level.name} ({level.code})
+                          </option>
+                        ))}
+                      </optgroup>
+                    );
+                  })
+                : levels.map((level) => (
+                    <option key={level.id} value={level.id}>
+                      {level.name} ({level.code})
+                    </option>
+                  ))}
+            </select>
           </div>
 
           {/* Semester */}
@@ -212,8 +252,6 @@ export default function EnrollmentForm({
             <select
               id="current_semester"
               {...register("current_semester", { valueAsNumber: true })}
-              aria-invalid={!!errors.current_semester}
-              aria-describedby={errors.current_semester ? "current_semester-error" : undefined}
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.current_semester ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             >
@@ -224,9 +262,7 @@ export default function EnrollmentForm({
               ))}
             </select>
             {errors.current_semester && (
-              <p id="current_semester-error" className="mt-1.5 text-xs text-red-600">
-                {errors.current_semester.message}
-              </p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.current_semester.message}</p>
             )}
           </div>
 
@@ -241,11 +277,11 @@ export default function EnrollmentForm({
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             >
-              <option value={EnrollmentStatus.PENDING}>En attente</option>
-              <option value={EnrollmentStatus.REGISTERED}>Enregistrée</option>
-              <option value={EnrollmentStatus.ACTIVE}>Active</option>
-              <option value={EnrollmentStatus.COMPLETED}>Terminée</option>
-              <option value={EnrollmentStatus.WITHDRAWN}>Retirée</option>
+              <option value={RegistrationStatus.DRAFT}>Brouillon</option>
+              <option value={RegistrationStatus.PENDING_VALIDATION}>En attente de validation</option>
+              <option value={RegistrationStatus.VALIDATED}>Validée</option>
+              <option value={RegistrationStatus.SUSPENDED}>Suspendue</option>
+              <option value={RegistrationStatus.CANCELLED}>Annulée</option>
             </select>
           </div>
 
@@ -258,10 +294,6 @@ export default function EnrollmentForm({
               type="number"
               id="registration_fee_paid"
               {...register("registration_fee_paid", { valueAsNumber: true })}
-              aria-invalid={!!errors.registration_fee_paid}
-              aria-describedby={
-                errors.registration_fee_paid ? "registration_fee_paid-error" : undefined
-              }
               placeholder="| Saisir"
               min="0"
               step="1000"
@@ -269,24 +301,128 @@ export default function EnrollmentForm({
               disabled={isLoading}
             />
             {errors.registration_fee_paid && (
-              <p id="registration_fee_paid-error" className="mt-1.5 text-xs text-red-600">
-                {errors.registration_fee_paid.message}
-              </p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.registration_fee_paid.message}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* DÉTAILS DE L'INSCRIPTION */}
+      <div>
+        <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+          Détails de l&apos;inscription
+        </h3>
+        <div className="space-y-4">
+          {/* Checkboxes row */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                {...register("is_repeating")}
+                className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+                disabled={isLoading}
+              />
+              <span className="text-sm text-zinc-900">Redoublant</span>
+            </label>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                {...register("is_medically_fit")}
+                className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+                disabled={isLoading}
+              />
+              <span className="text-sm text-zinc-900">Apte médicalement</span>
+            </label>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                {...register("is_registered_elsewhere")}
+                className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+                disabled={isLoading}
+              />
+              <span className="text-sm text-zinc-900">Inscrit ailleurs</span>
+            </label>
+
+            {isRegisteredElsewhere && (
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  {...register("is_willing_to_cancel_other_registration")}
+                  className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+                  disabled={isLoading}
+                />
+                <span className="text-sm text-zinc-900">Prêt à annuler l&apos;autre inscription</span>
+              </label>
             )}
           </div>
 
-          {/* Is Scholarship */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="is_scholarship"
-              {...register("is_scholarship")}
-              className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+          {/* Scholarship */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                {...register("is_scholarship_holder")}
+                className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
+                disabled={isLoading}
+              />
+              <span className="text-sm text-zinc-900">Étudiant boursier</span>
+            </label>
+
+            {isScholarshipHolder && (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pl-6">
+                <div>
+                  <label htmlFor="scholarship_type" className="mb-2 block text-sm text-zinc-900">
+                    Type de bourse
+                  </label>
+                  <input
+                    type="text"
+                    id="scholarship_type"
+                    {...register("scholarship_type")}
+                    placeholder="Ex: Bourse d'État, Bourse UCAD..."
+                    className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="scholarship_amount" className="mb-2 block text-sm text-zinc-900">
+                    Montant de la bourse (FCFA)
+                  </label>
+                  <input
+                    type="number"
+                    id="scholarship_amount"
+                    {...register("scholarship_amount", { valueAsNumber: true })}
+                    placeholder="0"
+                    min="0"
+                    step="1000"
+                    className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.scholarship_amount ? "border-red-300" : "border-zinc-300"}`}
+                    disabled={isLoading}
+                  />
+                  {errors.scholarship_amount && (
+                    <p className="mt-1.5 text-xs text-red-600">{errors.scholarship_amount.message}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label htmlFor="notes" className="mb-2 block text-sm text-zinc-900">
+              Notes
+            </label>
+            <textarea
+              id="notes"
+              {...register("notes")}
+              placeholder="Observations, remarques..."
+              rows={3}
+              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             />
-            <label htmlFor="is_scholarship" className="ml-2 text-sm text-zinc-900">
-              Étudiant boursier
-            </label>
+            {errors.notes && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.notes.message}</p>
+            )}
           </div>
         </div>
       </div>

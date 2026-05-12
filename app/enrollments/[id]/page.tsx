@@ -166,7 +166,7 @@ export default function EnrollmentDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Type d'inscription</p>
                 <p className="mt-1 text-sm text-zinc-900">
-                  {enrollment.is_scholarship ? (
+                  {enrollment.is_scholarship_holder ? (
                     <span className="inline-flex items-center gap-1">
                       <span>Étudiant boursier</span>
                       <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">

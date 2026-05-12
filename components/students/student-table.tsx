@@ -40,6 +40,9 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
               <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
                 Téléphone
               </th>
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 xl:table-cell">
+                Email
+              </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Statut
               </th>
@@ -77,6 +80,9 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                 </td>
                 <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
                   {student.phone}
+                </td>
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 xl:table-cell">
+                  {student.email ?? "—"}
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <StudentStatusBadge status={student.status} />

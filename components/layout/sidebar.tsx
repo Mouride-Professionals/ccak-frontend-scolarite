@@ -3,12 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+
+function getRealmRoles(accessToken: string | undefined): string[] {
+  if (!accessToken) return [];
+  try {
+    const [, payload] = accessToken.split(".");
+    const padded = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(atob(padded)) as { realm_access?: { roles?: string[] } };
+    return decoded?.realm_access?.roles ?? [];
+  } catch {
+    return [];
+  }
+}
 
 interface MenuItem {
   id: string;
   label: string;
   icon: React.ReactNode;
   href?: string;
+  requiresAdmin?: boolean;
   children?: MenuItem[];
 }
 
@@ -303,6 +317,22 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    id: "sync",
+    label: "Synchronisation",
+    href: "/sync",
+    requiresAdmin: true,
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+    ),
+  },
+  {
     id: "communication",
     label: "Communication",
     icon: (
@@ -346,6 +376,8 @@ interface SidebarProps {
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(["scolarite"]);
+  const { data: session } = useSession();
+  const isAdmin = getRealmRoles(session?.accessToken).includes("admin");
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) => (prev.includes(itemId) ? [] : [itemId]));
@@ -380,7 +412,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         {/* Menu Items */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <ul className="space-y-1">
-            {menuItems.map((item) => (
+            {menuItems.filter((item) => !item.requiresAdmin || isAdmin).map((item) => (
               <li key={item.id}>
                 {item.children ? (
                   // Parent with children

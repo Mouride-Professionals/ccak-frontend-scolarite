@@ -17,9 +17,8 @@ import {
   useCreateStudent,
   useUpdateStudent,
 } from "@/hooks/use-students";
-import type { StudentFilters, CreateStudentInput } from "@/types/student";
+import type { StudentFilters, CreateStudentInput, CreateStudentBacInfoInput } from "@/types/student";
 import { StudentStatus, Gender } from "@/types/student";
-
 export default function StudentsPage() {
   const [filters, setFilters] = useState<StudentFilters>({
     page: 1,
@@ -51,9 +50,17 @@ export default function StudentsPage() {
   const createMutation = useCreateStudent();
   const updateMutation = useUpdateStudent();
 
-  const handleCreateSubmit = async (data: CreateStudentInput) => {
+  const handleCreateSubmit = async (
+    data: CreateStudentInput,
+    bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">
+  ) => {
     try {
-      await createMutation.mutateAsync(data);
+      const student = await createMutation.mutateAsync(data);
+      if (bacInfo) {
+        await import("@/lib/api/student-bac-info").then((m) =>
+          m.createStudentBacInfo({ ...bacInfo, student_id: student.id })
+        );
+      }
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
@@ -74,7 +81,10 @@ export default function StudentsPage() {
     setEditStudentId(id);
   };
 
-  const handleEditSubmit = async (data: CreateStudentInput) => {
+  const handleEditSubmit = async (
+    data: CreateStudentInput,
+    bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">
+  ) => {
     if (!editStudentId) return;
 
     try {
@@ -82,6 +92,11 @@ export default function StudentsPage() {
         id: editStudentId,
         input: data,
       });
+      if (bacInfo) {
+        await import("@/lib/api/student-bac-info").then((m) =>
+          m.updateStudentBacInfo(editStudentId, bacInfo)
+        );
+      }
       setEditStudentId(null);
       setToast({
         isOpen: true,
@@ -185,10 +200,13 @@ export default function StudentsPage() {
                 >
                   <option value="">Tous les statuts</option>
                   <option value={StudentStatus.ACTIVE}>Actif</option>
+                  <option value={StudentStatus.PENDING}>En attente</option>
                   <option value={StudentStatus.SUSPENDED}>Suspendu</option>
                   <option value={StudentStatus.GRADUATED}>Diplômé</option>
                   <option value={StudentStatus.WITHDRAWN}>Désisté</option>
                   <option value={StudentStatus.EXPELLED}>Exclu</option>
+                  <option value={StudentStatus.CANCELLED}>Annulé</option>
+                  <option value={StudentStatus.INACTIVE}>Inactif</option>
                 </select>
               </div>
 
@@ -208,6 +226,7 @@ export default function StudentsPage() {
                   <option value={Gender.F}>Féminin</option>
                 </select>
               </div>
+
             </div>
           </div>
         )}

@@ -61,7 +61,12 @@ export default function AcademicYearsTable({
               return (
                 <tr key={year.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                   <td className="px-6 py-5">
-                    <div className="text-sm font-medium text-zinc-900">{year.name}</div>
+                    <div className="text-sm font-medium text-zinc-900">
+                      {year.name}
+                      {year.code ? (
+                        <span className="ml-2 text-xs font-normal text-zinc-500">· {year.code}</span>
+                      ) : null}
+                    </div>
                   </td>
                   <td className="px-6 py-5 text-sm text-zinc-700">{formatDate(year.start_date)}</td>
                   <td className="px-6 py-5 text-sm text-zinc-700">{formatDate(year.end_date)}</td>
@@ -70,6 +75,15 @@ export default function AcademicYearsTable({
                       {year.is_current ? (
                         <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
                           Actuelle
+                        </span>
+                      ) : null}
+                      {year.status === "O" ? (
+                        <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                          Ouvert
+                        </span>
+                      ) : year.status === "F" ? (
+                        <span className="inline-flex rounded-full bg-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600">
+                          Fermé
                         </span>
                       ) : null}
                       <span

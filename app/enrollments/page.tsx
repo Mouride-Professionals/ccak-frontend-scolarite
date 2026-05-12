@@ -38,7 +38,7 @@ import type {
   CreateEnrollmentInput,
   UpdateEnrollmentInput,
 } from "@/types/enrollment";
-import { EnrollmentStatus } from "@/types/enrollment";
+import { RegistrationStatus } from "@/types/enrollment";
 
 export default function EnrollmentsPage() {
   const router = useRouter();
@@ -334,11 +334,11 @@ export default function EnrollmentsPage() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les statuts</option>
-                  <option value={EnrollmentStatus.PENDING}>En attente</option>
-                  <option value={EnrollmentStatus.REGISTERED}>Enregistrée</option>
-                  <option value={EnrollmentStatus.ACTIVE}>Active</option>
-                  <option value={EnrollmentStatus.COMPLETED}>Terminée</option>
-                  <option value={EnrollmentStatus.WITHDRAWN}>Retirée</option>
+                  <option value={RegistrationStatus.DRAFT}>Brouillon</option>
+                  <option value={RegistrationStatus.PENDING_VALIDATION}>En attente de validation</option>
+                  <option value={RegistrationStatus.VALIDATED}>Validée</option>
+                  <option value={RegistrationStatus.SUSPENDED}>Suspendue</option>
+                  <option value={RegistrationStatus.CANCELLED}>Annulée</option>
                 </select>
               </div>
 

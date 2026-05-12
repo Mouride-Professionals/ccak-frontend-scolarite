@@ -6,18 +6,26 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import StudentForm from "@/components/students/student-form";
 import { useCreateStudent } from "@/hooks/use-students";
+import { useCreateStudentBacInfo } from "@/hooks/use-student-bac-info";
 import { toUserError } from "@/lib/error-handler";
-import type { CreateStudentInput } from "@/types/student";
+import type { CreateStudentInput, CreateStudentBacInfoInput } from "@/types/student";
 
 export default function NewStudentPage() {
   const router = useRouter();
   const createMutation = useCreateStudent();
+  const createBacInfoMutation = useCreateStudentBacInfo();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = async (data: CreateStudentInput) => {
+  const handleSubmit = async (
+    data: CreateStudentInput,
+    bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">
+  ) => {
     setSubmitError(null);
     try {
       const student = await createMutation.mutateAsync(data);
+      if (bacInfo) {
+        await createBacInfoMutation.mutateAsync({ ...bacInfo, student_id: student.id });
+      }
       router.push(`/students/${student.id}`);
     } catch (error) {
       console.error("Error creating student:", error);
