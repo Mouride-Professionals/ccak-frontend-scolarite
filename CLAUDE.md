@@ -89,7 +89,7 @@ Required env vars (see .env.example):
 - **Errors:** Use `toUserError()` from `lib/error-handler.ts` for user-facing messages
 - **API:** Use `api.*` helpers from `lib/api-client.ts` (auto-sanitizes, logs errors)
 - **URLs:** Validate with `useSafeParams()` hook for route params
-- **Dependencies:** Next.js 16.0.10 has security vulnerabilities - UPDATE to 16.1.5+ required
+- **Dependencies:** Next.js 16.1.6 (up to date)
 
 Quick reference: [docs/security/DEVELOPER_GUIDE.md](docs/security/DEVELOPER_GUIDE.md)
 

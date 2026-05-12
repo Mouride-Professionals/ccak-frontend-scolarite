@@ -5,6 +5,8 @@
 export interface AcademicYear {
   id: string;
   name: string;
+  code?: string | null;
+  status?: "O" | "F" | null;
   start_date?: string | null;
   end_date?: string | null;
   is_current?: boolean;
