@@ -63,7 +63,7 @@ export default function FacultiesPage() {
       onSuccess: () => {
         setToast({
           isOpen: true,
-          message: "Faculté créée avec succès",
+          message: "Établissement créé avec succès",
           type: "success",
         });
         setIsCreateModalOpen(false);
@@ -86,7 +86,7 @@ export default function FacultiesPage() {
         onSuccess: () => {
           setToast({
             isOpen: true,
-            message: "Faculté mise à jour avec succès",
+            message: "Établissement mis à jour avec succès",
             type: "success",
           });
           setEditFacultyId(null);
@@ -108,7 +108,7 @@ export default function FacultiesPage() {
       onSuccess: () => {
         setToast({
           isOpen: true,
-          message: "Faculté supprimée avec succès",
+          message: "Établissement supprimé avec succès",
           type: "success",
         });
         setDeleteConfirm({ isOpen: false, facultyId: null });
@@ -125,17 +125,17 @@ export default function FacultiesPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout title="Facultés">
+      <DashboardLayout title="Établissements">
         <div className="space-y-6">
           <ListHeader
             className="mb-2"
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
-            searchPlaceholder="Rechercher une faculté..."
+            searchPlaceholder="Rechercher un établissement..."
             onToggleFilters={() => setShowFilters(!showFilters)}
             isFiltersOpen={showFilters}
             filtersCount={statusFilter ? 1 : 0}
-            actionLabel="Nouvelle Faculté"
+            actionLabel="Nouvel Établissement"
             onAction={() => setIsCreateModalOpen(true)}
           />
 
@@ -177,7 +177,7 @@ export default function FacultiesPage() {
           <div className="space-y-4">
             {isLoading ? (
               <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-                <p className="text-sm text-zinc-500">Chargement des facultés...</p>
+                <p className="text-sm text-zinc-500">Chargement des établissements...</p>
               </div>
             ) : (
               <FacultiesTable
@@ -196,7 +196,7 @@ export default function FacultiesPage() {
             totalPages={data?.total_pages ?? 1}
             totalItems={data?.total ?? 0}
             perPage={data?.limit ?? filters.limit ?? 10}
-            itemLabel="facultés"
+            itemLabel="établissements"
             onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
             onPerPageChange={(nextLimit) =>
               setFilters((prev) => ({ ...prev, limit: nextLimit, page: 1 }))
@@ -207,7 +207,7 @@ export default function FacultiesPage() {
           <Modal
             isOpen={isCreateModalOpen}
             onClose={() => setIsCreateModalOpen(false)}
-            title="Créer une Nouvelle Faculté"
+            title="Créer un Nouvel Établissement"
           >
             <FacultyForm onSuccess={() => setIsCreateModalOpen(false)} faculty={undefined} />
           </Modal>
@@ -216,7 +216,7 @@ export default function FacultiesPage() {
           <Modal
             isOpen={!!editFacultyId}
             onClose={() => setEditFacultyId(null)}
-            title="Modifier la Faculté"
+            title="Modifier l'Établissement"
           >
             {facultyToEdit ? (
               <FacultyForm onSuccess={() => setEditFacultyId(null)} faculty={facultyToEdit} />
@@ -230,8 +230,8 @@ export default function FacultiesPage() {
             isOpen={deleteConfirm.isOpen}
             onClose={() => setDeleteConfirm({ isOpen: false, facultyId: null })}
             onConfirm={handleDeleteConfirm}
-            title="Supprimer la Faculté"
-            message={`Êtes-vous sûr de vouloir supprimer cette faculté ? Cette action est irréversible.`}
+            title="Supprimer l'Établissement"
+            message={`Êtes-vous sûr de vouloir supprimer cet établissement ? Cette action est irréversible.`}
             confirmText="Supprimer"
             cancelText="Annuler"
             variant="danger"

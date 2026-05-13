@@ -58,7 +58,7 @@ const menuItems: MenuItem[] = [
     children: [
       {
         id: "faculties",
-        label: "Facultés",
+        label: "Établissements",
         href: "/faculties",
         icon: null as any,
       },

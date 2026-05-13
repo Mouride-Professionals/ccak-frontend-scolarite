@@ -52,10 +52,10 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
     try {
       if (faculty) {
         await updateFaculty({ id: faculty.id, input });
-        toast.success("Faculty updated successfully");
+        toast.success("Établissement mis à jour avec succès");
       } else {
         await createFaculty(input);
-        toast.success("Faculty created successfully");
+        toast.success("Établissement créé avec succès");
       }
       onSuccess?.();
     } catch (error) {
@@ -82,12 +82,12 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
       {/* Name */}
       <div>
         <label htmlFor="name" className="mb-2 block text-sm font-medium text-zinc-700">
-          Nom de la faculté *
+          Nom de l'établissement *
         </label>
         <input
           id="name"
           type="text"
-          placeholder="Ex: Faculté des Sciences"
+          placeholder="Ex: Sciences et Technologies"
           {...register("name", { setValueAs: (value) => String(value ?? "").trimStart() })}
           disabled={isPending}
           aria-invalid={!!errors.name}
@@ -104,7 +104,7 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
       {/* Code */}
       <div>
         <label htmlFor="code" className="mb-2 block text-sm font-medium text-zinc-700">
-          Code de la faculté *
+          Code de l'établissement *
         </label>
         <input
           id="code"
@@ -164,7 +164,7 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
             disabled={isPending}
             className="rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
           />
-          <span className="ml-2 text-sm text-zinc-700">Faculté active</span>
+          <span className="ml-2 text-sm text-zinc-700">Établissement actif</span>
         </label>
       </div>
 

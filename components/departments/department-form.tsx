@@ -87,7 +87,7 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
       {/* Faculty */}
       <div>
         <label htmlFor="faculty_id" className="mb-2 block text-sm font-medium text-zinc-700">
-          Faculté *
+          Établissement *
         </label>
         <select
           id="faculty_id"
@@ -98,7 +98,7 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.faculty_id ? "border-red-300" : "border-zinc-300"}`}
         >
           <option value="" disabled>
-            Sélectionnez une faculté
+            Sélectionnez un établissement
           </option>
           {faculties.map((faculty) => (
             <option key={faculty.id} value={faculty.id}>

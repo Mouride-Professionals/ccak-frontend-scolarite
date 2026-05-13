@@ -111,7 +111,7 @@ export default function DepartmentsPage() {
                 {/* Faculty Filter */}
                 <div>
                   <label htmlFor="faculty" className="mb-2 block text-sm font-medium text-zinc-700">
-                    Faculté
+                    Établissement
                   </label>
                   <select
                     id="faculty"
@@ -119,7 +119,7 @@ export default function DepartmentsPage() {
                     onChange={(e) => setFacultyFilter(e.target.value)}
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                   >
-                    <option value="">Toutes les facultés</option>
+                    <option value="">Tous les établissements</option>
                     {faculties.map((faculty) => (
                       <option key={faculty.id} value={faculty.id}>
                         {faculty.name}

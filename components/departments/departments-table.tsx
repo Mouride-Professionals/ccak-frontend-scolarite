@@ -31,7 +31,7 @@ export default function DepartmentsTable({ departments, onEdit, onDelete }: Depa
                 Code
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
-                Faculté
+                Établissement
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Chef de Département

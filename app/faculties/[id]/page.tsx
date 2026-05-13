@@ -29,7 +29,7 @@ export default function FacultyDetailPage() {
     if (error) {
       setToast({
         isOpen: true,
-        message: "Faculté introuvable",
+        message: "Établissement introuvable",
         type: "error",
       });
       const timeout = setTimeout(() => {
@@ -44,7 +44,7 @@ export default function FacultyDetailPage() {
       await deleteMutation.mutateAsync(facultyId);
       setToast({
         isOpen: true,
-        message: "Faculté supprimée avec succès",
+        message: "Établissement supprimé avec succès",
         type: "success",
       });
       setTimeout(() => {
@@ -64,11 +64,11 @@ export default function FacultyDetailPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <DashboardLayout title="Détails de la Faculté">
+        <DashboardLayout title="Détails de l'Établissement">
           <div className="flex min-h-[400px] items-center justify-center">
             <div className="text-center">
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-              <p className="mt-3 text-sm text-zinc-500">Chargement de la faculté...</p>
+              <p className="mt-3 text-sm text-zinc-500">Chargement de l'établissement...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -174,8 +174,8 @@ export default function FacultyDetailPage() {
           isOpen={deleteConfirm}
           onClose={() => setDeleteConfirm(false)}
           onConfirm={handleDelete}
-          title="Supprimer la Faculté"
-          message="Êtes-vous sûr de vouloir supprimer cette faculté ? Cette action est irréversible."
+          title="Supprimer l'Établissement"
+          message="Êtes-vous sûr de vouloir supprimer cet établissement ? Cette action est irréversible."
           confirmText="Supprimer"
           cancelText="Annuler"
           variant="danger"

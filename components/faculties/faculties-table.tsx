@@ -13,7 +13,7 @@ export default function FacultiesTable({ faculties, onEdit, onDelete }: Facultie
   if (faculties.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <p className="text-sm text-zinc-500">Aucune faculté trouvée.</p>
+        <p className="text-sm text-zinc-500">Aucun établissement trouvé.</p>
       </div>
     );
   }
