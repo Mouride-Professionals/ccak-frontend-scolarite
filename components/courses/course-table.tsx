@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { Course } from "@/types/course";
 
 interface CourseTableProps {
@@ -21,6 +22,7 @@ export default function CourseTable({
   onDelete,
   viewMode = "table",
 }: CourseTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (courses.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -96,7 +98,8 @@ export default function CourseTable({
 
               <div className="mt-4 flex items-center justify-end gap-2">
                 <button
-                  onClick={() => onEdit(course.id)}
+                  onClick={() => !isReadOnly && onEdit(course.id)}
+                  disabled={isReadOnly}
                   className="rounded-lg px-2 py-1 text-xs font-medium text-[#00365F] hover:bg-zinc-100"
                 >
                   Éditer
@@ -108,7 +111,8 @@ export default function CourseTable({
                   Voir
                 </Link>
                 <button
-                  onClick={() => onDelete(course.id)}
+                  onClick={() => !isReadOnly && onDelete(course.id)}
+                  disabled={isReadOnly}
                   className="rounded-lg px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                 >
                   Supprimer
@@ -190,7 +194,8 @@ export default function CourseTable({
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
                     <button
-                      onClick={() => onEdit(course.id)}
+                      onClick={() => !isReadOnly && onEdit(course.id)}
+                  disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Éditer"
                     >
@@ -234,7 +239,8 @@ export default function CourseTable({
                       </svg>
                     </Link>
                     <button
-                      onClick={() => onDelete(course.id)}
+                      onClick={() => !isReadOnly && onDelete(course.id)}
+                  disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Supprimer"
                     >

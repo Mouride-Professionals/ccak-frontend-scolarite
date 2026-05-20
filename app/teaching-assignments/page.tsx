@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -16,9 +16,11 @@ import {
   useTeachingAssignments,
 } from "@/hooks/use-teaching-assignments";
 import { TeachingRole } from "@/types/teaching-assignment";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function TeachingAssignmentsPage() {
   const router = useRouter();
+  const { selectedYear } = useSelectedYear();
   const { data: coursesData } = useCourses({ page: 1, limit: 100 });
   const { data: years } = useAcademicYears();
   const [showFilters, setShowFilters] = useState(false);
@@ -37,6 +39,10 @@ export default function TeachingAssignmentsPage() {
     academicYearId: "",
     role: "",
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academicYearId: selectedYear?.id ?? "", page: 1 }));
+  }, [selectedYear?.id]);
   const { data, isLoading } = useTeachingAssignments({
     page: filters.page,
     limit: filters.limit,

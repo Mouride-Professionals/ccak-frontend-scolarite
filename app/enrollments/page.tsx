@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -39,13 +39,19 @@ import type {
   UpdateEnrollmentInput,
 } from "@/types/enrollment";
 import { RegistrationStatus } from "@/types/enrollment";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function EnrollmentsPage() {
   const router = useRouter();
+  const { selectedYear } = useSelectedYear();
   const [filters, setFilters] = useState<EnrollmentFilters>({
     page: 1,
     limit: 10,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academic_year_id: selectedYear?.id, page: 1 }));
+  }, [selectedYear?.id]);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -182,7 +188,7 @@ export default function EnrollmentsPage() {
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setFilters({ page: 1, limit: 10 });
+    setFilters({ page: 1, limit: 10, academic_year_id: selectedYear?.id });
   };
 
   return (

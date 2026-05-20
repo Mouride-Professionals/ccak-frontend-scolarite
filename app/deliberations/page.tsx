@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DeliberationTable from "@/components/deliberations/deliberation-table";
@@ -25,12 +25,18 @@ import type {
   CreateDeliberationSessionInput,
 } from "@/types/deliberation";
 import { DeliberationStatus } from "@/types/deliberation";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function DeliberationsPage() {
+  const { selectedYear } = useSelectedYear();
   const [filters, setFilters] = useState<DeliberationSessionFilters>({
     page: 1,
     limit: 10,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academic_year_id: selectedYear?.id, page: 1 }));
+  }, [selectedYear?.id]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editSessionId, setEditSessionId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -153,7 +159,7 @@ export default function DeliberationsPage() {
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setFilters({ page: 1, limit: 10 });
+    setFilters({ page: 1, limit: 10, academic_year_id: selectedYear?.id });
   };
 
   return (

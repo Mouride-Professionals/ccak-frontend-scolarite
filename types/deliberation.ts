@@ -98,7 +98,7 @@ export interface DeliberationResult {
   // Populated relations (optional)
   student?: {
     id: string;
-    student_number: string;
+    student_number: string | null;
     full_name: string;
     photo_url: string | null;
   };

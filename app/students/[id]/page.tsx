@@ -26,7 +26,6 @@ import {
   useRejectDocument,
 } from "@/hooks/use-documents";
 import {
-  usePriorDiplomas,
   useCreatePriorDiploma,
   useDeletePriorDiploma,
 } from "@/hooks/use-prior-diplomas";
@@ -67,8 +66,9 @@ export default function StudentDetailPage() {
   const approveDocumentMutation = useApproveDocument();
   const rejectDocumentMutation = useRejectDocument();
 
-  // Prior Diplomas
-  const { data: priorDiplomas = [], isLoading: loadingDiplomas } = usePriorDiplomas(studentId);
+  // Prior Diplomas — loaded from student detail response
+  const priorDiplomas = student?.prior_diplomas ?? [];
+  const loadingDiplomas = isLoading;
   const createDiplomaMutation = useCreatePriorDiploma();
   const deleteDiplomaMutation = useDeletePriorDiploma();
   const [showDiplomaForm, setShowDiplomaForm] = useState(false);
@@ -335,35 +335,74 @@ export default function StudentDetailPage() {
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Numéro étudiant</p>
                     <p className="mt-1 text-sm font-semibold text-zinc-900">
-                      {student.student_number}
+                      {student.student_number ?? "—"}
                     </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">INE</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.ine ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">Numéro d'inscription</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.registration_number ?? "—"}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Genre</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {student.gender === "M" ? "Masculin" : "Féminin"}
+                      {student.gender === "M" ? "Masculin" : student.gender === "F" ? "Féminin" : "—"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Date de naissance</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {new Date(student.date_of_birth).toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {student.date_of_birth
+                        ? new Date(student.date_of_birth).toLocaleDateString("fr-FR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "—"}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Lieu de naissance</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.place_of_birth}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.place_of_birth ?? "—"}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Nationalité</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.nationality}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.nationality ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">Provenance</p>
+                    <p className="mt-1 text-sm text-zinc-900">
+                      {student.provenance === "ETAT"
+                        ? "État"
+                        : student.provenance === "PLATEFORME"
+                        ? "Plateforme"
+                        : "—"}
+                    </p>
                   </div>
                 </div>
               </div>
+
+              {/* Identity Document */}
+              {(student.type_of_id || student.id_details) && (
+                <div className="rounded-lg border border-zinc-200 bg-white p-6">
+                  <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+                    Pièce d'identité
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                      <p className="text-sm font-medium text-zinc-500">Type</p>
+                      <p className="mt-1 text-sm text-zinc-900">{student.type_of_id ?? "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-500">Référence</p>
+                      <p className="mt-1 text-sm text-zinc-900">{student.id_details ?? "—"}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Contact Info */}
               <div className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -373,12 +412,24 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.phone}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.phone ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">Téléphone 2</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.phone_2 ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">Email personnel</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.email ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-500">Email universitaire</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.email_university ?? "—"}</p>
                   </div>
                   <div className="sm:col-span-2">
                     <p className="text-sm font-medium text-zinc-500">Adresse</p>
                     <p className="mt-1 text-sm text-zinc-900 whitespace-pre-line">
-                      {student.address}
+                      {student.address ?? "—"}
                     </p>
                   </div>
                 </div>
@@ -392,14 +443,27 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Nom du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_name}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_name ?? "—"}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_phone}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_phone ?? "—"}</p>
                   </div>
                 </div>
               </div>
+
+              {/* Sync Info */}
+              {student.synced_from && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                  <p className="text-xs text-zinc-500">
+                    Synchronisé depuis{" "}
+                    <span className="font-semibold text-zinc-700">{student.synced_from}</span>
+                    {student.last_synced_at && (
+                      <> · {new Date(student.last_synced_at).toLocaleString("fr-FR")}</>
+                    )}
+                  </p>
+                </div>
+              )}
             </>
           )}
 

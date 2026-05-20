@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,6 +37,7 @@ export default function AcademicYearForm({
   onCancel,
   isLoading = false,
 }: AcademicYearFormProps) {
+  const isReadOnly = useIsReadOnly();
   const {
     register,
     handleSubmit,
@@ -157,7 +159,7 @@ export default function AcademicYearForm({
         ) : null}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isReadOnly}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Enregistrement..." : "Enregistrer"}

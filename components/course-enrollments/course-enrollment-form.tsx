@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { z } from "zod";
 import type { Course, CreateCourseEnrollmentInput } from "@/types/course-enrollment";
 import { CourseEnrollmentStatus } from "@/types/course-enrollment";
@@ -56,6 +57,7 @@ export default function CourseEnrollmentForm({
   isLoading = false,
   initialData,
 }: CourseEnrollmentFormProps) {
+  const isReadOnly = useIsReadOnly();
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState<CourseEnrollmentFormData>({
     enrollment_id: initialData?.enrollment_id ?? "",
@@ -485,7 +487,7 @@ export default function CourseEnrollmentForm({
         )}
         <button
           type="submit"
-          disabled={isLoading || !canSubmit}
+          disabled={isLoading || !canSubmit || isReadOnly}
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? "Enregistrement..." : "Valider le panier"}

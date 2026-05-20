@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { z } from "zod";
 import type { CreateCourseUnitInput } from "@/types/course-unit";
 import type { AcademicProgram } from "@/types/course-unit";
@@ -55,6 +56,7 @@ export default function CourseUnitForm({
   isLoading = false,
   initialData,
 }: CourseUnitFormProps) {
+  const isReadOnly = useIsReadOnly();
   const [formData, setFormData] = useState<CourseUnitFormData>({
     academicProgramId: initialData?.academicProgramId ?? "",
     code: initialData?.code ?? "",
@@ -292,7 +294,7 @@ export default function CourseUnitForm({
         )}
         <button
           type="submit"
-          disabled={isLoading || !canSubmit}
+          disabled={isLoading || !canSubmit || isReadOnly}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white hover:bg-[#007A2E] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? (

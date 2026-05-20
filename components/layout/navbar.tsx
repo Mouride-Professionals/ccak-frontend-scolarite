@@ -3,9 +3,10 @@
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-
-// 👇 1. On importe ton composant ici
 import NotificationPopup from "@/components/notifications/NotificationPopup";
+import { useAcademicYears } from "@/hooks/use-academic-years";
+import { useSelectedYear } from "@/hooks/use-selected-year";
+import type { AcademicYear } from "@/types/academic-year";
 
 interface NavbarProps {
   title: string;
@@ -13,14 +14,64 @@ interface NavbarProps {
   isSidebarOpen?: boolean;
 }
 
+function YearOption({
+  year,
+  isSelected,
+  isCurrent,
+  onSelect,
+}: {
+  year: AcademicYear;
+  isSelected: boolean;
+  isCurrent: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-zinc-50 ${
+        isSelected ? "bg-zinc-50 font-medium" : ""
+      }`}
+    >
+      {isCurrent ? (
+        <span className="h-2 w-2 rounded-full bg-green-500" />
+      ) : (
+        <svg className="h-3.5 w-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      )}
+      <span className={isCurrent ? "text-[#00365F]" : "text-zinc-600"}>{year.name}</span>
+      {isSelected && (
+        <svg className="ml-auto h-3.5 w-3.5 text-[#00365F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarProps) {
   const { data: session } = useSession();
+  const { selectedYear, isReadOnly, setSelectedYear, currentYearId } = useSelectedYear();
+  const { data: yearsResponse } = useAcademicYears({ limit: 50 });
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showYearMenu, setShowYearMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const yearMenuRef = useRef<HTMLDivElement>(null);
+
+  const allYears = yearsResponse?.data ?? [];
+  const currentYears = allYears.filter((y) => y.id === currentYearId);
+  const archivedYears = allYears
+    .filter((y) => y.id !== currentYearId)
+    .sort((a, b) => {
+      const dateA = a.start_date ?? a.name;
+      const dateB = b.start_date ?? b.name;
+      return dateB.localeCompare(dateA);
+    });
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -30,6 +81,9 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
+      }
+      if (yearMenuRef.current && !yearMenuRef.current.contains(event.target as Node)) {
+        setShowYearMenu(false);
       }
     };
 
@@ -102,6 +156,72 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
           </button>
           <h1 className="text-lg font-semibold text-[#00365F] md:text-2xl">{title}</h1>
         </div>
+
+        {/* Year Switcher */}
+        {selectedYear && (
+          <div className="relative hidden sm:block" ref={yearMenuRef}>
+            <button
+              type="button"
+              onClick={() => setShowYearMenu((v) => !v)}
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition ${
+                isReadOnly
+                  ? "border-amber-300 bg-amber-50 hover:bg-amber-100"
+                  : "border-zinc-200 bg-zinc-50 hover:bg-zinc-100"
+              }`}
+            >
+              {isReadOnly ? (
+                <svg className="h-3.5 w-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              ) : (
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+              )}
+              <span className={`font-medium ${isReadOnly ? "text-amber-700" : "text-[#00365F]"}`}>
+                {selectedYear.name}
+              </span>
+              <svg className={`h-3.5 w-3.5 ${isReadOnly ? "text-amber-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showYearMenu && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-lg border border-zinc-200 bg-white shadow-lg">
+                {currentYears.length > 0 && (
+                  <>
+                    <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                      Année en cours
+                    </div>
+                    {currentYears.map((year) => (
+                      <YearOption
+                        key={year.id}
+                        year={year}
+                        isSelected={selectedYear.id === year.id}
+                        isCurrent
+                        onSelect={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                      />
+                    ))}
+                  </>
+                )}
+                {archivedYears.length > 0 && (
+                  <>
+                    <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 ${currentYears.length > 0 ? "border-t border-zinc-100" : ""}`}>
+                      Années archivées
+                    </div>
+                    {archivedYears.map((year) => (
+                      <YearOption
+                        key={year.id}
+                        year={year}
+                        isSelected={selectedYear.id === year.id}
+                        isCurrent={false}
+                        onSelect={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                      />
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* User Info & Notifications */}
         <div className="flex items-center gap-2 sm:gap-4">

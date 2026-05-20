@@ -1,6 +1,7 @@
 "use client";
 
 import type { TeachingAssignment } from "@/types/teaching-assignment";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 
 interface TeachingAssignmentsTableProps {
   assignments: TeachingAssignment[];
@@ -19,6 +20,7 @@ export default function TeachingAssignmentsTable({
   onEdit,
   onDelete,
 }: TeachingAssignmentsTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (assignments.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -78,7 +80,7 @@ export default function TeachingAssignmentsTable({
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(assignment.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -99,7 +101,7 @@ export default function TeachingAssignmentsTable({
                         </svg>
                       </button>
                     )}
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(assignment.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

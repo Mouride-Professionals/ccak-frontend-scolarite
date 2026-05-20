@@ -17,7 +17,7 @@ import {
   useCreateStudent,
   useUpdateStudent,
 } from "@/hooks/use-students";
-import type { StudentFilters, CreateStudentInput, CreateStudentBacInfoInput } from "@/types/student";
+import type { StudentFilters, CreateStudentInput } from "@/types/student";
 import { StudentStatus, Gender } from "@/types/student";
 export default function StudentsPage() {
   const [filters, setFilters] = useState<StudentFilters>({
@@ -50,17 +50,9 @@ export default function StudentsPage() {
   const createMutation = useCreateStudent();
   const updateMutation = useUpdateStudent();
 
-  const handleCreateSubmit = async (
-    data: CreateStudentInput,
-    bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">
-  ) => {
+  const handleCreateSubmit = async (data: CreateStudentInput) => {
     try {
-      const student = await createMutation.mutateAsync(data);
-      if (bacInfo) {
-        await import("@/lib/api/student-bac-info").then((m) =>
-          m.createStudentBacInfo({ ...bacInfo, student_id: student.id })
-        );
-      }
+      await createMutation.mutateAsync(data);
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
@@ -81,10 +73,7 @@ export default function StudentsPage() {
     setEditStudentId(id);
   };
 
-  const handleEditSubmit = async (
-    data: CreateStudentInput,
-    bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">
-  ) => {
+  const handleEditSubmit = async (data: CreateStudentInput) => {
     if (!editStudentId) return;
 
     try {
@@ -92,11 +81,6 @@ export default function StudentsPage() {
         id: editStudentId,
         input: data,
       });
-      if (bacInfo) {
-        await import("@/lib/api/student-bac-info").then((m) =>
-          m.updateStudentBacInfo(editStudentId, bacInfo)
-        );
-      }
       setEditStudentId(null);
       setToast({
         isOpen: true,

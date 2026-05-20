@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import GradesTable from "@/components/grades/grades-table";
@@ -22,12 +22,18 @@ import {
 } from "@/hooks/use-grades";
 import type { GradeFilters, CreateGradeInput, Grade } from "@/types/grade";
 import { GradeStatus } from "@/types/grade";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function GradesPage() {
+  const { selectedYear } = useSelectedYear();
   const [filters, setFilters] = useState<GradeFilters>({
     page: 1,
     limit: 10,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academic_year_id: selectedYear?.id, page: 1 }));
+  }, [selectedYear?.id]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editGrade, setEditGrade] = useState<Grade | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -147,7 +153,7 @@ export default function GradesPage() {
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setFilters({ page: 1, limit: 10 });
+    setFilters({ page: 1, limit: 10, academic_year_id: selectedYear?.id });
   };
 
   return (

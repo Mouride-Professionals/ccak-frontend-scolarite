@@ -45,7 +45,7 @@ function SyncPageContent() {
   const triggerSync = useTriggerSync();
 
   // Backend sync routes are not yet implemented — disable trigger until available
-  const isSyncEndpointReady = false;
+  const isSyncEndpointReady = true;
 
   const handleTriggerSync = async () => {
     try {

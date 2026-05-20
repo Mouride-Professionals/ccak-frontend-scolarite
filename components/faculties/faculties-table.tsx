@@ -2,6 +2,7 @@
 
 import type { Faculty } from "@/types/faculty";
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 
 interface FacultiesTableProps {
   faculties: Faculty[];
@@ -10,6 +11,7 @@ interface FacultiesTableProps {
 }
 
 export default function FacultiesTable({ faculties, onEdit, onDelete }: FacultiesTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (faculties.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -68,7 +70,7 @@ export default function FacultiesTable({ faculties, onEdit, onDelete }: Facultie
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(faculty.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -110,7 +112,7 @@ export default function FacultiesTable({ faculties, onEdit, onDelete }: Facultie
                         <circle cx="12" cy="12" r="3" strokeWidth={2} />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(faculty.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

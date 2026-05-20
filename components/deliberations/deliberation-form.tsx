@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { z } from "zod";
 import type { CreateDeliberationSessionInput } from "@/types/deliberation";
 import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
@@ -60,6 +61,7 @@ export default function DeliberationForm({
   isLoading = false,
   initialData,
 }: DeliberationFormProps) {
+  const isReadOnly = useIsReadOnly();
   const [formData, setFormData] = useState<DeliberationFormData>({
     academic_program_id: initialData?.academic_program_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
@@ -397,7 +399,7 @@ export default function DeliberationForm({
         <button
           type="submit"
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading || !canSubmit}
+          disabled={isLoading || !canSubmit || isReadOnly}
         >
           {isLoading
             ? initialData

@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateStudentInput, CreateStudentBacInfoInput, Student } from "@/types/student";
+import type { CreateStudentInput, Student } from "@/types/student";
 import { Gender, DocumentType, Provenance, IDType } from "@/types/student";
 import DocumentUploader from "./document-uploader";
 import { StudentSchema, type StudentFormData } from "@/lib/validations/schemas";
 import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 
 interface StudentFormProps {
-  onSubmit: (data: CreateStudentInput, bacInfo?: Omit<CreateStudentBacInfoInput, "student_id">) => void;
+  onSubmit: (data: CreateStudentInput) => void;
   onCancel?: () => void;
   isLoading?: boolean;
   initialData?: Partial<Student>;
@@ -22,6 +23,7 @@ export default function StudentForm({
   isLoading = false,
   initialData,
 }: StudentFormProps) {
+  const isReadOnly = useIsReadOnly();
   const {
     register,
     handleSubmit,
@@ -53,14 +55,6 @@ export default function StudentForm({
     },
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [bacInfo, setBacInfo] = useState({
-    serie: initialData?.bac_info?.serie ?? "",
-    year_of_bac: initialData?.bac_info?.year_of_bac?.toString() ?? "",
-    bac_mention: initialData?.bac_info?.bac_mention ?? "",
-    bac_institution: initialData?.bac_info?.bac_institution ?? "",
-    average_first_session: initialData?.bac_info?.average_first_session?.toString() ?? "",
-  });
-
   // registration_number is read-only when editing a student that already has one
   const isRegistrationNumberReadOnly = !!(initialData && initialData.registration_number);
 
@@ -72,19 +66,7 @@ export default function StudentForm({
   const handleFormSubmit = async (data: StudentFormData) => {
     setSubmitError(null);
     try {
-      const hasBacInfo = !!bacInfo.serie.trim();
-      const bacInfoPayload: Omit<CreateStudentBacInfoInput, "student_id"> | undefined = hasBacInfo
-        ? {
-            serie: bacInfo.serie,
-            year_of_bac: bacInfo.year_of_bac ? parseInt(bacInfo.year_of_bac) : new Date().getFullYear(),
-            bac_mention: bacInfo.bac_mention || null,
-            bac_institution: bacInfo.bac_institution || null,
-            average_first_session: bacInfo.average_first_session
-              ? parseFloat(bacInfo.average_first_session)
-              : null,
-          }
-        : undefined;
-      await onSubmit(data as CreateStudentInput, bacInfoPayload);
+      await onSubmit(data as CreateStudentInput);
     } catch (error) {
       const validationErrors = extractValidationErrors(error);
       if (Object.keys(validationErrors).length > 0) {
@@ -453,79 +435,6 @@ export default function StudentForm({
         </div>
       </div>
 
-      {/* BACCALAURÉAT */}
-      <div>
-        <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-          Baccalauréat
-        </h3>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm text-zinc-900">Série</label>
-            <input
-              type="text"
-              value={bacInfo.serie}
-              onChange={(e) => setBacInfo({ ...bacInfo, serie: e.target.value })}
-              placeholder="ex: S1, S2, L, STEG"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              disabled={isLoading}
-            />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm text-zinc-900">Année d&apos;obtention</label>
-            <input
-              type="number"
-              value={bacInfo.year_of_bac}
-              onChange={(e) => setBacInfo({ ...bacInfo, year_of_bac: e.target.value })}
-              placeholder={new Date().getFullYear().toString()}
-              min="1950"
-              max={new Date().getFullYear()}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              disabled={isLoading}
-            />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm text-zinc-900">Mention</label>
-            <select
-              value={bacInfo.bac_mention}
-              onChange={(e) => setBacInfo({ ...bacInfo, bac_mention: e.target.value })}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              disabled={isLoading}
-            >
-              <option value="">— Sélectionner —</option>
-              <option value="Passable">Passable</option>
-              <option value="Assez Bien">Assez Bien</option>
-              <option value="Bien">Bien</option>
-              <option value="Très Bien">Très Bien</option>
-            </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-sm text-zinc-900">Moyenne (1ère session)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={bacInfo.average_first_session}
-              onChange={(e) => setBacInfo({ ...bacInfo, average_first_session: e.target.value })}
-              placeholder="ex: 12.50"
-              min="0"
-              max="20"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              disabled={isLoading}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="mb-2 block text-sm text-zinc-900">Établissement</label>
-            <input
-              type="text"
-              value={bacInfo.bac_institution}
-              onChange={(e) => setBacInfo({ ...bacInfo, bac_institution: e.target.value })}
-              placeholder="Lycée / École"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* DOCUMENTS */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
@@ -558,7 +467,7 @@ export default function StudentForm({
         <button
           type="submit"
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || isReadOnly}
         >
           {isLoading
             ? initialData

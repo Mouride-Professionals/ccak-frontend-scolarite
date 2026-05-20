@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 
 interface ListHeaderProps {
   searchValue: string;
@@ -35,6 +38,7 @@ export default function ListHeader({
   className = "",
   variant = "green",
 }: ListHeaderProps) {
+  const isReadOnly = useIsReadOnly();
   const showFilters = Boolean(onToggleFilters);
   const showAction = Boolean(onAction && actionLabel);
   const focusClasses =
@@ -115,7 +119,9 @@ export default function ListHeader({
         <button
           type="button"
           onClick={onAction}
-          className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors sm:w-auto ${actionClasses}`}
+          disabled={isReadOnly}
+          title={isReadOnly ? "Mode lecture seule — année archivée" : undefined}
+          className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors sm:w-auto disabled:cursor-not-allowed disabled:opacity-40 ${actionClasses}`}
         >
           {actionIcon}
           {actionLabel}

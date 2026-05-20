@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Student, Course, EvaluationTypeOption, CreateGradeInput } from "@/types/grade";
@@ -27,6 +28,7 @@ export default function GradeForm({
   isLoading = false,
   initialData,
 }: GradeFormProps) {
+  const isReadOnly = useIsReadOnly();
   const {
     register,
     handleSubmit,
@@ -321,7 +323,7 @@ export default function GradeForm({
         </button>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isReadOnly}
           className="flex items-center gap-2 rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading && (

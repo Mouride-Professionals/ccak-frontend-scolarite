@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { Student } from "@/types/student";
 import StudentStatusBadge from "./student-status-badge";
 
@@ -11,6 +12,7 @@ interface StudentTableProps {
 }
 
 export default function StudentTable({ students, onEdit, onDelete }: StudentTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (students.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -89,7 +91,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -135,7 +137,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                         />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

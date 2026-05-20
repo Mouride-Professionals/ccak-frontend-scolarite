@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { FacultyMember } from "@/types/academic";
 
 interface FacultyMembersTableProps {
@@ -28,6 +29,7 @@ export default function FacultyMembersTable({
   onEdit,
   onDelete,
 }: FacultyMembersTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (facultyMembers.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -99,7 +101,7 @@ export default function FacultyMembersTable({
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(member.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -140,7 +142,7 @@ export default function FacultyMembersTable({
                         <circle cx="12" cy="12" r="3" strokeWidth={2} />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(member.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

@@ -68,8 +68,9 @@ export interface Address {
   street: string | null;
   city: string | null;
   region: string | null;
+  department: string | null;
   country: string | null;
-  postal_code: string | null;
+  is_primary: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -78,8 +79,11 @@ export interface SocialProfile {
   id: string;
   profilable_type: string;
   profilable_id: string;
-  platform: string;
-  url: string;
+  family_status: string | null;
+  number_of_children: number | null;
+  is_employed: boolean | null;
+  socio_professional_category: string | null;
+  student_regime: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -90,8 +94,8 @@ export interface StudentBacInfo {
   serie: string;
   year_of_bac: number;
   bac_result_id: string | null;
-  average_first_session: number | null;
-  average_second_session: number | null;
+  first_round_average: number | null;
+  second_round_average: number | null;
   bac_mention: string | null;
   bac_institution: string | null;
   created_at: string;
@@ -120,7 +124,7 @@ export interface PriorDiploma {
 export interface Student {
   id: string;
   user_id: string;
-  student_number: string;
+  student_number: string | null;
   registration_number: string | null;
   full_name: string;
   first_name: string | null;
@@ -143,9 +147,9 @@ export interface Student {
   photo_url: string | null;
   status: StudentStatus;
   // Relations
-  bac_info?: StudentBacInfo;
+  bac_info?: StudentBacInfo | null;
   addresses?: Address[];
-  social_profiles?: SocialProfile[];
+  social_profile?: SocialProfile | null;
   prior_diplomas?: PriorDiploma[];
   created_at: string;
   updated_at: string;
@@ -326,8 +330,8 @@ export interface CreateStudentBacInfoInput {
   year_of_bac: number;
   bac_mention?: string | null;
   bac_institution?: string | null;
-  average_first_session?: number | null;
-  average_second_session?: number | null;
+  first_round_average?: number | null;
+  second_round_average?: number | null;
   [key: string]: unknown;
 }
 

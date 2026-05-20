@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -23,16 +23,22 @@ import { useEnrollment } from "@/hooks/use-enrollments";
 import { CourseEnrollmentStatus, type CourseEnrollmentFilters } from "@/types/course-enrollment";
 import { useCourseBasketStore } from "@/stores/course-basket-store";
 import { toUserError } from "@/lib/error-handler";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function EnrollmentCoursesPageClient() {
   const searchParams = useSearchParams();
   const enrollmentId = searchParams.get("enrollment_id") || "";
+  const { selectedYear } = useSelectedYear();
 
   const [filters, setFilters] = useState<CourseEnrollmentFilters>({
     enrollment_id: enrollmentId,
     page: 1,
     limit: 10,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academic_year_id: selectedYear?.id, page: 1 }));
+  }, [selectedYear?.id]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;

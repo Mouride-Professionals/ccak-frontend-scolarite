@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Department, CreateDepartmentInput } from "@/types/department";
@@ -18,6 +19,7 @@ interface DepartmentFormProps {
 }
 
 export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFormProps) {
+  const isReadOnly = useIsReadOnly();
   const { mutateAsync: createDepartment, isPending: isCreating } = useCreateDepartment();
   const { mutateAsync: updateDepartment, isPending: isUpdating } = useUpdateDepartment();
   const { data: facultiesData } = useFaculties();
@@ -221,7 +223,7 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
         )}
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isReadOnly}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending

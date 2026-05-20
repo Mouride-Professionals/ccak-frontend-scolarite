@@ -1,6 +1,7 @@
 "use client";
 
 import type { AcademicYear } from "@/types/academic-year";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 
 interface AcademicYearsTableProps {
   academicYears: AcademicYear[];
@@ -24,6 +25,7 @@ export default function AcademicYearsTable({
   onSetCurrent,
   actionLoadingId,
 }: AcademicYearsTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (academicYears.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -110,7 +112,7 @@ export default function AcademicYearsTable({
                           {isActionLoading ? "..." : "Definir actuelle"}
                         </button>
                       ) : null}
-                      {onEdit ? (
+                      {onEdit && !isReadOnly ? (
                         <button
                           onClick={() => onEdit(year.id)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -132,7 +134,7 @@ export default function AcademicYearsTable({
                           </svg>
                         </button>
                       ) : null}
-                      {onDelete ? (
+                      {onDelete && !isReadOnly ? (
                         <button
                           onClick={() => onDelete(year.id)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

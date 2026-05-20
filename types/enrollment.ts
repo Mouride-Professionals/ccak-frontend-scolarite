@@ -51,7 +51,7 @@ export interface Enrollment {
   // Populated relations (optional, for joined queries)
   student?: {
     id: string;
-    student_number: string;
+    student_number: string | null;
     full_name: string;
     gender: Gender;
     date_of_birth: string;
@@ -155,7 +155,7 @@ export interface EnrollmentFilters {
  */
 export interface EnrollmentListItem {
   id: string;
-  student_number: string;
+  student_number: string | null;
   full_name: string;
   academic_year_name: string;
   current_semester: number;

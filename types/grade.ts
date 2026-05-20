@@ -59,7 +59,7 @@ export interface Grade {
   // Populated fields
   student?: {
     id: string;
-    student_number: string;
+    student_number: string | null;
     full_name: string;
   };
   course?: {
@@ -75,7 +75,7 @@ export interface Grade {
 
 export interface Student {
   id: string;
-  student_number: string;
+  student_number: string | null;
   full_name: string;
   email: string;
   phone?: string;

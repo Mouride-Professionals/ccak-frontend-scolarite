@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Faculty, CreateFacultyInput } from "@/types/faculty";
@@ -17,6 +18,7 @@ interface FacultyFormProps {
 }
 
 export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) {
+  const isReadOnly = useIsReadOnly();
   const { mutateAsync: createFaculty, isPending: isCreating } = useCreateFaculty();
   const { mutateAsync: updateFaculty, isPending: isUpdating } = useUpdateFaculty();
 
@@ -187,7 +189,7 @@ export function FacultyForm({ faculty, onSuccess, onCancel }: FacultyFormProps) 
         )}
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isReadOnly}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending
