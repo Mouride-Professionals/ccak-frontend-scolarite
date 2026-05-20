@@ -1,7 +1,21 @@
 "use client";
 
 import type { TeachingAssignment } from "@/types/teaching-assignment";
+import { TeachingDeliveryStatus } from "@/types/teaching-assignment";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
+
+const DELIVERY_STATUS_CLASSES: Record<TeachingDeliveryStatus, string> = {
+  [TeachingDeliveryStatus.NOT_STARTED]: "bg-zinc-100 text-zinc-600",
+  [TeachingDeliveryStatus.IN_PROGRESS]: "bg-blue-50 text-blue-700",
+  [TeachingDeliveryStatus.COMPLETED]: "bg-green-50 text-green-700",
+  [TeachingDeliveryStatus.LATE]: "bg-red-50 text-red-700",
+};
+const DELIVERY_STATUS_LABELS: Record<TeachingDeliveryStatus, string> = {
+  [TeachingDeliveryStatus.NOT_STARTED]: "Non commencé",
+  [TeachingDeliveryStatus.IN_PROGRESS]: "En cours",
+  [TeachingDeliveryStatus.COMPLETED]: "Achevé",
+  [TeachingDeliveryStatus.LATE]: "En retard",
+};
 
 interface TeachingAssignmentsTableProps {
   assignments: TeachingAssignment[];
@@ -50,6 +64,9 @@ export default function TeachingAssignmentsTable({
               <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
                 Heures
               </th>
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
+                Statut
+              </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Actions
               </th>
@@ -77,6 +94,15 @@ export default function TeachingAssignmentsTable({
                 </td>
                 <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
                   {assignment.hours_assigned}h
+                </td>
+                <td className="hidden px-4 py-4 sm:px-6 sm:py-5 lg:table-cell">
+                  {assignment.status ? (
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${DELIVERY_STATUS_CLASSES[assignment.status]}`}>
+                      {DELIVERY_STATUS_LABELS[assignment.status]}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-400">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex items-center justify-end gap-2">

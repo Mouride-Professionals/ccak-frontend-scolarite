@@ -42,6 +42,9 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                 Crédits
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                Coef
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Type
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
@@ -71,6 +74,9 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm text-zinc-900">{courseUnit.credits}</div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-zinc-900">{courseUnit.coefficient ?? "—"}</div>
                 </td>
                 <td className="px-6 py-4">
                   <span

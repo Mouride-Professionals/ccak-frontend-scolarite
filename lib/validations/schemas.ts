@@ -111,6 +111,12 @@ export const CourseSchema = z.object({
     .int()
     .min(0, "Les heures doivent être positives")
     .max(200),
+  hours_tpe: z
+    .number()
+    .int()
+    .min(0, "Les heures doivent être positives")
+    .max(200)
+    .optional(),
   coefficient: z
     .number({ error: "Le coefficient est requis" })
     .min(0, "Le coefficient doit être positif")

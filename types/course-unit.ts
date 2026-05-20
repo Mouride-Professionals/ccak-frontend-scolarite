@@ -9,6 +9,7 @@ export interface CourseUnit {
   name: string;
   semesterNumber: number;
   credits: number;
+  coefficient?: number;
   type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive: boolean;
   createdAt: string;
@@ -21,6 +22,7 @@ export interface CreateCourseUnitInput {
   name: string;
   semesterNumber: number;
   credits: number;
+  coefficient?: number;
   type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive?: boolean;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsReadOnly } from "@/hooks/use-selected-year";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { AcademicYear, CreateAcademicYearInput } from "@/types/academic-year";
@@ -31,6 +31,31 @@ const AcademicYearSchema = z
 
 type AcademicYearFormData = z.input<typeof AcademicYearSchema>;
 
+const isPastDate = (value?: string | null) => {
+  if (!value) return false;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
+
+  return date < today;
+};
+
+const getCurrentEligibilityBlockReason = (data: {
+  status?: AcademicYear["status"];
+  end_date?: string | null;
+  is_active?: boolean;
+}) => {
+  if (data.status === "F") return "Une annee fermee ne peut pas etre actuelle.";
+  if (data.is_active === false) return "Une annee inactive ne peut pas etre actuelle.";
+  if (isPastDate(data.end_date)) return "Une annee passee ne peut pas etre actuelle.";
+
+  return null;
+};
+
 export default function AcademicYearForm({
   academicYear,
   onSubmit,
@@ -41,6 +66,7 @@ export default function AcademicYearForm({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<AcademicYearFormData>({
     resolver: zodResolver(AcademicYearSchema),
@@ -53,12 +79,21 @@ export default function AcademicYearForm({
     },
   });
 
+  const watchedEndDate = useWatch({ control, name: "end_date" });
+  const watchedIsActive = useWatch({ control, name: "is_active" });
+  const currentEligibilityBlockReason = getCurrentEligibilityBlockReason({
+    status: academicYear?.status,
+    end_date: watchedEndDate,
+    is_active: watchedIsActive,
+  });
+  const canSetAsCurrent = currentEligibilityBlockReason === null;
+
   const handleFormSubmit = async (data: AcademicYearFormData) => {
     await onSubmit({
       name: data.name.trim(),
       start_date: data.start_date ? data.start_date : null,
       end_date: data.end_date ? data.end_date : null,
-      is_current: data.is_current ?? false,
+      is_current: canSetAsCurrent ? (data.is_current ?? false) : false,
       is_active: data.is_active ?? true,
     });
   };
@@ -131,9 +166,12 @@ export default function AcademicYearForm({
             type="checkbox"
             {...register("is_current")}
             className="rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
-            disabled={isLoading}
+            disabled={isLoading || !canSetAsCurrent}
           />
           <span className="ml-2 text-sm text-zinc-700">Definir comme annee actuelle</span>
+          {currentEligibilityBlockReason ? (
+            <span className="ml-2 text-xs text-zinc-500">{currentEligibilityBlockReason}</span>
+          ) : null}
         </label>
         <label className="flex items-center">
           <input

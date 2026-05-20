@@ -43,6 +43,7 @@ const CourseUnitFormSchema = z.object({
     .int("Le nombre de crédits doit être un nombre entier")
     .min(1, "Le nombre de crédits doit être compris entre 1 et 60")
     .max(60, "Le nombre de crédits doit être compris entre 1 et 60"),
+  coefficient: z.number().min(0).max(10).optional(),
   type: z.enum(["OBLIGATOIRE", "OPTIONNEL"]),
   isActive: z.boolean().default(true),
 });
@@ -63,6 +64,7 @@ export default function CourseUnitForm({
     name: initialData?.name ?? "",
     semesterNumber: initialData?.semesterNumber ?? 1,
     credits: initialData?.credits ?? 1,
+    coefficient: initialData?.coefficient ?? undefined,
     type: initialData?.type ?? "OBLIGATOIRE",
     isActive: initialData?.isActive ?? true,
   });
@@ -237,6 +239,33 @@ export default function CourseUnitForm({
           <p id={getErrorId("credits")} className="mt-1 text-sm text-red-600">
             {errors.credits}
           </p>
+        )}
+      </div>
+
+      {/* Coefficient */}
+      <div>
+        <label htmlFor="coefficient" className="block text-sm font-medium text-zinc-700 mb-2">
+          Coefficient
+        </label>
+        <input
+          type="number"
+          id="coefficient"
+          value={formData.coefficient ?? ""}
+          onChange={(e) => {
+            const v = parseFloat(e.target.value);
+            handleChange("coefficient", Number.isNaN(v) ? undefined : v);
+          }}
+          min="0"
+          max="10"
+          step="0.1"
+          placeholder="Ex: 1.5"
+          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+            errors.coefficient ? "border-red-300" : "border-zinc-300"
+          }`}
+          disabled={isLoading}
+        />
+        {errors.coefficient && (
+          <p className="mt-1 text-sm text-red-600">{errors.coefficient}</p>
         )}
       </div>
 

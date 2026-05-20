@@ -44,6 +44,7 @@ export default function CourseForm({
       hours_lecture: initialData?.hours_lecture || 0,
       hours_td: initialData?.hours_td || 0,
       hours_tp: initialData?.hours_tp || 0,
+      hours_tpe: initialData?.hours_tpe || 0,
       coefficient: initialData?.coefficient || 1,
       prerequisites: initialData?.prerequisites || [],
       is_active: initialData?.is_active !== false,
@@ -178,10 +179,10 @@ export default function CourseForm({
       </div>
 
       {/* Hours */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div>
           <label htmlFor="hours_lecture" className="mb-2 block text-sm font-medium text-zinc-700">
-            Heures CM
+            CM
           </label>
           <input
             type="number"
@@ -197,7 +198,7 @@ export default function CourseForm({
 
         <div>
           <label htmlFor="hours_td" className="mb-2 block text-sm font-medium text-zinc-700">
-            Heures TD
+            TD
           </label>
           <input
             type="number"
@@ -213,7 +214,7 @@ export default function CourseForm({
 
         <div>
           <label htmlFor="hours_tp" className="mb-2 block text-sm font-medium text-zinc-700">
-            Heures TP
+            TP
           </label>
           <input
             type="number"
@@ -224,6 +225,22 @@ export default function CourseForm({
           />
           {errors.hours_tp && (
             <p className="mt-1 text-sm text-red-600">{errors.hours_tp.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="hours_tpe" className="mb-2 block text-sm font-medium text-zinc-700">
+            TPE
+          </label>
+          <input
+            type="number"
+            id="hours_tpe"
+            {...register("hours_tpe", { valueAsNumber: true })}
+            min="0"
+            className={`block w-full rounded-lg border px-4 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.hours_tpe ? "border-red-300" : "border-zinc-300"}`}
+          />
+          {errors.hours_tpe && (
+            <p className="mt-1 text-sm text-red-600">{errors.hours_tpe.message}</p>
           )}
         </div>
       </div>

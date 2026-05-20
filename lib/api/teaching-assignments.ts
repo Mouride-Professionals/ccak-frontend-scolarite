@@ -6,6 +6,9 @@ import type {
   TeachingAssignmentsResponse,
   CreateTeachingAssignmentInput,
   TeachingAssignmentConflict,
+  PlanningFilters,
+  UpdateDeliveryInput,
+  PlanningDashboard,
 } from "@/types/teaching-assignment";
 
 export async function getTeachingAssignments(
@@ -38,6 +41,44 @@ export async function createTeachingAssignment(
 
 export async function deleteTeachingAssignment(id: string): Promise<void> {
   await api.del(`/teaching-assignments/${id}`);
+}
+
+export async function getPlanning(
+  filters?: PlanningFilters
+): Promise<TeachingAssignment[]> {
+  const params = new URLSearchParams();
+  if (filters?.program_id) params.append("filter[program_id]", filters.program_id);
+  if (filters?.academic_year_id)
+    params.append("filter[academic_year_id]", filters.academic_year_id);
+  if (filters?.level_id) params.append("filter[level_id]", filters.level_id);
+  const response = await api.get(
+    `/teaching-assignments/planning${params.toString() ? `?${params}` : ""}`
+  );
+  return unwrapData<TeachingAssignment[]>(response);
+}
+
+export async function getPlanningDashboard(
+  filters?: Pick<PlanningFilters, "program_id" | "academic_year_id">
+): Promise<PlanningDashboard> {
+  const params = new URLSearchParams();
+  if (filters?.program_id) params.append("filter[program_id]", filters.program_id);
+  if (filters?.academic_year_id)
+    params.append("filter[academic_year_id]", filters.academic_year_id);
+  const response = await api.get(
+    `/teaching-assignments/planning/dashboard${params.toString() ? `?${params}` : ""}`
+  );
+  return unwrapData<PlanningDashboard>(response);
+}
+
+export async function updateDelivery(
+  id: string,
+  input: UpdateDeliveryInput
+): Promise<TeachingAssignment> {
+  const response = await api.patch(
+    `/teaching-assignments/${id}/delivery`,
+    input as unknown as Record<string, unknown>
+  );
+  return unwrapData<TeachingAssignment>(response);
 }
 
 export async function checkTeachingAssignmentConflicts(

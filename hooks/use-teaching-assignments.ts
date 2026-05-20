@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CreateTeachingAssignmentInput,
   TeachingAssignmentFilters,
+  PlanningFilters,
+  UpdateDeliveryInput,
 } from "@/types/teaching-assignment";
 import * as teachingAssignmentsApi from "@/lib/api/teaching-assignments";
 
@@ -47,5 +49,35 @@ export function useTeachingAssignmentConflictCheck() {
   return useMutation({
     mutationFn: (input: CreateTeachingAssignmentInput) =>
       teachingAssignmentsApi.checkTeachingAssignmentConflicts(input),
+  });
+}
+
+export function usePlanning(filters?: PlanningFilters) {
+  return useQuery({
+    queryKey: ["teaching-assignments", "planning", filters],
+    queryFn: () => teachingAssignmentsApi.getPlanning(filters),
+    staleTime: 30_000,
+  });
+}
+
+export function usePlanningDashboard(
+  filters?: Pick<PlanningFilters, "program_id" | "academic_year_id">
+) {
+  return useQuery({
+    queryKey: ["teaching-assignments", "planning-dashboard", filters],
+    queryFn: () => teachingAssignmentsApi.getPlanningDashboard(filters),
+    staleTime: 30_000,
+  });
+}
+
+export function useUpdateDelivery() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: UpdateDeliveryInput }) =>
+      teachingAssignmentsApi.updateDelivery(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teaching-assignments", "planning"] });
+      queryClient.invalidateQueries({ queryKey: ["teaching-assignments", "planning-dashboard"] });
+    },
   });
 }

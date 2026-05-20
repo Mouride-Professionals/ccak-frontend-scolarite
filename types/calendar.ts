@@ -21,12 +21,15 @@ export interface Holiday {
   is_recurring: boolean;
 }
 
+export type RoomType = "LECTURE_HALL" | "LAB" | "TD_ROOM";
+
 export interface Room {
   id: string;
-  name: string;
-  building?: string;
+  room_number: string;
+  name: string | null;
+  building?: string | null;
   capacity: number;
-  type: string;
+  type: RoomType;
   equipment?: string[];
   is_available: boolean;
 }

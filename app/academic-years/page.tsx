@@ -10,6 +10,7 @@ import Toast from "@/components/ui/toast";
 import Pagination from "@/components/ui/pagination";
 import AcademicYearForm from "@/components/academic-years/academic-year-form";
 import AcademicYearsTable from "@/components/academic-years/academic-years-table";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 import {
   useAcademicYears,
   useAcademicYear,
@@ -20,6 +21,13 @@ import {
   useSetAcademicYearCurrent,
 } from "@/hooks/use-academic-years";
 import type { AcademicYearFilters, CreateAcademicYearInput } from "@/types/academic-year";
+
+const getAcademicYearErrorMessage = (error: unknown, fallback: string) => {
+  const validationErrors = extractValidationErrors(error);
+  const firstValidationError = Object.values(validationErrors)[0];
+
+  return firstValidationError ?? toUserError(error, fallback).message;
+};
 
 export default function AcademicYearsPage() {
   const [filters, setFilters] = useState<AcademicYearFilters>({
@@ -82,7 +90,7 @@ export default function AcademicYearsPage() {
     } catch (error) {
       setToast({
         isOpen: true,
-        message: error instanceof Error ? error.message : "Erreur lors de la creation.",
+        message: getAcademicYearErrorMessage(error, "Erreur lors de la creation."),
         type: "error",
       });
     }
@@ -105,7 +113,7 @@ export default function AcademicYearsPage() {
     } catch (error) {
       setToast({
         isOpen: true,
-        message: error instanceof Error ? error.message : "Erreur lors de la mise a jour.",
+        message: getAcademicYearErrorMessage(error, "Erreur lors de la mise a jour."),
         type: "error",
       });
     }
@@ -125,7 +133,7 @@ export default function AcademicYearsPage() {
     } catch (error) {
       setToast({
         isOpen: true,
-        message: error instanceof Error ? error.message : "Erreur lors de la suppression.",
+        message: getAcademicYearErrorMessage(error, "Erreur lors de la suppression."),
         type: "error",
       });
     }
@@ -143,8 +151,7 @@ export default function AcademicYearsPage() {
     } catch (error) {
       setToast({
         isOpen: true,
-        message:
-          error instanceof Error ? error.message : "Erreur lors de la mise a jour du statut.",
+        message: getAcademicYearErrorMessage(error, "Erreur lors de la mise a jour du statut."),
         type: "error",
       });
     } finally {

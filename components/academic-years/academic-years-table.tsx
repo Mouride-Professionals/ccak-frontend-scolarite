@@ -18,6 +18,27 @@ const formatDate = (value?: string | null) => {
   return date.toLocaleDateString("fr-FR");
 };
 
+const isPastDate = (value?: string | null) => {
+  if (!value) return false;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  date.setHours(0, 0, 0, 0);
+
+  return date < today;
+};
+
+const getCurrentEligibilityBlockReason = (year: AcademicYear) => {
+  if (year.status === "F") return "Annee fermee";
+  if (year.is_active === false) return "Annee inactive";
+  if (isPastDate(year.end_date)) return "Annee passee";
+
+  return null;
+};
+
 export default function AcademicYearsTable({
   academicYears,
   onEdit,
@@ -60,13 +81,16 @@ export default function AcademicYearsTable({
           <tbody className="divide-y divide-zinc-100">
             {academicYears.map((year) => {
               const isActionLoading = actionLoadingId === year.id;
+              const currentEligibilityBlockReason = getCurrentEligibilityBlockReason(year);
               return (
                 <tr key={year.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                   <td className="px-6 py-5">
                     <div className="text-sm font-medium text-zinc-900">
                       {year.name}
                       {year.code ? (
-                        <span className="ml-2 text-xs font-normal text-zinc-500">· {year.code}</span>
+                        <span className="ml-2 text-xs font-normal text-zinc-500">
+                          · {year.code}
+                        </span>
                       ) : null}
                     </div>
                   </td>
@@ -101,7 +125,9 @@ export default function AcademicYearsTable({
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center justify-end gap-2">
-                      {onSetCurrent && !year.is_current ? (
+                      {onSetCurrent &&
+                      !year.is_current &&
+                      currentEligibilityBlockReason === null ? (
                         <button
                           type="button"
                           onClick={() => onSetCurrent(year.id)}

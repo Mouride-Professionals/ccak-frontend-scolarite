@@ -8,6 +8,8 @@ export interface Course {
   hours_lecture: number;
   hours_td: number;
   hours_tp: number;
+  hours_tpe?: number;
+  vht?: number;
   coefficient: number;
   prerequisites?: string[];
   is_active: boolean;
@@ -24,6 +26,7 @@ export interface CreateCourseInput {
   hours_lecture?: number;
   hours_td?: number;
   hours_tp?: number;
+  hours_tpe?: number;
   coefficient?: number;
   prerequisites?: string[];
   is_active?: boolean;

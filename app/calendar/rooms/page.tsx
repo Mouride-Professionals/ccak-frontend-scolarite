@@ -7,6 +7,8 @@ import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
 import { useCreateRoom, useDeleteRoom, useRooms, useUpdateRoom } from "@/hooks/use-calendar";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
+import type { RoomType } from "@/types/calendar";
 
 const equipmentOptions = [
   "Projecteur",
@@ -16,6 +18,22 @@ const equipmentOptions = [
   "Sonorisation",
   "Laboratoire",
 ];
+
+const roomTypeOptions: Array<{ value: RoomType; label: string }> = [
+  { value: "LECTURE_HALL", label: "Amphi" },
+  { value: "TD_ROOM", label: "Salle TD" },
+  { value: "LAB", label: "Laboratoire" },
+];
+
+const emptyForm = {
+  room_number: "",
+  name: "",
+  building: "",
+  capacity: "",
+  type: "" as RoomType | "",
+  equipment: [] as string[],
+  is_available: true,
+};
 
 export default function RoomsPage() {
   const [filters, setFilters] = useState({
@@ -38,14 +56,7 @@ export default function RoomsPage() {
     type: "success" as "success" | "error",
   });
 
-  const [form, setForm] = useState({
-    name: "",
-    building: "",
-    capacity: "",
-    type: "",
-    equipment: [] as string[],
-    is_available: true,
-  });
+  const [form, setForm] = useState(emptyForm);
 
   const toggleEquipment = (item: string) => {
     setForm((prev) => ({
@@ -57,20 +68,34 @@ export default function RoomsPage() {
   };
 
   const handleCreateOrUpdate = async () => {
-    if (!form.name || !form.type || !form.capacity) {
+    const roomNumber = form.room_number.trim();
+    const roomType = form.type;
+    const capacity = Number(form.capacity);
+
+    if (!roomNumber || !roomType || !form.capacity) {
       setToast({
         isOpen: true,
-        message: "Nom, type et capacité sont requis.",
+        message: "Numéro de salle, type et capacité sont requis.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (!Number.isInteger(capacity) || capacity < 1) {
+      setToast({
+        isOpen: true,
+        message: "La capacité doit être un nombre entier positif.",
         type: "error",
       });
       return;
     }
 
     const payload = {
-      name: form.name,
-      building: form.building,
-      capacity: Number(form.capacity || 0),
-      type: form.type,
+      room_number: roomNumber,
+      name: form.name.trim() || null,
+      building: form.building.trim() || null,
+      capacity,
+      type: roomType,
       equipment: form.equipment,
       is_available: form.is_available,
     };
@@ -85,16 +110,17 @@ export default function RoomsPage() {
       }
 
       setEditingRoomId(null);
-      setForm({
-        name: "",
-        building: "",
-        capacity: "",
-        type: "",
-        equipment: [],
-        is_available: true,
+      setForm(emptyForm);
+    } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      const firstValidationError = Object.values(validationErrors)[0];
+      const fallback = toUserError(error, "Erreur lors de l'enregistrement.").message;
+
+      setToast({
+        isOpen: true,
+        message: firstValidationError ?? fallback,
+        type: "error",
       });
-    } catch {
-      setToast({ isOpen: true, message: "Erreur lors de l'enregistrement.", type: "error" });
     }
   };
 
@@ -160,8 +186,14 @@ export default function RoomsPage() {
                     {(data?.data ?? []).map((room) => (
                       <tr key={room.id}>
                         <td className="px-4 py-3">
-                          <div className="font-medium text-zinc-800">{room.name}</div>
-                          <div className="text-xs text-zinc-500">{room.type}</div>
+                          <div className="font-medium text-zinc-800">
+                            {room.name || room.room_number}
+                          </div>
+                          <div className="text-xs text-zinc-500">
+                            {room.room_number} ·{" "}
+                            {roomTypeOptions.find((option) => option.value === room.type)?.label ??
+                              room.type}
+                          </div>
                         </td>
                         <td className="px-4 py-3">{room.building || "—"}</td>
                         <td className="px-4 py-3">{room.capacity}</td>
@@ -205,7 +237,8 @@ export default function RoomsPage() {
                               onClick={() => {
                                 setEditingRoomId(room.id);
                                 setForm({
-                                  name: room.name,
+                                  room_number: room.room_number,
+                                  name: room.name || "",
                                   building: room.building || "",
                                   capacity: String(room.capacity),
                                   type: room.type,
@@ -251,7 +284,15 @@ export default function RoomsPage() {
             </h2>
             <div className="mt-4 space-y-4">
               <input
-                placeholder="Nom de la salle"
+                placeholder="Numéro de salle (ex. A101)"
+                value={form.room_number}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, room_number: event.target.value }))
+                }
+                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+              />
+              <input
+                placeholder="Nom de la salle (optionnel)"
                 value={form.name}
                 onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
@@ -269,12 +310,23 @@ export default function RoomsPage() {
                 onChange={(event) => setForm((prev) => ({ ...prev, capacity: event.target.value }))}
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
-              <input
-                placeholder="Type (amphi, TD, labo)"
+              <select
                 value={form.type}
-                onChange={(event) => setForm((prev) => ({ ...prev, type: event.target.value }))}
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-              />
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    type: event.target.value as RoomType | "",
+                  }))
+                }
+                className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Type de salle</option>
+                {roomTypeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">Équipements</label>
@@ -316,14 +368,7 @@ export default function RoomsPage() {
                     type="button"
                     onClick={() => {
                       setEditingRoomId(null);
-                      setForm({
-                        name: "",
-                        building: "",
-                        capacity: "",
-                        type: "",
-                        equipment: [],
-                        is_available: true,
-                      });
+                      setForm(emptyForm);
                     }}
                     className="rounded-lg border border-zinc-300 px-4 py-2 text-sm"
                   >

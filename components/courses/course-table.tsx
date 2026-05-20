@@ -69,7 +69,8 @@ export default function CourseTable({
                   Coeff: <span className="font-medium">{course.coefficient}</span>
                 </div>
                 <div className="col-span-2">
-                  Heures: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}
+                  CM/TD/TP/TPE: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}
+                  {" "}· VHT: <span className="font-medium">{course.hours_lecture + course.hours_td + course.hours_tp + (course.hours_tpe ?? 0)}</span>
                 </div>
               </div>
 
@@ -134,7 +135,7 @@ export default function CourseTable({
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Nom</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Crédits</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">
-              Heures (CM/TD/TP)
+              CM/TD/TP/TPE (VHT)
             </th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Coefficient</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Prérequis</th>
@@ -158,7 +159,11 @@ export default function CourseTable({
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.credits}</td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
-                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}
+                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}
+                  {" "}
+                  <span className="text-xs text-zinc-400">
+                    ({course.hours_lecture + course.hours_td + course.hours_tp + (course.hours_tpe ?? 0)}h)
+                  </span>
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.coefficient}</td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
