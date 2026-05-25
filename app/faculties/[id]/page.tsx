@@ -9,6 +9,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useFaculty, useDeleteFaculty } from "@/hooks/use-faculties";
+import HierarchyBreadcrumb from "@/components/ui/hierarchy-breadcrumb";
 
 export default function FacultyDetailPage() {
   const params = useSafeParams<{ id: string }>();
@@ -81,6 +82,13 @@ export default function FacultyDetailPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Détails de la Faculté">
+        <div className="mx-auto max-w-4xl">
+        <HierarchyBreadcrumb
+          items={[
+            { label: "Établissements", href: "/faculties" },
+            { label: faculty.name },
+          ]}
+        />
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-zinc-900">{faculty.name}</h2>
@@ -90,18 +98,13 @@ export default function FacultyDetailPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/faculties"
+              href={`/departments?faculty_id=${faculty.id}`}
               className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
             >
+              Voir les départements
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              Retour
             </Link>
             <button
               onClick={() => setDeleteConfirm(true)}
@@ -168,6 +171,8 @@ export default function FacultyDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+
         </div>
 
         <ConfirmDialog

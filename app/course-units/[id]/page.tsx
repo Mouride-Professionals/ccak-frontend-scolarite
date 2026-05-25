@@ -9,6 +9,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useCourseUnit, useDeleteCourseUnit } from "@/hooks/use-course-units";
+import HierarchyBreadcrumb from "@/components/ui/hierarchy-breadcrumb";
 
 export const dynamic = "force-dynamic";
 
@@ -109,6 +110,15 @@ export default function CourseUnitDetailPage() {
     <ProtectedRoute>
       <DashboardLayout title="Unité d'Enseignement">
         <div className="mx-auto max-w-4xl">
+          <HierarchyBreadcrumb
+            items={[
+              { label: "Programmes", href: "/programmes" },
+              ...(courseUnit.academicProgram
+                ? [{ label: courseUnit.academicProgram.name, href: `/programmes/${courseUnit.academicProgramId}` }]
+                : []),
+              { label: courseUnit.name },
+            ]}
+          />
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -118,6 +128,15 @@ export default function CourseUnitDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <Link
+                href={`/courses?course_unit_id=${courseUnit.id}`}
+                className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                Voir les cours
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
               <Link
                 href={`/course-units?edit=${courseUnit.id}`}
                 className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
@@ -209,13 +228,14 @@ export default function CourseUnitDetailPage() {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">Nom du programme</dt>
-                    <dd className="mt-1 text-sm text-zinc-900">
-                      {courseUnit.academicProgram.name}
+                    <dd className="mt-1">
+                      <Link
+                        href={`/programmes/${courseUnit.academicProgramId}`}
+                        className="text-sm text-[#00365F] hover:underline"
+                      >
+                        {courseUnit.academicProgram.name}
+                      </Link>
                     </dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500">ID</dt>
-                    <dd className="mt-1 text-sm text-zinc-900">{courseUnit.academicProgram.id}</dd>
                   </div>
                 </dl>
               ) : (

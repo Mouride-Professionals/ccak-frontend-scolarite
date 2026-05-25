@@ -9,6 +9,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useDepartment, useDeleteDepartment } from "@/hooks/use-departments";
+import HierarchyBreadcrumb from "@/components/ui/hierarchy-breadcrumb";
 
 export default function DepartmentDetailPage() {
   const params = useSafeParams<{ id: string }>();
@@ -81,6 +82,16 @@ export default function DepartmentDetailPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Détails du Département">
+        <div className="mx-auto max-w-4xl">
+        <HierarchyBreadcrumb
+          items={[
+            { label: "Établissements", href: "/faculties" },
+            ...(department.faculty
+              ? [{ label: department.faculty.name, href: `/faculties/${department.faculty_id}` }]
+              : []),
+            { label: department.name },
+          ]}
+        />
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-zinc-900">{department.name}</h2>
@@ -90,18 +101,13 @@ export default function DepartmentDetailPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/departments"
+              href={`/programmes?department_id=${department.id}`}
               className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
             >
+              Voir les programmes
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              Retour
             </Link>
             <button
               onClick={() => setDeleteConfirm(true)}
@@ -140,7 +146,16 @@ export default function DepartmentDetailPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-zinc-500">Faculté</p>
-                <p className="mt-1 text-sm text-zinc-900">{department.faculty?.name || "-"}</p>
+                {department.faculty ? (
+                  <Link
+                    href={`/faculties/${department.faculty_id}`}
+                    className="mt-1 inline-block text-sm text-[#00365F] hover:underline"
+                  >
+                    {department.faculty.name}
+                  </Link>
+                ) : (
+                  <p className="mt-1 text-sm text-zinc-900">-</p>
+                )}
               </div>
               <div>
                 <p className="text-sm font-medium text-zinc-500">Chef de département</p>
@@ -174,6 +189,8 @@ export default function DepartmentDetailPage() {
               </div>
             </div>
           </div>
+        </div>
+
         </div>
 
         <ConfirmDialog

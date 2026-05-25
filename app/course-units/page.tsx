@@ -28,10 +28,11 @@ function CourseUnitsPageContent() {
   const [filters, setFilters] = useState<CourseUnitFilters>({
     page: 1,
     limit: 10,
+    academicProgramId: searchParams.get("academicProgramId") || undefined,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editCourseUnitId, setEditCourseUnitId] = useState<string | null>(searchParams.get("edit"));
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("academicProgramId"));
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;

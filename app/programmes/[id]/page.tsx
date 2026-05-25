@@ -10,6 +10,7 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useAcademicProgram, useDeleteAcademicProgram } from "@/hooks/use-academic";
 import { AcademicLevel } from "@/types/academic";
+import HierarchyBreadcrumb from "@/components/ui/hierarchy-breadcrumb";
 
 export default function ProgrammeDetailPage() {
   const router = useRouter();
@@ -110,6 +111,18 @@ export default function ProgrammeDetailPage() {
     <ProtectedRoute>
       <DashboardLayout title="Programme Académique">
         <div className="mx-auto max-w-4xl">
+          <HierarchyBreadcrumb
+            items={[
+              { label: "Établissements", href: "/faculties" },
+              ...(programme.department?.faculty
+                ? [{ label: programme.department.faculty.name, href: `/faculties/${programme.department.faculty.id}` }]
+                : []),
+              ...(programme.department
+                ? [{ label: programme.department.name, href: `/departments/${programme.department_id}` }]
+                : []),
+              { label: programme.name },
+            ]}
+          />
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -119,6 +132,15 @@ export default function ProgrammeDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <Link
+                href={`/course-units?academicProgramId=${programme.id}`}
+                className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                Voir les UE
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
               <Link
                 href={`/programmes?edit=${programme.id}`}
                 className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
@@ -208,7 +230,14 @@ export default function ProgrammeDetailPage() {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">Nom</dt>
-                    <dd className="mt-1 text-sm text-zinc-900">{programme.department.name}</dd>
+                    <dd className="mt-1">
+                      <Link
+                        href={`/departments/${programme.department_id}`}
+                        className="text-sm text-[#00365F] hover:underline"
+                      >
+                        {programme.department.name}
+                      </Link>
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">Code</dt>
@@ -216,8 +245,17 @@ export default function ProgrammeDetailPage() {
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-zinc-500">Faculté</dt>
-                    <dd className="mt-1 text-sm text-zinc-900">
-                      {programme.department?.faculty?.name || "Aucune faculté"}
+                    <dd className="mt-1">
+                      {programme.department.faculty ? (
+                        <Link
+                          href={`/faculties/${programme.department.faculty.id}`}
+                          className="text-sm text-[#00365F] hover:underline"
+                        >
+                          {programme.department.faculty.name}
+                        </Link>
+                      ) : (
+                        <span className="text-sm text-zinc-900">Aucune faculté</span>
+                      )}
                     </dd>
                   </div>
                 </dl>

@@ -118,7 +118,7 @@ async function renderSemesters(
       for (let i = 0; i < count; i++) {
         const c = courses[i];
         const vht = c
-          ? (c.vht ?? c.hours_lecture + c.hours_td + (c.hours_tpe ?? 0))
+          ? (c.vht ?? c.hours_lecture + c.hours_td + (c.hours_tp ?? 0) + (c.hours_tpe ?? 0))
           : "";
         body.push([
           i === 0 ? unit.code : "",
@@ -130,6 +130,7 @@ async function renderSemesters(
           c ? c.name : "",
           c ? c.hours_lecture : "",
           c ? c.hours_td : "",
+          c ? (c.hours_tp ?? 0) : "",
           c ? (c.hours_tpe ?? 0) : "",
           c ? vht : "",
           c ? c.credits : "",
@@ -143,7 +144,7 @@ async function renderSemesters(
       startY: currentY,
       head: [
         ["Code UE", "Nom UE", "Type", "Cr. UE", "Coef UE",
-          "Code ECUE", "Intitulé ECUE", "CM", "TD", "TPE", "VHT", "Crédits", "Coef"],
+          "Code ECUE", "Intitulé ECUE", "CM", "TD", "TP", "TPE", "VHT", "Crédits", "Coef"],
       ],
       body,
       styles: { fontSize: 7.5, cellPadding: 1.5, overflow: "ellipsize" },

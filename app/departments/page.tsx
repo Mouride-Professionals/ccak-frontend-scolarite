@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import DepartmentsTable from "@/components/departments/departments-table";
@@ -14,7 +15,8 @@ import { useDepartments, useDepartment, useDeleteDepartment } from "@/hooks/use-
 import { useFaculties } from "@/hooks/use-faculties";
 import type { DepartmentFilters } from "@/types/department";
 
-export default function DepartmentsPage() {
+function DepartmentsPageContent() {
+  const searchParams = useSearchParams();
   const [filters, setFilters] = useState<DepartmentFilters>({
     page: 1,
     limit: 10,
@@ -22,9 +24,11 @@ export default function DepartmentsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editDepartmentId, setEditDepartmentId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [facultyFilter, setFacultyFilter] = useState<string>("");
+  const [facultyFilter, setFacultyFilter] = useState<string>(
+    searchParams.get("faculty_id") ?? ""
+  );
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("faculty_id"));
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     departmentId: string | null;
@@ -224,5 +228,26 @@ export default function DepartmentsPage() {
         </div>
       </DashboardLayout>
     </ProtectedRoute>
+  );
+}
+
+export default function DepartmentsPage() {
+  return (
+    <Suspense
+      fallback={
+        <ProtectedRoute>
+          <DashboardLayout title="Départements">
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="text-center">
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
+                <p className="mt-3 text-sm text-zinc-500">Chargement...</p>
+              </div>
+            </div>
+          </DashboardLayout>
+        </ProtectedRoute>
+      }
+    >
+      <DepartmentsPageContent />
+    </Suspense>
   );
 }

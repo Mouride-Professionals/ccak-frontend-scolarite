@@ -6,6 +6,7 @@ export interface MaquetteCourse {
   coefficient: number;
   hours_lecture: number;
   hours_td: number;
+  hours_tp?: number | null;
   hours_tpe?: number | null;
   vht?: number | null;
 }

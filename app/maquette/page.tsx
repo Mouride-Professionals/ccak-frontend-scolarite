@@ -1,17 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
-import { useMaquette } from "@/hooks/use-maquette";
+import { useMaquette, useImportMaquette } from "@/hooks/use-maquette";
 import type { MaquetteProgram, MaquetteSemester, MaquetteUE, MaquetteCourse } from "@/types/maquette";
 import { getAcademicPrograms } from "@/lib/api/course-units";
-import { useQuery } from "@tanstack/react-query";
+import { getDepartments } from "@/lib/api/departments";
+import { downloadTemplate } from "@/lib/api/maquette";
+import type { ImportMaquetteResult } from "@/lib/api/maquette";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { exportMaquetteCsv } from "@/lib/csv/maquette-export";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 export default function MaquettePage() {
   const [programId, setProgramId] = useState<string>("");
   const [exporting, setExporting] = useState<"pdf" | "excel" | "csv" | null>(null);
+
+  // Import dialog state
+  const [importOpen, setImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importDeptId, setImportDeptId] = useState("");
+  const [importProgramName, setImportProgramName] = useState("");
+  const [importLevel, setImportLevel] = useState<"LICENCE" | "MASTER" | "DOCTORAT">("LICENCE");
+  const [importDryRun, setImportDryRun] = useState(true);
+  const [importResult, setImportResult] = useState<ImportMaquetteResult | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
+
+  const importMutation = useImportMaquette();
+  const queryClient = useQueryClient();
+
+  const { data: departments } = useQuery({
+    queryKey: ["departments-all"],
+    queryFn: () => getDepartments({ limit: 200 }),
+    staleTime: 60_000,
+  });
 
   const { data: programs } = useQuery({
     queryKey: ["academic-programs-all"],
@@ -25,14 +56,58 @@ export default function MaquettePage() {
 
   const canExport = !isLoading && maquette.length > 0;
 
+  function resetImportDialog() {
+    setImportFile(null);
+    setImportDeptId("");
+    setImportProgramName("");
+    setImportLevel("LICENCE");
+    setImportDryRun(true);
+    setImportResult(null);
+    setImportError(null);
+  }
+
+  async function handleImport() {
+    if (!importFile || !importDeptId) return;
+    setImportError(null);
+    setImportResult(null);
+    try {
+      const result = await importMutation.mutateAsync({
+        file: importFile,
+        params: {
+          department_id: importDeptId,
+          program_name: importProgramName || undefined,
+          program_level: importLevel,
+          dry_run: importDryRun,
+        },
+      });
+      setImportResult(result);
+      if (!importDryRun && result.errors.length === 0) {
+        await queryClient.invalidateQueries({ queryKey: ["academic-programs-all"] });
+        await queryClient.invalidateQueries({ queryKey: ["maquette"] });
+      }
+    } catch (err: unknown) {
+      const msg = (err as { body?: { message?: string } })?.body?.message ?? "Erreur lors de l'import.";
+      setImportError(msg);
+    }
+  }
+
+  function handleViewImported(id: string) {
+    setProgramId(id);
+    setImportOpen(false);
+    resetImportDialog();
+  }
+
+  async function handleDownloadTemplate() {
+    setDownloadingTemplate(true);
+    try { await downloadTemplate(); } finally { setDownloadingTemplate(false); }
+  }
+
   async function handleExportPdf() {
     setExporting("pdf");
     try {
       const { exportMaquettePdf } = await import("@/lib/pdf/maquette-export");
       await exportMaquettePdf(maquette);
-    } finally {
-      setExporting(null);
-    }
+    } finally { setExporting(null); }
   }
 
   async function handleExportExcel() {
@@ -56,9 +131,7 @@ export default function MaquettePage() {
       a.download = `maquette${slug}.xlsx`;
       a.click();
       URL.revokeObjectURL(url);
-    } finally {
-      setExporting(null);
-    }
+    } finally { setExporting(null); }
   }
 
   function handleExportCsv() {
@@ -86,39 +159,47 @@ export default function MaquettePage() {
             </select>
           </div>
 
-          {canExport && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleExportCsv}
-                disabled={exporting !== null}
-                title="Télécharger CSV"
-                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
-              >
-                <DownloadIcon />
-                CSV
-              </button>
-              <button
-                onClick={handleExportExcel}
-                disabled={exporting !== null}
-                title="Télécharger Excel"
-                className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
-              >
-                {exporting === "excel" ? <Spinner /> : <TableIcon />}
-                Excel
-              </button>
-              <button
-                onClick={handleExportPdf}
-                disabled={exporting !== null}
-                title="Télécharger PDF"
-                className="flex items-center gap-1.5 rounded-lg bg-[#00365F] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90 disabled:opacity-50"
-              >
-                {exporting === "pdf" ? <Spinner white /> : <PdfIcon />}
-                PDF
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { resetImportDialog(); setImportOpen(true); }}
+              className="flex items-center gap-1.5 rounded-lg border border-[#008D36] bg-white px-3 py-2 text-sm font-medium text-[#008D36] transition-colors hover:bg-[#008D36]/5"
+            >
+              <UploadIcon />
+              Importer
+            </button>
+
+            {canExport && (
+              <>
+                <button
+                  onClick={handleExportCsv}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+                >
+                  <DownloadIcon />
+                  CSV
+                </button>
+                <button
+                  onClick={handleExportExcel}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
+                >
+                  {exporting === "excel" ? <Spinner /> : <TableIcon />}
+                  Excel
+                </button>
+                <button
+                  onClick={handleExportPdf}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#00365F] px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[#00365F]/90 disabled:opacity-50"
+                >
+                  {exporting === "pdf" ? <Spinner white /> : <PdfIcon />}
+                  PDF
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
+        {/* Main content */}
         {error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">Erreur lors du chargement.</p>
@@ -138,8 +219,271 @@ export default function MaquettePage() {
             ))}
           </div>
         )}
+
+        {/* Import Dialog */}
+        {importOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-lg rounded-xl bg-white shadow-xl">
+              <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-4">
+                <h2 className="text-base font-semibold text-zinc-900">Importer une maquette</h2>
+                <button onClick={() => setImportOpen(false)} className="text-zinc-400 hover:text-zinc-600">✕</button>
+              </div>
+
+              <div className="max-h-[70vh] overflow-y-auto space-y-4 px-6 py-5">
+                {/* Template download */}
+                <div className="flex items-center justify-between rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 py-3">
+                  <p className="text-xs text-zinc-500">
+                    Les fichiers UFR SATA sont acceptés directement. Utilisez le modèle CAMES pour les autres formats.
+                  </p>
+                  <button
+                    onClick={handleDownloadTemplate}
+                    disabled={downloadingTemplate}
+                    className="ml-3 shrink-0 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  >
+                    {downloadingTemplate ? "..." : "Modèle CAMES"}
+                  </button>
+                </div>
+
+                {/* File drop zone */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">Fichier Excel (.xlsx) *</label>
+                  <FileDropZone file={importFile} onChange={setImportFile} />
+                </div>
+
+                {/* Department */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">Département *</label>
+                  <select
+                    value={importDeptId}
+                    onChange={(e) => setImportDeptId(e.target.value)}
+                    className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                  >
+                    <option value="">Sélectionner un département</option>
+                    {(departments?.data ?? []).map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Program name */}
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                    Nom du programme
+                    <span className="ml-1 text-xs font-normal text-zinc-400">
+                      (requis si absent du fichier)
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={importProgramName}
+                    onChange={(e) => setImportProgramName(e.target.value)}
+                    placeholder="Ex: Licence en Agronomie-Productions Végétales"
+                    className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                  />
+                </div>
+
+                {/* Level + dry run */}
+                <div className="flex items-end gap-4">
+                  <div className="flex-1">
+                    <label className="mb-1 block text-sm font-medium text-zinc-700">Niveau</label>
+                    <select
+                      value={importLevel}
+                      onChange={(e) => setImportLevel(e.target.value as "LICENCE" | "MASTER" | "DOCTORAT")}
+                      className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+                    >
+                      <option value="LICENCE">Licence</option>
+                      <option value="MASTER">Master</option>
+                      <option value="DOCTORAT">Doctorat</option>
+                    </select>
+                  </div>
+                  <label className="flex cursor-pointer items-center gap-2 pb-2">
+                    <input
+                      type="checkbox"
+                      checked={importDryRun}
+                      onChange={(e) => setImportDryRun(e.target.checked)}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-zinc-700">Simulation</span>
+                  </label>
+                </div>
+
+                {/* Error */}
+                {importError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    {importError}
+                  </div>
+                )}
+
+                {/* Result */}
+                {importResult && (
+                  <ImportResultCard
+                    result={importResult}
+                    onViewProgram={
+                      !importResult.dry_run && importResult.errors.length === 0 && importResult.program_id
+                        ? () => handleViewImported(importResult.program_id!)
+                        : undefined
+                    }
+                  />
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-zinc-200 px-6 py-4">
+                <button
+                  onClick={() => setImportOpen(false)}
+                  className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                >
+                  Fermer
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={!importFile || !importDeptId || importMutation.isPending}
+                  className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white hover:bg-[#008D36]/90 disabled:opacity-50"
+                >
+                  {importMutation.isPending
+                    ? "En cours..."
+                    : importDryRun
+                    ? "Simuler"
+                    : "Importer"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
+  );
+}
+
+// ─── File drop zone ────────────────────────────────────────────────────────────
+
+function FileDropZone({ file, onChange }: { file: File | null; onChange: (f: File | null) => void }) {
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    const f = e.dataTransfer.files[0];
+    if (f) onChange(f);
+  }
+
+  return (
+    <div
+      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
+      className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 transition-colors ${
+        dragging
+          ? "border-[#008D36] bg-[#008D36]/5"
+          : file
+          ? "border-[#008D36]/40 bg-[#008D36]/5"
+          : "border-zinc-300 bg-zinc-50 hover:border-zinc-400"
+      }`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".xlsx,.xls"
+        className="hidden"
+        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+      />
+      {file ? (
+        <>
+          <svg className="h-6 w-6 text-[#008D36]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm font-medium text-zinc-800">{file.name}</p>
+          <button
+            onClick={(e) => { e.stopPropagation(); onChange(null); }}
+            className="text-xs text-zinc-400 hover:text-red-500"
+          >
+            Supprimer
+          </button>
+        </>
+      ) : (
+        <>
+          <UploadIcon />
+          <p className="text-sm text-zinc-600">
+            Glissez un fichier ici ou <span className="font-medium text-[#008D36]">parcourir</span>
+          </p>
+          <p className="text-xs text-zinc-400">.xlsx / .xls</p>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Import result card ────────────────────────────────────────────────────────
+
+function ImportResultCard({
+  result,
+  onViewProgram,
+}: {
+  result: ImportMaquetteResult;
+  onViewProgram?: () => void;
+}) {
+  const hasErrors = result.errors.length > 0;
+  const isDry = result.dry_run;
+
+  const borderColor = hasErrors
+    ? "border-red-200 bg-red-50"
+    : isDry
+    ? "border-amber-200 bg-amber-50"
+    : "border-green-200 bg-green-50";
+
+  const stats = [
+    { label: "Programmes créés", value: result.programs_created },
+    { label: "Programmes trouvés", value: result.programs_found },
+    { label: "UE créées", value: result.units_created },
+    { label: "UE mises à jour / ignorées", value: result.units_skipped },
+    { label: "ECUE créées", value: result.courses_created },
+    { label: "ECUE mises à jour / ignorées", value: result.courses_skipped },
+  ];
+
+  return (
+    <div className={`rounded-lg border p-4 text-sm ${borderColor}`}>
+      <p className="mb-3 font-semibold text-zinc-800">
+        {hasErrors ? "Erreurs détectées" : isDry ? "Résultat de la simulation" : "Import réussi"}
+      </p>
+
+      {!hasErrors && (
+        <div className="mb-3 grid grid-cols-2 gap-x-6 gap-y-1 text-zinc-700">
+          {stats.map(({ label, value }) => (
+            <div key={label} className="contents">
+              <span className="text-zinc-500">{label}</span>
+              <span className="font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {result.errors.length > 0 && (
+        <ul className="space-y-1 text-sm text-red-700">
+          {result.errors.map((e, i) => <li key={i}>• {e}</li>)}
+        </ul>
+      )}
+
+      {result.warnings.length > 0 && (
+        <div className="mt-2">
+          <p className="text-xs font-medium text-amber-700">
+            {result.warnings.length} avertissement{result.warnings.length > 1 ? "s" : ""}
+          </p>
+          <ul className="mt-1 space-y-0.5 text-xs text-amber-700">
+            {result.warnings.map((w, i) => <li key={i}>• {w}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {onViewProgram && (
+        <button
+          onClick={onViewProgram}
+          className="mt-3 flex items-center gap-1.5 rounded-md bg-[#008D36] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#008D36]/90"
+        >
+          Voir le programme importé →
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -153,7 +497,6 @@ function ProgramBlock({ prog }: { prog: MaquetteProgram }) {
 
   return (
     <div className="space-y-4">
-      {/* Programme header */}
       <div className="overflow-hidden rounded-lg shadow-sm">
         <div className="flex items-center justify-between bg-[#00365F] px-6 py-4">
           <div>
@@ -168,7 +511,6 @@ function ProgramBlock({ prog }: { prog: MaquetteProgram }) {
         </div>
       </div>
 
-      {/* Semesters */}
       <div className="space-y-4">
         {prog.semesters.map((s) => (
           <SemesterSection key={`${prog.program_id}-${s.semester}`} data={s} />
@@ -178,53 +520,17 @@ function ProgramBlock({ prog }: { prog: MaquetteProgram }) {
   );
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-function Spinner({ white }: { white?: boolean }) {
-  return (
-    <div
-      className={`h-4 w-4 animate-spin rounded-full border-2 ${
-        white ? "border-white/30 border-t-white" : "border-zinc-300 border-t-zinc-700"
-      }`}
-    />
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-    </svg>
-  );
-}
-
-function TableIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-  );
-}
-
-function PdfIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-    </svg>
-  );
-}
-
-// ─── Semester / UE / Course (unchanged logic) ─────────────────────────────────
+// ─── Semester section ──────────────────────────────────────────────────────────
 
 function SemesterSection({ data }: { data: MaquetteSemester }) {
   const [open, setOpen] = useState(true);
   const totalCredits = data.course_units.reduce((sum, u) => sum + (u.credits ?? 0), 0);
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between bg-[#00365F]/10 px-5 py-3 text-left hover:bg-[#00365F]/15 transition-colors"
+        className="flex w-full items-center justify-between bg-[#00365F]/10 px-5 py-3 text-left transition-colors hover:bg-[#00365F]/15"
       >
         <span className="text-sm font-bold text-[#00365F]">Semestre {data.semester}</span>
         <div className="flex items-center gap-3">
@@ -251,14 +557,17 @@ function SemesterSection({ data }: { data: MaquetteSemester }) {
   );
 }
 
+// ─── UE block ─────────────────────────────────────────────────────────────────
+
 function UEBlock({ unit }: { unit: MaquetteUE }) {
   const [open, setOpen] = useState(true);
+  const hasCoef = unit.courses?.some((c) => c.coefficient != null && c.coefficient > 0);
 
   return (
     <div>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-3 bg-zinc-50 px-5 py-3 text-left hover:bg-zinc-100 transition-colors"
+        className="flex w-full items-center gap-3 bg-zinc-50 px-5 py-3 text-left transition-colors hover:bg-zinc-100"
       >
         <svg
           className={`h-3.5 w-3.5 shrink-0 text-zinc-400 transition-transform ${open ? "rotate-90" : ""}`}
@@ -266,11 +575,15 @@ function UEBlock({ unit }: { unit: MaquetteUE }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="w-24 shrink-0 text-xs font-mono text-zinc-500">{unit.code}</span>
+        <span className="w-24 shrink-0 font-mono text-xs text-zinc-500">{unit.code}</span>
         <span className="flex-1 text-sm font-semibold text-zinc-800">{unit.name}</span>
         <div className="flex items-center gap-4 text-xs text-zinc-500">
-          <span><span className="font-medium text-zinc-700">{unit.credits}</span> crédits UE</span>
-          {unit.coefficient != null && (
+          {unit.credits != null && unit.credits > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{unit.credits}</span> crédits
+            </span>
+          )}
+          {unit.coefficient != null && unit.coefficient > 0 && (
             <span>Coef <span className="font-medium text-zinc-700">{unit.coefficient}</span></span>
           )}
           <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${
@@ -282,30 +595,9 @@ function UEBlock({ unit }: { unit: MaquetteUE }) {
       </button>
 
       {open && (unit.courses ?? []).length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-zinc-100 bg-white">
-                <th className="px-4 py-2 text-left font-medium text-zinc-400">Code ECUE</th>
-                <th className="px-4 py-2 text-left font-medium text-zinc-400">Intitulé</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">CM</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">TD</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">TPE</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">VHT</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">Crédits EC</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">Crédits UE</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">Coef EC</th>
-                <th className="px-4 py-2 text-right font-medium text-zinc-400">Coef UE</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50">
-              {(unit.courses ?? []).map((course) => (
-                <CourseRow key={course.id} course={course} unit={unit} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <CoursesTable courses={unit.courses ?? []} showCoef={!!hasCoef} />
       )}
+
       {open && (unit.courses ?? []).length === 0 && (
         <p className="px-5 py-3 text-xs text-zinc-400">Aucun cours dans cette UE</p>
       )}
@@ -313,20 +605,101 @@ function UEBlock({ unit }: { unit: MaquetteUE }) {
   );
 }
 
-function CourseRow({ course, unit }: { course: MaquetteCourse; unit: MaquetteUE }) {
-  const vht = course.vht ?? (course.hours_lecture + course.hours_td + (course.hours_tpe ?? 0));
+// ─── Courses table ─────────────────────────────────────────────────────────────
+
+function CoursesTable({ courses, showCoef }: { courses: MaquetteCourse[]; showCoef: boolean }) {
   return (
-    <tr className="hover:bg-zinc-50 transition-colors">
-      <td className="px-4 py-2 font-mono text-zinc-500">{course.code}</td>
-      <td className="px-4 py-2 text-zinc-800">{course.name}</td>
-      <td className="px-4 py-2 text-right text-zinc-600">{course.hours_lecture}</td>
-      <td className="px-4 py-2 text-right text-zinc-600">{course.hours_td}</td>
-      <td className="px-4 py-2 text-right text-zinc-600">{course.hours_tpe ?? 0}</td>
-      <td className="px-4 py-2 text-right font-medium text-zinc-700">{vht}</td>
-      <td className="px-4 py-2 text-right text-zinc-600">{course.credits}</td>
-      <td className="px-4 py-2 text-right text-zinc-400">{unit.credits}</td>
-      <td className="px-4 py-2 text-right text-zinc-600">{course.coefficient}</td>
-      <td className="px-4 py-2 text-right text-zinc-400">{unit.coefficient ?? "—"}</td>
-    </tr>
+    <Table>
+      <TableHeader>
+        <TableRow className="border-b border-zinc-100 bg-white">
+          <TableHead className="w-28 py-2 text-xs font-medium text-zinc-400">Code ECUE</TableHead>
+          <TableHead className="py-2 text-xs font-medium text-zinc-400">Intitulé</TableHead>
+          <TableHead className="w-14 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">CM</TableHead>
+          <TableHead className="w-14 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">TD</TableHead>
+          <TableHead className="w-14 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">TP</TableHead>
+          <TableHead className="w-14 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">TPE</TableHead>
+          <TableHead className="w-16 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">VHT</TableHead>
+          {showCoef && (
+            <TableHead className="w-16 whitespace-nowrap py-2 text-right text-xs font-medium text-zinc-400">Coef</TableHead>
+          )}
+        </TableRow>
+      </TableHeader>
+      <TableBody className="divide-y divide-zinc-50">
+        {courses.map((course) => (
+          <CourseRow key={course.id} course={course} showCoef={showCoef} />
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+// ─── Course row ────────────────────────────────────────────────────────────────
+
+function CourseRow({ course, showCoef }: { course: MaquetteCourse; showCoef: boolean }) {
+  const cm  = course.hours_lecture ?? 0;
+  const td  = course.hours_td ?? 0;
+  const tp  = course.hours_tp ?? 0;
+  const tpe = course.hours_tpe ?? 0;
+  const vht = (course.vht && course.vht > 0) ? course.vht : (cm + td + tp + tpe);
+
+  const fmt = (v: number) => v === 0 ? <span className="text-zinc-300">—</span> : v;
+
+  return (
+    <TableRow className="transition-colors hover:bg-zinc-50">
+      <TableCell className="py-2 font-mono text-xs text-zinc-500">{course.code}</TableCell>
+      <TableCell className="py-2 text-xs text-zinc-800">{course.name}</TableCell>
+      <TableCell className="py-2 text-right text-xs text-zinc-600">{fmt(cm)}</TableCell>
+      <TableCell className="py-2 text-right text-xs text-zinc-600">{fmt(td)}</TableCell>
+      <TableCell className="py-2 text-right text-xs text-zinc-600">{fmt(tp)}</TableCell>
+      <TableCell className="py-2 text-right text-xs text-zinc-600">{fmt(tpe)}</TableCell>
+      <TableCell className="py-2 text-right text-xs font-medium text-zinc-700">{fmt(vht)}</TableCell>
+      {showCoef && (
+        <TableCell className="py-2 text-right text-xs text-zinc-600">
+          {course.coefficient != null && course.coefficient > 0 ? course.coefficient : <span className="text-zinc-300">—</span>}
+        </TableCell>
+      )}
+    </TableRow>
+  );
+}
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+function Spinner({ white }: { white?: boolean }) {
+  return (
+    <div className={`h-4 w-4 animate-spin rounded-full border-2 ${
+      white ? "border-white/30 border-t-white" : "border-zinc-300 border-t-zinc-700"
+    }`} />
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+  );
+}
+
+function TableIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
+function PdfIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    </svg>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import CourseTable from "@/components/courses/course-table";
@@ -21,14 +22,16 @@ import {
 import type { CreateCourseInput, CourseFilters } from "@/types/course";
 
 function CoursesPageContent() {
+  const searchParams = useSearchParams();
   const [filters, setFilters] = useState<CourseFilters>({
     page: 1,
     limit: 10,
+    course_unit_id: searchParams.get("course_unit_id") || undefined,
   });
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editCourseId, setEditCourseId] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [editCourseId, setEditCourseId] = useState<string | null>(searchParams.get("edit"));
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("course_unit_id"));
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;

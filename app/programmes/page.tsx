@@ -25,13 +25,15 @@ import type { CreateProgrammeInput, AcademicProgramFilters } from "@/types/progr
 function ProgrammesPageContent() {
   const searchParams = useSearchParams();
   const queryEditId = searchParams.get("edit");
+  const queryDeptId = searchParams.get("department_id");
   const [filters, setFilters] = useState<AcademicProgramFilters>({
     page: 1,
     limit: 10,
+    department_id: queryDeptId || undefined,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editProgrammeId, setEditProgrammeId] = useState<string | null>(queryEditId);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("department_id"));
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
