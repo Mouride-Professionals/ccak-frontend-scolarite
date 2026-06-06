@@ -22,7 +22,10 @@ export const StudentSchema = z.object({
     .string()
     .min(1, "Le prénom est requis")
     .max(50, "Le prénom ne peut pas dépasser 50 caractères")
-    .regex(NAME_REGEX, "Le prénom ne peut contenir que des lettres, espaces, apostrophes et tirets"),
+    .regex(
+      NAME_REGEX,
+      "Le prénom ne peut contenir que des lettres, espaces, apostrophes et tirets"
+    ),
   last_name: z
     .string()
     .min(1, "Le nom est requis")
@@ -62,7 +65,11 @@ export const StudentSchema = z.object({
     .or(z.literal("")),
   email: z.string().email("Adresse email invalide").optional().nullable().or(z.literal("")),
   type_of_id: z.nativeEnum(IDType).optional().nullable(),
-  id_details: z.string().max(100, "Les détails ne peuvent pas dépasser 100 caractères").optional().nullable(),
+  id_details: z
+    .string()
+    .max(100, "Les détails ne peuvent pas dépasser 100 caractères")
+    .optional()
+    .nullable(),
   emergency_contact_name: z.string().min(2, "Le nom du contact d'urgence est requis").max(100),
   emergency_contact_phone: z
     .string()
@@ -111,12 +118,7 @@ export const CourseSchema = z.object({
     .int()
     .min(0, "Les heures doivent être positives")
     .max(200),
-  hours_tpe: z
-    .number()
-    .int()
-    .min(0, "Les heures doivent être positives")
-    .max(200)
-    .optional(),
+  hours_tpe: z.number().int().min(0, "Les heures doivent être positives").max(200).optional(),
   coefficient: z
     .number({ error: "Le coefficient est requis" })
     .min(0, "Le coefficient doit être positif")
@@ -143,19 +145,23 @@ export const EnrollmentSchema = z.object({
   registration_fee_paid: z
     .number({ error: "Le montant des frais est requis" })
     .min(0, "Les frais d'inscription ne peuvent pas être négatifs"),
-  is_scholarship_holder: z.boolean().default(false),
+  is_scholarship_holder: z.boolean(),
   scholarship_type: z.string().max(100).optional().nullable(),
   scholarship_amount: z
     .number()
     .min(0, "Le montant de la bourse ne peut pas être négatif")
     .optional()
     .nullable(),
-  notes: z.string().max(1000, "Les notes ne peuvent pas dépasser 1000 caractères").optional().nullable(),
-  is_repeating: z.boolean().default(false),
-  is_medically_fit: z.boolean().default(false),
-  is_registered_elsewhere: z.boolean().default(false),
-  is_willing_to_cancel_other_registration: z.boolean().default(false),
-  status: z.nativeEnum(RegistrationStatus).default(RegistrationStatus.DRAFT),
+  notes: z
+    .string()
+    .max(1000, "Les notes ne peuvent pas dépasser 1000 caractères")
+    .optional()
+    .nullable(),
+  is_repeating: z.boolean(),
+  is_medically_fit: z.boolean(),
+  is_registered_elsewhere: z.boolean(),
+  is_willing_to_cancel_other_registration: z.boolean(),
+  status: z.nativeEnum(RegistrationStatus).optional(),
 });
 
 // ============================================================================

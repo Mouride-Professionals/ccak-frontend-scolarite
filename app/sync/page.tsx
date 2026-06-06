@@ -26,13 +26,18 @@ function SyncPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
     isOpen: false,
     message: "",
     type: "success",
   });
 
-  const isAdmin = status === "authenticated" && getRealmRoles(session?.accessToken).includes("admin");
+  const isAdmin =
+    status === "authenticated" && getRealmRoles(session?.accessToken).includes("admin");
 
   // Redirect non-admins once session is resolved
   useEffect(() => {
@@ -49,10 +54,18 @@ function SyncPageContent() {
 
   const handleTriggerSync = async () => {
     try {
-      await triggerSync.mutateAsync();
-      setToast({ isOpen: true, message: "Synchronisation déclenchée avec succès.", type: "success" });
+      await triggerSync.mutateAsync(undefined);
+      setToast({
+        isOpen: true,
+        message: "Synchronisation déclenchée avec succès.",
+        type: "success",
+      });
     } catch {
-      setToast({ isOpen: true, message: "Erreur lors du déclenchement de la synchronisation.", type: "error" });
+      setToast({
+        isOpen: true,
+        message: "Erreur lors du déclenchement de la synchronisation.",
+        type: "error",
+      });
     }
   };
 

@@ -11,10 +11,10 @@ import type {
   EnrollmentFilters,
   CreateEnrollmentInput,
   UpdateEnrollmentInput,
-  Student,
   AcademicProgram,
   AcademicYear,
 } from "@/types/enrollment";
+import type { Student } from "@/types/student";
 
 /**
  * Get all enrollments with optional filters

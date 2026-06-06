@@ -22,7 +22,7 @@ const statusOptions: Array<{ value: AttendanceStatus; label: string }> = [
 type AttendanceStudent = {
   id: string;
   full_name: string;
-  student_number?: string;
+  student_number?: string | null;
 };
 
 export default function AttendanceMarkingPage() {
@@ -49,7 +49,7 @@ export default function AttendanceMarkingPage() {
         {
           id: student.id,
           full_name: student.full_name,
-          student_number: student.student_number,
+          student_number: student.student_number ?? undefined,
         },
       ];
     });

@@ -33,8 +33,7 @@ const toOptionalTrimmedString = (value: unknown) => {
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
-const FacultyRegistrationSchema = z
-  .object({
+const FacultyRegistrationBaseSchema = z.object({
     full_name: z
       .string()
       .trim()
@@ -92,31 +91,32 @@ const FacultyRegistrationSchema = z
         .max(2000, "Les termes du contrat ne peuvent pas dépasser 2000 caractères")
         .optional()
     ),
-  })
-  .superRefine((data, ctx) => {
-    if (data.contract_end && data.contract_end < data.contract_start) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["contract_end"],
-        message: "La fin de contrat doit être postérieure au début de contrat",
-      });
-    }
-  });
+});
 
-const StepOneSchema = FacultyRegistrationSchema.pick({
+const FacultyRegistrationSchema = FacultyRegistrationBaseSchema.superRefine((data, ctx) => {
+  if (data.contract_end && data.contract_end < data.contract_start) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["contract_end"],
+      message: "La fin de contrat doit être postérieure au début de contrat",
+    });
+  }
+});
+
+const StepOneSchema = FacultyRegistrationBaseSchema.pick({
   full_name: true,
   email: true,
   phone: true,
   address: true,
 });
 
-const StepTwoSchema = FacultyRegistrationSchema.pick({
+const StepTwoSchema = FacultyRegistrationBaseSchema.pick({
   department_id: true,
   rank: true,
   hire_date: true,
 });
 
-const StepThreeSchema = FacultyRegistrationSchema.pick({
+const StepThreeSchema = FacultyRegistrationBaseSchema.pick({
   contract_type: true,
   contract_start: true,
   contract_end: true,

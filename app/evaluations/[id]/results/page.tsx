@@ -233,7 +233,7 @@ export default function EvaluationResultsPage() {
                     <XAxis dataKey="key" />
                     <YAxis domain={[0, ratingCeiling]} />
                     <Tooltip
-                      formatter={(value: number | undefined) => [
+                      formatter={(value) => [
                         `${Number(value ?? 0).toFixed(2)} / 5`,
                         "Moyenne",
                       ]}
@@ -273,7 +273,7 @@ export default function EvaluationResultsPage() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number | undefined) => Number(value ?? 0).toFixed(2)}
+                      formatter={(value) => Number(value ?? 0).toFixed(2)}
                     />
                   </PieChart>
                 </ResponsiveContainer>

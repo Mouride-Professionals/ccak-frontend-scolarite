@@ -25,10 +25,7 @@ import {
   useApproveDocument,
   useRejectDocument,
 } from "@/hooks/use-documents";
-import {
-  useCreatePriorDiploma,
-  useDeletePriorDiploma,
-} from "@/hooks/use-prior-diplomas";
+import { useCreatePriorDiploma, useDeletePriorDiploma } from "@/hooks/use-prior-diplomas";
 import { DocumentType } from "@/types/student";
 
 type TabType = "info" | "guardians" | "diplomas" | "documents" | "status";
@@ -344,12 +341,18 @@ export default function StudentDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Numéro d'inscription</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.registration_number ?? "—"}</p>
+                    <p className="mt-1 text-sm text-zinc-900">
+                      {student.registration_number ?? "—"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Genre</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {student.gender === "M" ? "Masculin" : student.gender === "F" ? "Féminin" : "—"}
+                      {student.gender === "M"
+                        ? "Masculin"
+                        : student.gender === "F"
+                          ? "Féminin"
+                          : "—"}
                     </p>
                   </div>
                   <div>
@@ -378,8 +381,8 @@ export default function StudentDetailPage() {
                       {student.provenance === "ETAT"
                         ? "État"
                         : student.provenance === "PLATEFORME"
-                        ? "Plateforme"
-                        : "—"}
+                          ? "Plateforme"
+                          : "—"}
                     </p>
                   </div>
                 </div>
@@ -443,11 +446,15 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Nom du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_name ?? "—"}</p>
+                    <p className="mt-1 text-sm text-zinc-900">
+                      {student.emergency_contact_name ?? "—"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.emergency_contact_phone ?? "—"}</p>
+                    <p className="mt-1 text-sm text-zinc-900">
+                      {student.emergency_contact_phone ?? "—"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -675,7 +682,9 @@ export default function StudentDetailPage() {
                         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
                           {diploma.year && <span>Année : {diploma.year}</span>}
                           {diploma.mention && <span>Mention : {diploma.mention}</span>}
-                          {diploma.institution && <span>Établissement : {diploma.institution}</span>}
+                          {diploma.institution && (
+                            <span>Établissement : {diploma.institution}</span>
+                          )}
                         </div>
                       </div>
                       <button
@@ -683,7 +692,12 @@ export default function StudentDetailPage() {
                         disabled={deleteDiplomaMutation.isPending}
                         className="ml-4 text-zinc-400 hover:text-red-600 disabled:opacity-50"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
