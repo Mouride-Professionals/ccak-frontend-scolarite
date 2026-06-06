@@ -38,13 +38,8 @@ export async function getExamSession(id: string): Promise<ExamSession> {
   return unwrapData<ExamSession>(response);
 }
 
-export async function createExamSession(
-  input: CreateExamSessionInput
-): Promise<ExamSession> {
-  const response = await api.post(
-    "/exam-sessions",
-    input as unknown as Record<string, unknown>
-  );
+export async function createExamSession(input: CreateExamSessionInput): Promise<ExamSession> {
+  const response = await api.post("/exam-sessions", input as unknown as Record<string, unknown>);
   return unwrapData<ExamSession>(response);
 }
 
@@ -103,16 +98,11 @@ export async function updateExamSchedule(
   return unwrapData<ExamSchedule>(response);
 }
 
-export async function deleteExamSchedule(
-  sessionId: string,
-  scheduleId: string
-): Promise<void> {
+export async function deleteExamSchedule(sessionId: string, scheduleId: string): Promise<void> {
   await api.del(`/exam-sessions/${sessionId}/schedules/${scheduleId}`);
 }
 
-export async function checkConflicts(
-  input: CheckConflictsInput
-): Promise<ConflictResult> {
+export async function checkConflicts(input: CheckConflictsInput): Promise<ConflictResult> {
   const response = await api.post(
     "/exam-schedules/check-conflicts",
     input as unknown as Record<string, unknown>

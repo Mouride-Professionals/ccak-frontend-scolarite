@@ -264,9 +264,7 @@ export default function CourseUnitForm({
           }`}
           disabled={isLoading}
         />
-        {errors.coefficient && (
-          <p className="mt-1 text-sm text-red-600">{errors.coefficient}</p>
-        )}
+        {errors.coefficient && <p className="mt-1 text-sm text-red-600">{errors.coefficient}</p>}
       </div>
 
       {/* Type */}

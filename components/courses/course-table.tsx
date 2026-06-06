@@ -69,8 +69,14 @@ export default function CourseTable({
                   Coeff: <span className="font-medium">{course.coefficient}</span>
                 </div>
                 <div className="col-span-2">
-                  CM/TD/TP/TPE: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}
-                  {" "}· VHT: <span className="font-medium">{course.hours_lecture + course.hours_td + course.hours_tp + (course.hours_tpe ?? 0)}</span>
+                  CM/TD/TP/TPE: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/
+                  {course.hours_tpe ?? 0} · VHT:{" "}
+                  <span className="font-medium">
+                    {course.hours_lecture +
+                      course.hours_td +
+                      course.hours_tp +
+                      (course.hours_tpe ?? 0)}
+                  </span>
                 </div>
               </div>
 
@@ -159,10 +165,14 @@ export default function CourseTable({
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.credits}</td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
-                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}
-                  {" "}
+                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}{" "}
                   <span className="text-xs text-zinc-400">
-                    ({course.hours_lecture + course.hours_td + course.hours_tp + (course.hours_tpe ?? 0)}h)
+                    (
+                    {course.hours_lecture +
+                      course.hours_td +
+                      course.hours_tp +
+                      (course.hours_tpe ?? 0)}
+                    h)
                   </span>
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.coefficient}</td>
@@ -200,7 +210,7 @@ export default function CourseTable({
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => !isReadOnly && onEdit(course.id)}
-                  disabled={isReadOnly}
+                      disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Éditer"
                     >
@@ -245,7 +255,7 @@ export default function CourseTable({
                     </Link>
                     <button
                       onClick={() => !isReadOnly && onDelete(course.id)}
-                  disabled={isReadOnly}
+                      disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Supprimer"
                     >

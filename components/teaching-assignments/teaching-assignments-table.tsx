@@ -97,7 +97,9 @@ export default function TeachingAssignmentsTable({
                 </td>
                 <td className="hidden px-4 py-4 sm:px-6 sm:py-5 lg:table-cell">
                   {assignment.status ? (
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${DELIVERY_STATUS_CLASSES[assignment.status]}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${DELIVERY_STATUS_CLASSES[assignment.status]}`}
+                    >
                       {DELIVERY_STATUS_LABELS[assignment.status]}
                     </span>
                   ) : (

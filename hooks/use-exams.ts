@@ -106,8 +106,7 @@ export function useCloseExamSession() {
 export function useCreateExamSchedule(sessionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateExamScheduleInput) =>
-      examsApi.createExamSchedule(sessionId, input),
+    mutationFn: (input: CreateExamScheduleInput) => examsApi.createExamSchedule(sessionId, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: examKeys.detail(sessionId) });
       queryClient.invalidateQueries({ queryKey: examKeys.schedules(sessionId) });

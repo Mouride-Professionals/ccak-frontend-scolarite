@@ -115,10 +115,20 @@ export default function ProgrammeDetailPage() {
             items={[
               { label: "Établissements", href: "/faculties" },
               ...(programme.department?.faculty
-                ? [{ label: programme.department.faculty.name, href: `/faculties/${programme.department.faculty.id}` }]
+                ? [
+                    {
+                      label: programme.department.faculty.name,
+                      href: `/faculties/${programme.department.faculty.id}`,
+                    },
+                  ]
                 : []),
               ...(programme.department
-                ? [{ label: programme.department.name, href: `/departments/${programme.department_id}` }]
+                ? [
+                    {
+                      label: programme.department.name,
+                      href: `/departments/${programme.department_id}`,
+                    },
+                  ]
                 : []),
               { label: programme.name },
             ]}
@@ -138,7 +148,12 @@ export default function ProgrammeDetailPage() {
               >
                 Voir les UE
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </Link>
               <Link

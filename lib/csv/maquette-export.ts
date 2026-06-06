@@ -5,9 +5,7 @@ export function exportMaquetteCsv(programs: MaquetteProgram[]): void {
     "Programme,Semestre,Code UE,Nom UE,Type UE,Crédits UE,Coef UE,Code ECUE,Intitulé ECUE,CM,TD,TPE,VHT,Crédits ECUE,Coef ECUE\n";
 
   const escape = (v: string) =>
-    v.includes(",") || v.includes('"') || v.includes("\n")
-      ? `"${v.replace(/"/g, '""')}"`
-      : v;
+    v.includes(",") || v.includes('"') || v.includes("\n") ? `"${v.replace(/"/g, '""')}"` : v;
 
   const dataRows = programs.flatMap((prog) =>
     prog.semesters.flatMap((s) =>
@@ -23,7 +21,14 @@ export function exportMaquetteCsv(programs: MaquetteProgram[]): void {
               unit.type,
               unit.credits ?? "",
               unit.coefficient ?? "",
-              "", "", "", "", "", "", "", "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
             ].join(","),
           ];
         }

@@ -10,8 +10,7 @@ import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
  */
 export function useSelectedYear() {
   const { data: currentYear } = useCurrentAcademicYear();
-  const { selectedYear, isReadOnly, setSelectedYear, initFromCurrentYear } =
-    useSelectedYearStore();
+  const { selectedYear, isReadOnly, setSelectedYear, initFromCurrentYear } = useSelectedYearStore();
 
   useEffect(() => {
     if (currentYear) {

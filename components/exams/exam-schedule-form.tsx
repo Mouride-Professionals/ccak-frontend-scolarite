@@ -105,7 +105,14 @@ export default function ExamScheduleForm({
     } finally {
       setIsCheckingConflicts(false);
     }
-  }, [formData.room_id, formData.date, formData.start_time, formData.end_time, formData.invigilator_ids, excludeScheduleId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    formData.room_id,
+    formData.date,
+    formData.start_time,
+    formData.end_time,
+    formData.invigilator_ids,
+    excludeScheduleId,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(runConflictCheck, 400);
@@ -163,8 +170,19 @@ export default function ExamScheduleForm({
       {isCheckingConflicts && (
         <div className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
           <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
           </svg>
           Vérification des conflits...
         </div>
@@ -176,22 +194,46 @@ export default function ExamScheduleForm({
               key={i}
               className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800"
             >
-              <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
               {c.message}
             </div>
           ))}
         </div>
       )}
-      {!isCheckingConflicts && conflicts && !conflicts.has_conflicts && formData.room_id && formData.date && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700">
-          <svg className="h-3.5 w-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          Aucun conflit détecté
-        </div>
-      )}
+      {!isCheckingConflicts &&
+        conflicts &&
+        !conflicts.has_conflicts &&
+        formData.room_id &&
+        formData.date && (
+          <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700">
+            <svg
+              className="h-3.5 w-3.5 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Aucun conflit détecté
+          </div>
+        )}
 
       {/* Matière */}
       <div>
@@ -281,8 +323,7 @@ export default function ExamScheduleForm({
           <option value="">Sélectionner une salle</option>
           {sortedRooms.map((r) => {
             const tooSmall =
-              selectedCourse?.enrolled_count &&
-              r.capacity < selectedCourse.enrolled_count;
+              selectedCourse?.enrolled_count && r.capacity < selectedCourse.enrolled_count;
             return (
               <option key={r.id} value={r.id}>
                 {r.name ?? r.room_number} — {r.capacity} places
@@ -366,8 +407,19 @@ export default function ExamScheduleForm({
         >
           {isLoading && (
             <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
             </svg>
           )}
           Confirmer

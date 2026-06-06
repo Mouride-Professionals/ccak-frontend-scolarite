@@ -210,7 +210,6 @@ export default function StudentsPage() {
                   <option value={Gender.F}>Féminin</option>
                 </select>
               </div>
-
             </div>
           </div>
         )}

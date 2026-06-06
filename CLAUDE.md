@@ -96,21 +96,25 @@ Quick reference: [docs/security/DEVELOPER_GUIDE.md](docs/security/DEVELOPER_GUID
 ## Clean Code Laws (enforced — no exceptions)
 
 ### Tables
+
 - **Always** use the shared primitives from `components/ui/table.tsx`:
   `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`
 - Never use raw `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<th>`, `<td>` HTML in feature components
 - Cross-cutting concerns (read-only, loading skeletons, empty states) belong in these primitives or a wrapper — not copy-pasted into every table
 
 ### Forms
+
 - Every submit button must go through a shared `<SubmitButton>` component (or equivalent) so cross-cutting concerns (read-only, loading, disabled state) are centralized
 - Never duplicate submit button logic across form components
 
 ### Cross-cutting UI behaviors (read-only, permissions, theming…)
+
 - Implement once in a layout wrapper, a context provider, or a shared primitive
 - **Never** add the same `useIsReadOnly()` / `usePermission()` / etc. call to every individual component — that is the wrong layer
 - If you find yourself editing >3 files for the same behavioral change, stop and centralize first
 
 ### General
+
 - Before adding a hook/util/component: grep the codebase to check if one already exists
 - Shared UI lives in `components/ui/` — build there first, consume everywhere
 - No feature-specific logic inside `components/ui/` primitives — keep them generic

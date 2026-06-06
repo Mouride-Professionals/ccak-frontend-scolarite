@@ -439,77 +439,79 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         {/* Menu Items */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <ul className="space-y-1">
-            {menuItems.filter((item) => !item.requiresAdmin || isAdmin).map((item) => (
-              <li key={item.id}>
-                {item.children ? (
-                  // Parent with children
-                  <div>
-                    <button
-                      onClick={() => toggleExpanded(item.id)}
-                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                        expandedItems.includes(item.id) ||
-                        item.children.some((child) => isActive(child.href))
+            {menuItems
+              .filter((item) => !item.requiresAdmin || isAdmin)
+              .map((item) => (
+                <li key={item.id}>
+                  {item.children ? (
+                    // Parent with children
+                    <div>
+                      <button
+                        onClick={() => toggleExpanded(item.id)}
+                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                          expandedItems.includes(item.id) ||
+                          item.children.some((child) => isActive(child.href))
+                            ? "bg-[#00365F]/10 text-[#00365F]"
+                            : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </div>
+                        <svg
+                          className={`h-4 w-4 transition-transform ${
+                            expandedItems.includes(item.id) ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                      {expandedItems.includes(item.id) && (
+                        <ul className="ml-8 mt-1 space-y-1">
+                          {item.children.map((child) => (
+                            <li key={child.id}>
+                              <Link
+                                href={child.href || "#"}
+                                onClick={onClose}
+                                className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
+                                  isActive(child.href)
+                                    ? "font-medium text-[#008D36]"
+                                    : "text-[#00365F]/70 hover:text-[#00365F]"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ) : (
+                    // Simple link
+                    <Link
+                      href={item.href || "#"}
+                      onClick={onClose}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        isActive(item.href)
                           ? "bg-[#00365F]/10 text-[#00365F]"
                           : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </div>
-                      <svg
-                        className={`h-4 w-4 transition-transform ${
-                          expandedItems.includes(item.id) ? "rotate-180" : ""
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                    {expandedItems.includes(item.id) && (
-                      <ul className="ml-8 mt-1 space-y-1">
-                        {item.children.map((child) => (
-                          <li key={child.id}>
-                            <Link
-                              href={child.href || "#"}
-                              onClick={onClose}
-                              className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
-                                isActive(child.href)
-                                  ? "font-medium text-[#008D36]"
-                                  : "text-[#00365F]/70 hover:text-[#00365F]"
-                              }`}
-                            >
-                              {child.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  // Simple link
-                  <Link
-                    href={item.href || "#"}
-                    onClick={onClose}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isActive(item.href)
-                        ? "bg-[#00365F]/10 text-[#00365F]"
-                        : "text-[#00365F]/70 hover:bg-[#00365F]/5 hover:text-[#00365F]"
-                    }`}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </Link>
-                )}
-              </li>
-            ))}
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </Link>
+                  )}
+                </li>
+              ))}
           </ul>
         </nav>
       </div>

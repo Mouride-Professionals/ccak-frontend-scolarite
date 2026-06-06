@@ -16,9 +16,11 @@ export default function NewExamSessionPage() {
   const { selectedYear } = useSelectedYear();
   const createMutation = useCreateExamSession();
 
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>(
-    { isOpen: false, message: "", type: "success" }
-  );
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({ isOpen: false, message: "", type: "success" });
 
   const handleSubmit = async (data: CreateExamSessionInput) => {
     try {
@@ -37,7 +39,9 @@ export default function NewExamSessionPage() {
       <ProtectedRoute>
         <DashboardLayout title="Nouvelle session d'examen">
           <div className="flex min-h-[400px] items-center justify-center">
-            <p className="text-sm text-zinc-500">Sélectionnez une année académique pour continuer.</p>
+            <p className="text-sm text-zinc-500">
+              Sélectionnez une année académique pour continuer.
+            </p>
           </div>
         </DashboardLayout>
       </ProtectedRoute>
@@ -54,7 +58,12 @@ export default function NewExamSessionPage() {
             className="flex items-center gap-2 text-sm font-medium text-[#00365F] transition-colors hover:text-[#008D36]"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Retour aux sessions
           </Link>

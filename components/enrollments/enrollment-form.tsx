@@ -4,11 +4,7 @@ import { useState } from "react";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  CreateEnrollmentInput,
-  AcademicProgram,
-  AcademicYear,
-} from "@/types/enrollment";
+import type { CreateEnrollmentInput, AcademicProgram, AcademicYear } from "@/types/enrollment";
 import { RegistrationStatus } from "@/types/enrollment";
 import type { Student } from "@/types/student";
 import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
@@ -280,7 +276,9 @@ export default function EnrollmentForm({
               disabled={isLoading}
             >
               <option value={RegistrationStatus.DRAFT}>Brouillon</option>
-              <option value={RegistrationStatus.PENDING_VALIDATION}>En attente de validation</option>
+              <option value={RegistrationStatus.PENDING_VALIDATION}>
+                En attente de validation
+              </option>
               <option value={RegistrationStatus.VALIDATED}>Validée</option>
               <option value={RegistrationStatus.SUSPENDED}>Suspendue</option>
               <option value={RegistrationStatus.CANCELLED}>Annulée</option>
@@ -355,7 +353,9 @@ export default function EnrollmentForm({
                   className="h-4 w-4 rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
                   disabled={isLoading}
                 />
-                <span className="text-sm text-zinc-900">Prêt à annuler l&apos;autre inscription</span>
+                <span className="text-sm text-zinc-900">
+                  Prêt à annuler l&apos;autre inscription
+                </span>
               </label>
             )}
           </div>
@@ -402,7 +402,9 @@ export default function EnrollmentForm({
                     disabled={isLoading}
                   />
                   {errors.scholarship_amount && (
-                    <p className="mt-1.5 text-xs text-red-600">{errors.scholarship_amount.message}</p>
+                    <p className="mt-1.5 text-xs text-red-600">
+                      {errors.scholarship_amount.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -422,9 +424,7 @@ export default function EnrollmentForm({
               className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             />
-            {errors.notes && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.notes.message}</p>
-            )}
+            {errors.notes && <p className="mt-1.5 text-xs text-red-600">{errors.notes.message}</p>}
           </div>
         </div>
       </div>

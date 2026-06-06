@@ -18,7 +18,9 @@ const config: Record<ExamSessionStatus, { label: string; classes: string }> = {
 export default function ExamSessionStatusBadge({ status }: { status: ExamSessionStatus }) {
   const { label, classes } = config[status] ?? config[ExamSessionStatus.DRAFT];
   return (
-    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ${classes}`}>
+    <span
+      className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ${classes}`}
+    >
       {label}
     </span>
   );

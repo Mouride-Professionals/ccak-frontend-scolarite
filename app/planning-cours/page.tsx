@@ -4,12 +4,20 @@ import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
-import { usePlanning, usePlanningDashboard, useUpdateDelivery } from "@/hooks/use-teaching-assignments";
+import {
+  usePlanning,
+  usePlanningDashboard,
+  useUpdateDelivery,
+} from "@/hooks/use-teaching-assignments";
 import { useSelectedYear } from "@/hooks/use-selected-year";
 import { getAcademicPrograms } from "@/lib/api/course-units";
 import { useQuery } from "@tanstack/react-query";
 import { TeachingDeliveryStatus } from "@/types/teaching-assignment";
-import type { PlanningFilters, TeachingAssignment, UpdateDeliveryInput } from "@/types/teaching-assignment";
+import type {
+  PlanningFilters,
+  TeachingAssignment,
+  UpdateDeliveryInput,
+} from "@/types/teaching-assignment";
 
 const STATUS_LABELS: Record<TeachingDeliveryStatus, string> = {
   [TeachingDeliveryStatus.NOT_STARTED]: "Non commencé",
@@ -28,7 +36,9 @@ const STATUS_CLASSES: Record<TeachingDeliveryStatus, string> = {
 function DeliveryStatusBadge({ status }: { status?: TeachingDeliveryStatus | null }) {
   const s = status ?? TeachingDeliveryStatus.NOT_STARTED;
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CLASSES[s]}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CLASSES[s]}`}
+    >
       {STATUS_LABELS[s]}
     </span>
   );
@@ -36,7 +46,11 @@ function DeliveryStatusBadge({ status }: { status?: TeachingDeliveryStatus | nul
 
 function fmt(date?: string | null) {
   if (!date) return "—";
-  return new Date(date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(date).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function PlanningCoursPage() {
@@ -45,8 +59,14 @@ export default function PlanningCoursPage() {
   const [filters, setFilters] = useState<PlanningFilters>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<UpdateDeliveryInput>({});
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>({
-    isOpen: false, message: "", type: "success",
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
+    isOpen: false,
+    message: "",
+    type: "success",
   });
 
   const { data: programs } = useQuery({
@@ -107,7 +127,9 @@ export default function PlanningCoursPage() {
           >
             <option value="">Tous les programmes</option>
             {(programs ?? []).map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
             ))}
           </select>
         </div>
@@ -116,7 +138,10 @@ export default function PlanningCoursPage() {
         {!dashLoading && dashboard.length > 0 && (
           <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {dashboard.map((level) => (
-              <div key={level.level_id} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+              <div
+                key={level.level_id}
+                className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
+              >
                 <h3 className="mb-3 text-sm font-semibold text-zinc-800">{level.level_name}</h3>
                 <div className="space-y-2">
                   <ProgressBar
@@ -154,14 +179,24 @@ export default function PlanningCoursPage() {
                 <thead>
                   <tr className="border-b border-zinc-200 bg-zinc-50">
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Cours</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Niveau</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Enseignant</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+                      Niveau
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+                      Enseignant
+                    </th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500">CM</th>
                     <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500">TD</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Début prévu</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Début effectif</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+                      Début prévu
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+                      Début effectif
+                    </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Fin</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">Statut</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500">
+                      Statut
+                    </th>
                     <th className="px-4 py-3" />
                   </tr>
                 </thead>
@@ -182,16 +217,28 @@ export default function PlanningCoursPage() {
                         <td className="px-4 py-3">
                           <div className="font-medium text-zinc-800">{assignment.course_name}</div>
                           {assignment.course_code && (
-                            <div className="text-xs text-zinc-400 font-mono">{assignment.course_code}</div>
+                            <div className="text-xs text-zinc-400 font-mono">
+                              {assignment.course_code}
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-3 text-zinc-600">{assignment.level_name ?? "—"}</td>
                         <td className="px-4 py-3 text-zinc-600">{assignment.faculty_name}</td>
-                        <td className="px-4 py-3 text-right text-zinc-600">{assignment.hours_cm ?? "—"}</td>
-                        <td className="px-4 py-3 text-right text-zinc-600">{assignment.hours_td ?? "—"}</td>
-                        <td className="px-4 py-3 text-zinc-600 text-xs">{fmt(assignment.planned_start_date)}</td>
-                        <td className="px-4 py-3 text-zinc-600 text-xs">{fmt(assignment.effective_start_date)}</td>
-                        <td className="px-4 py-3 text-zinc-600 text-xs">{fmt(assignment.end_date)}</td>
+                        <td className="px-4 py-3 text-right text-zinc-600">
+                          {assignment.hours_cm ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right text-zinc-600">
+                          {assignment.hours_td ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-600 text-xs">
+                          {fmt(assignment.planned_start_date)}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-600 text-xs">
+                          {fmt(assignment.effective_start_date)}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-600 text-xs">
+                          {fmt(assignment.end_date)}
+                        </td>
                         <td className="px-4 py-3">
                           <DeliveryStatusBadge status={assignment.status} />
                         </td>
@@ -263,7 +310,9 @@ function EditRow({
         <input
           type="number"
           value={form.hours_cm ?? ""}
-          onChange={(e) => onChange({ ...form, hours_cm: e.target.value ? Number(e.target.value) : null })}
+          onChange={(e) =>
+            onChange({ ...form, hours_cm: e.target.value ? Number(e.target.value) : null })
+          }
           placeholder="CM"
           className="w-16 rounded border border-zinc-300 px-2 py-1 text-xs focus:border-[#008D36] focus:outline-none"
         />
@@ -272,7 +321,9 @@ function EditRow({
         <input
           type="number"
           value={form.hours_td ?? ""}
-          onChange={(e) => onChange({ ...form, hours_td: e.target.value ? Number(e.target.value) : null })}
+          onChange={(e) =>
+            onChange({ ...form, hours_td: e.target.value ? Number(e.target.value) : null })
+          }
           placeholder="TD"
           className="w-16 rounded border border-zinc-300 px-2 py-1 text-xs focus:border-[#008D36] focus:outline-none"
         />
@@ -304,12 +355,16 @@ function EditRow({
       <td className="px-4 py-2">
         <select
           value={form.status ?? ""}
-          onChange={(e) => onChange({ ...form, status: (e.target.value as TeachingDeliveryStatus) || undefined })}
+          onChange={(e) =>
+            onChange({ ...form, status: (e.target.value as TeachingDeliveryStatus) || undefined })
+          }
           className="rounded border border-zinc-300 px-2 py-1 text-xs focus:border-[#008D36] focus:outline-none"
         >
           <option value="">Statut</option>
           {Object.values(TeachingDeliveryStatus).map((s) => (
-            <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+            <option key={s} value={s}>
+              {STATUS_LABELS[s]}
+            </option>
           ))}
         </select>
       </td>

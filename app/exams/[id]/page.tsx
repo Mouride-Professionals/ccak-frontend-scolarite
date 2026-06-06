@@ -79,7 +79,9 @@ function SessionCalendar({
               <span className="text-[10px] font-medium uppercase text-zinc-400">
                 {day.toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 3)}
               </span>
-              <span className={`mt-0.5 text-sm font-bold ${isWeekend ? "text-zinc-300" : "text-zinc-700"}`}>
+              <span
+                className={`mt-0.5 text-sm font-bold ${isWeekend ? "text-zinc-300" : "text-zinc-700"}`}
+              >
                 {day.getDate()}
               </span>
               {daySchedules.length > 0 ? (
@@ -93,8 +95,18 @@ function SessionCalendar({
                 </div>
               ) : (
                 <div className="mt-1 flex justify-center opacity-0 transition-opacity group-hover:opacity-100">
-                  <svg className="h-3 w-3 text-[#008D36]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <svg
+                    className="h-3 w-3 text-[#008D36]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                 </div>
               )}
@@ -133,7 +145,9 @@ function CourseCard({
   children,
 }: CourseCardProps) {
   return (
-    <div className={`rounded-lg border transition-all ${isExpanded ? "border-[#008D36] shadow-sm" : "border-zinc-200 bg-white"}`}>
+    <div
+      className={`rounded-lg border transition-all ${isExpanded ? "border-[#008D36] shadow-sm" : "border-zinc-200 bg-white"}`}
+    >
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-zinc-900 truncate">{courseName}</p>
@@ -164,9 +178,7 @@ function CourseCard({
         )}
       </div>
       {isExpanded && (
-        <div className="border-t border-[#008D36]/20 bg-[#008D36]/5 px-4 py-4">
-          {children}
-        </div>
+        <div className="border-t border-[#008D36]/20 bg-[#008D36]/5 px-4 py-4">{children}</div>
       )}
     </div>
   );
@@ -183,13 +195,16 @@ export default function ExamSessionDetailPage() {
   const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
   const [editingSchedule, setEditingSchedule] = useState<ExamSchedule | null>(null);
   const [preselectedDate, setPreselectedDate] = useState<string | undefined>();
-  const [deleteScheduleConfirm, setDeleteScheduleConfirm] = useState<{ isOpen: boolean; scheduleId: string | null }>(
-    { isOpen: false, scheduleId: null }
-  );
+  const [deleteScheduleConfirm, setDeleteScheduleConfirm] = useState<{
+    isOpen: boolean;
+    scheduleId: string | null;
+  }>({ isOpen: false, scheduleId: null });
   const [deleteSessionConfirm, setDeleteSessionConfirm] = useState(false);
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: "success" | "error" }>(
-    { isOpen: false, message: "", type: "success" }
-  );
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({ isOpen: false, message: "", type: "success" });
 
   const { data: session, isLoading, error } = useExamSession(sessionId);
   const { data: roomsData } = useRooms({ limit: 100 });
@@ -295,11 +310,13 @@ export default function ExamSessionDetailPage() {
   };
 
   const canEdit = !isReadOnly && session.status !== ExamSessionStatus.CLOSED;
-  const canPublish = !isReadOnly && session.status === ExamSessionStatus.DRAFT && schedules.length > 0;
+  const canPublish =
+    !isReadOnly && session.status === ExamSessionStatus.DRAFT && schedules.length > 0;
   const canClose = !isReadOnly && session.status === ExamSessionStatus.PUBLISHED;
 
   // Inline form — shown when a day is clicked OR a course card is expanded
-  const showInlineForm = (expandedCourseId !== null || preselectedDate !== null) && canEdit && !editingSchedule;
+  const showInlineForm =
+    (expandedCourseId !== null || preselectedDate !== null) && canEdit && !editingSchedule;
 
   return (
     <ProtectedRoute>
@@ -311,7 +328,12 @@ export default function ExamSessionDetailPage() {
             className="flex items-center gap-2 text-sm font-medium text-[#00365F] transition-colors hover:text-[#008D36]"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Sessions d&apos;examen
           </Link>
@@ -323,22 +345,29 @@ export default function ExamSessionDetailPage() {
             <div className="flex items-center gap-3">
               <h2 className="text-2xl font-semibold text-zinc-900">{session.name}</h2>
               <ExamSessionStatusBadge status={session.status} />
-              <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ${
-                session.type === ExamSessionType.NORMAL
-                  ? "bg-[#00365F]/10 text-[#00365F]"
-                  : "bg-amber-100 text-amber-700"
-              }`}>
+              <span
+                className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ${
+                  session.type === ExamSessionType.NORMAL
+                    ? "bg-[#00365F]/10 text-[#00365F]"
+                    : "bg-amber-100 text-amber-700"
+                }`}
+              >
                 {session.type_label}
               </span>
             </div>
             <p className="mt-1 text-sm text-zinc-500">
-              Semestre {session.semester_number} · {" "}
-              {new Date(session.start_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
+              Semestre {session.semester_number} ·{" "}
+              {new Date(session.start_date).toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+              })}
               {" → "}
-              {new Date(session.end_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-              {session.academic_year && (
-                <> · {session.academic_year.name}</>
-              )}
+              {new Date(session.end_date).toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              {session.academic_year && <> · {session.academic_year.name}</>}
             </p>
           </div>
 
@@ -350,7 +379,12 @@ export default function ExamSessionDetailPage() {
                 className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:opacity-50"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 Publier
               </button>
@@ -370,7 +404,12 @@ export default function ExamSessionDetailPage() {
                 className="rounded-lg border border-red-100 p-2 text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
               </button>
             )}
@@ -382,7 +421,9 @@ export default function ExamSessionDetailPage() {
           <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-zinc-700">Examens planifiés</span>
-              <span className="text-sm font-bold text-zinc-900">{schedules.length} examen{schedules.length > 1 ? "s" : ""}</span>
+              <span className="text-sm font-bold text-zinc-900">
+                {schedules.length} examen{schedules.length > 1 ? "s" : ""}
+              </span>
             </div>
           </div>
         )}
@@ -394,11 +435,19 @@ export default function ExamSessionDetailPage() {
             {canEdit && !expandedCourseId && !preselectedDate && (
               <button
                 type="button"
-                onClick={() => { setExpandedCourseId("__new__"); setPreselectedDate(undefined); }}
+                onClick={() => {
+                  setExpandedCourseId("__new__");
+                  setPreselectedDate(undefined);
+                }}
                 className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#008D36]/40 bg-[#008D36]/5 py-3 text-sm font-medium text-[#008D36] transition-colors hover:border-[#008D36] hover:bg-[#008D36]/10"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
                 Planifier un examen
               </button>
@@ -414,7 +463,10 @@ export default function ExamSessionDetailPage() {
                   rooms={rooms}
                   invigilators={invigilators}
                   onSubmit={handleCreateSchedule}
-                  onCancel={() => { setExpandedCourseId(null); setPreselectedDate(undefined); }}
+                  onCancel={() => {
+                    setExpandedCourseId(null);
+                    setPreselectedDate(undefined);
+                  }}
                   isLoading={createScheduleMutation.isPending}
                   preselectedDate={preselectedDate}
                 />
@@ -432,7 +484,9 @@ export default function ExamSessionDetailPage() {
                     <div key={s.id}>
                       {editingSchedule?.id === s.id ? (
                         <div className="rounded-lg border border-[#008D36] bg-[#008D36]/5 p-4">
-                          <p className="mb-3 text-sm font-semibold text-[#008D36]">Modifier l&apos;examen</p>
+                          <p className="mb-3 text-sm font-semibold text-[#008D36]">
+                            Modifier l&apos;examen
+                          </p>
                           <ExamScheduleForm
                             session={session}
                             courses={allCoursesInSession}
@@ -454,14 +508,22 @@ export default function ExamSessionDetailPage() {
                               {s.course?.name ?? s.course_id}
                             </p>
                             <div className="mt-0.5 text-xs text-zinc-500">
-                              {new Date(s.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
-                              {" · "}{s.start_time}–{s.end_time}
+                              {new Date(s.date).toLocaleDateString("fr-FR", {
+                                weekday: "short",
+                                day: "numeric",
+                                month: "short",
+                              })}
+                              {" · "}
+                              {s.start_time}–{s.end_time}
                               {s.room && <> · {s.room.name ?? s.room.room_number}</>}
                             </div>
                             {s.invigilators && s.invigilators.length > 0 && (
                               <div className="mt-1 flex flex-wrap gap-1">
                                 {s.invigilators.map((inv) => (
-                                  <span key={inv.id} className="inline-flex items-center rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600">
+                                  <span
+                                    key={inv.id}
+                                    className="inline-flex items-center rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600"
+                                  >
                                     {inv.full_name}
                                   </span>
                                 ))}
@@ -471,19 +533,44 @@ export default function ExamSessionDetailPage() {
                           {canEdit && (
                             <div className="shrink-0 flex gap-1">
                               <button
-                                onClick={() => { setEditingSchedule(s); setExpandedCourseId(null); }}
+                                onClick={() => {
+                                  setEditingSchedule(s);
+                                  setExpandedCourseId(null);
+                                }}
                                 className="rounded p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors"
                               >
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <svg
+                                  className="h-3.5 w-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
                                 </svg>
                               </button>
                               <button
-                                onClick={() => setDeleteScheduleConfirm({ isOpen: true, scheduleId: s.id })}
+                                onClick={() =>
+                                  setDeleteScheduleConfirm({ isOpen: true, scheduleId: s.id })
+                                }
                                 className="rounded p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                               >
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="h-3.5 w-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                               </button>
                             </div>

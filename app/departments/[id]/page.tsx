@@ -83,114 +83,118 @@ export default function DepartmentDetailPage() {
     <ProtectedRoute>
       <DashboardLayout title="Détails du Département">
         <div className="mx-auto max-w-4xl">
-        <HierarchyBreadcrumb
-          items={[
-            { label: "Établissements", href: "/faculties" },
-            ...(department.faculty
-              ? [{ label: department.faculty.name, href: `/faculties/${department.faculty_id}` }]
-              : []),
-            { label: department.name },
-          ]}
-        />
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-zinc-900">{department.name}</h2>
-            <p className="mt-1 text-sm text-zinc-500">
-              Créé le {new Date(department.created_at).toLocaleDateString("fr-FR")}
-            </p>
+          <HierarchyBreadcrumb
+            items={[
+              { label: "Établissements", href: "/faculties" },
+              ...(department.faculty
+                ? [{ label: department.faculty.name, href: `/faculties/${department.faculty_id}` }]
+                : []),
+              { label: department.name },
+            ]}
+          />
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold text-zinc-900">{department.name}</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                Créé le {new Date(department.created_at).toLocaleDateString("fr-FR")}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/programmes?department_id=${department.id}`}
+                className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                Voir les programmes
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Link>
+              <button
+                onClick={() => setDeleteConfirm(true)}
+                className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+                Supprimer
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href={`/programmes?department_id=${department.id}`}
-              className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-            >
-              Voir les programmes
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-            <button
-              onClick={() => setDeleteConfirm(true)}
-              className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-              Supprimer
-            </button>
-          </div>
-        </div>
 
-        <div className="space-y-6">
-          <div className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-              Informations générales
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Code</p>
-                <p className="mt-1 text-sm text-zinc-900">{department.code}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Statut</p>
-                <span
-                  className={`mt-1 inline-flex rounded-full px-2 py-1 text-xs font-medium ${department.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
-                >
-                  {department.is_active ? "Actif" : "Inactif"}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Faculté</p>
-                {department.faculty ? (
-                  <Link
-                    href={`/faculties/${department.faculty_id}`}
-                    className="mt-1 inline-block text-sm text-[#00365F] hover:underline"
+          <div className="space-y-6">
+            <div className="rounded-lg border border-zinc-200 bg-white p-6">
+              <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+                Informations générales
+              </h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Code</p>
+                  <p className="mt-1 text-sm text-zinc-900">{department.code}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Statut</p>
+                  <span
+                    className={`mt-1 inline-flex rounded-full px-2 py-1 text-xs font-medium ${department.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
                   >
-                    {department.faculty.name}
-                  </Link>
-                ) : (
-                  <p className="mt-1 text-sm text-zinc-900">-</p>
-                )}
+                    {department.is_active ? "Actif" : "Inactif"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Faculté</p>
+                  {department.faculty ? (
+                    <Link
+                      href={`/faculties/${department.faculty_id}`}
+                      className="mt-1 inline-block text-sm text-[#00365F] hover:underline"
+                    >
+                      {department.faculty.name}
+                    </Link>
+                  ) : (
+                    <p className="mt-1 text-sm text-zinc-900">-</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Chef de département</p>
+                  <p className="mt-1 text-sm text-zinc-900">
+                    {department.head?.name || "Non assigné"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Identifiant</p>
+                  <p className="mt-1 text-sm text-zinc-900">{department.id}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Chef de département</p>
-                <p className="mt-1 text-sm text-zinc-900">
-                  {department.head?.name || "Non assigné"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Identifiant</p>
-                <p className="mt-1 text-sm text-zinc-900">{department.id}</p>
+            </div>
+
+            <div className="rounded-lg border border-zinc-200 bg-white p-6">
+              <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+                Métadonnées
+              </h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Créé le</p>
+                  <p className="mt-1 text-sm text-zinc-900">
+                    {new Date(department.created_at).toLocaleString("fr-FR")}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-500">Mis à jour le</p>
+                  <p className="mt-1 text-sm text-zinc-900">
+                    {new Date(department.updated_at).toLocaleString("fr-FR")}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-              Métadonnées
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Créé le</p>
-                <p className="mt-1 text-sm text-zinc-900">
-                  {new Date(department.created_at).toLocaleString("fr-FR")}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-500">Mis à jour le</p>
-                <p className="mt-1 text-sm text-zinc-900">
-                  {new Date(department.updated_at).toLocaleString("fr-FR")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         </div>
 
         <ConfirmDialog

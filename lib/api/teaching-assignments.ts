@@ -43,9 +43,7 @@ export async function deleteTeachingAssignment(id: string): Promise<void> {
   await api.del(`/teaching-assignments/${id}`);
 }
 
-export async function getPlanning(
-  filters?: PlanningFilters
-): Promise<TeachingAssignment[]> {
+export async function getPlanning(filters?: PlanningFilters): Promise<TeachingAssignment[]> {
   const params = new URLSearchParams();
   if (filters?.program_id) params.append("filter[program_id]", filters.program_id);
   if (filters?.academic_year_id)

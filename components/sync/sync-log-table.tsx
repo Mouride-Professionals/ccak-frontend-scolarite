@@ -77,10 +77,18 @@ export default function SyncLogTable({ logs }: SyncLogTableProps) {
                       {cfg.label}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-right text-zinc-600 sm:px-6">{log.total_received}</td>
-                  <td className="px-4 py-4 text-right text-zinc-600 sm:px-6">{log.total_updated}</td>
+                  <td className="px-4 py-4 text-right text-zinc-600 sm:px-6">
+                    {log.total_received}
+                  </td>
+                  <td className="px-4 py-4 text-right text-zinc-600 sm:px-6">
+                    {log.total_updated}
+                  </td>
                   <td className="px-4 py-4 text-right sm:px-6">
-                    <span className={log.total_errors > 0 ? "font-medium text-red-600" : "text-zinc-600"}>
+                    <span
+                      className={
+                        log.total_errors > 0 ? "font-medium text-red-600" : "text-zinc-600"
+                      }
+                    >
                       {log.total_errors}
                     </span>
                   </td>

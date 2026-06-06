@@ -24,9 +24,7 @@ function DepartmentsPageContent() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editDepartmentId, setEditDepartmentId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [facultyFilter, setFacultyFilter] = useState<string>(
-    searchParams.get("faculty_id") ?? ""
-  );
+  const [facultyFilter, setFacultyFilter] = useState<string>(searchParams.get("faculty_id") ?? "");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [showFilters, setShowFilters] = useState(!!searchParams.get("faculty_id"));
   const [deleteConfirm, setDeleteConfirm] = useState<{

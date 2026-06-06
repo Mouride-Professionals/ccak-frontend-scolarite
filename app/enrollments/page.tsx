@@ -341,7 +341,9 @@ export default function EnrollmentsPage() {
                 >
                   <option value="">Tous les statuts</option>
                   <option value={RegistrationStatus.DRAFT}>Brouillon</option>
-                  <option value={RegistrationStatus.PENDING_VALIDATION}>En attente de validation</option>
+                  <option value={RegistrationStatus.PENDING_VALIDATION}>
+                    En attente de validation
+                  </option>
                   <option value={RegistrationStatus.VALIDATED}>Validée</option>
                   <option value={RegistrationStatus.SUSPENDED}>Suspendue</option>
                   <option value={RegistrationStatus.CANCELLED}>Annulée</option>

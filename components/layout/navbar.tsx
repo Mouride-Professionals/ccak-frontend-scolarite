@@ -36,13 +36,28 @@ function YearOption({
       {isCurrent ? (
         <span className="h-2 w-2 rounded-full bg-green-500" />
       ) : (
-        <svg className="h-3.5 w-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <svg
+          className="h-3.5 w-3.5 text-zinc-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
         </svg>
       )}
       <span className={isCurrent ? "text-[#00365F]" : "text-zinc-600"}>{year.name}</span>
       {isSelected && (
-        <svg className="ml-auto h-3.5 w-3.5 text-[#00365F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="ml-auto h-3.5 w-3.5 text-[#00365F]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       )}
@@ -170,8 +185,18 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
               }`}
             >
               {isReadOnly ? (
-                <svg className="h-3.5 w-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <svg
+                  className="h-3.5 w-3.5 text-amber-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
                 </svg>
               ) : (
                 <span className="h-2 w-2 rounded-full bg-green-500" />
@@ -179,8 +204,18 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
               <span className={`font-medium ${isReadOnly ? "text-amber-700" : "text-[#00365F]"}`}>
                 {selectedYear.name}
               </span>
-              <svg className={`h-3.5 w-3.5 ${isReadOnly ? "text-amber-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg
+                className={`h-3.5 w-3.5 ${isReadOnly ? "text-amber-500" : "text-zinc-400"}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
@@ -197,14 +232,19 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
                         year={year}
                         isSelected={selectedYear.id === year.id}
                         isCurrent
-                        onSelect={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                        onSelect={() => {
+                          setSelectedYear(year);
+                          setShowYearMenu(false);
+                        }}
                       />
                     ))}
                   </>
                 )}
                 {archivedYears.length > 0 && (
                   <>
-                    <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 ${currentYears.length > 0 ? "border-t border-zinc-100" : ""}`}>
+                    <div
+                      className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 ${currentYears.length > 0 ? "border-t border-zinc-100" : ""}`}
+                    >
                       Années archivées
                     </div>
                     {archivedYears.map((year) => (
@@ -213,7 +253,10 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
                         year={year}
                         isSelected={selectedYear.id === year.id}
                         isCurrent={false}
-                        onSelect={() => { setSelectedYear(year); setShowYearMenu(false); }}
+                        onSelect={() => {
+                          setSelectedYear(year);
+                          setShowYearMenu(false);
+                        }}
                       />
                     ))}
                   </>

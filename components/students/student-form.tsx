@@ -364,9 +364,7 @@ export default function StudentForm({
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.email ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.email && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email.message}</p>}
           </div>
 
           {/* Address */}
