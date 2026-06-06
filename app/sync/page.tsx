@@ -37,7 +37,7 @@ function SyncPageContent() {
   });
 
   const isAdmin =
-    status === "authenticated" && getRealmRoles(session?.accessToken).includes("admin");
+    status === "authenticated" && getRealmRoles(session?.accessToken).includes("ADMIN");
 
   // Redirect non-admins once session is resolved
   useEffect(() => {

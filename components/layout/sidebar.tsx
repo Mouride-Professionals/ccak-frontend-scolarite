@@ -404,7 +404,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(["scolarite"]);
   const { data: session } = useSession();
-  const isAdmin = getRealmRoles(session?.accessToken).includes("admin");
+  const isAdmin = getRealmRoles(session?.accessToken).includes("ADMIN");
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems((prev) => (prev.includes(itemId) ? [] : [itemId]));
