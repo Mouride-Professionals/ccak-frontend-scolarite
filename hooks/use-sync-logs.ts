@@ -10,6 +10,7 @@ export const syncLogKeys = {
   all: ["sync-logs"] as const,
   lists: () => [...syncLogKeys.all, "list"] as const,
   list: (filters?: SyncLogsFilters) => [...syncLogKeys.lists(), filters] as const,
+  stats: () => [...syncLogKeys.all, "stats"] as const,
 };
 
 export function useSyncLogs(filters?: SyncLogsFilters) {
@@ -20,6 +21,14 @@ export function useSyncLogs(filters?: SyncLogsFilters) {
   });
 }
 
+export function useSyncStats() {
+  return useQuery({
+    queryKey: syncLogKeys.stats(),
+    queryFn: syncLogsApi.getSyncStats,
+    staleTime: 60_000,
+  });
+}
+
 export function useTriggerSync() {
   const queryClient = useQueryClient();
 
@@ -27,6 +36,7 @@ export function useTriggerSync() {
     mutationFn: (entityType?: string) => syncLogsApi.triggerSync(entityType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: syncLogKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: syncLogKeys.stats() });
     },
   });
 }

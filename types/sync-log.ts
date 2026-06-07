@@ -30,3 +30,12 @@ export interface SyncLogsResponse {
   limit: number;
   total_pages: number;
 }
+
+export interface EntityStats {
+  is_static: boolean;
+  last_synced_at?: string | null;
+  total?: number | null;
+  status?: SyncStatus | null;
+}
+
+export type SyncStats = Record<string, EntityStats>;
