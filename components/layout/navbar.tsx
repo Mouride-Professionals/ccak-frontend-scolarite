@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import NotificationPopup from "@/components/notifications/NotificationPopup";
+import SearchTriggerButton from "@/components/shared/command-palette/SearchTriggerButton";
 import { useAcademicYears } from "@/hooks/use-academic-years";
 import { useSelectedYear } from "@/hooks/use-selected-year";
 import type { AcademicYear } from "@/types/academic-year";
@@ -268,6 +269,9 @@ export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarPro
 
         {/* User Info & Notifications */}
         <div className="flex items-center gap-2 sm:gap-4">
+          {/* Global Search */}
+          <SearchTriggerButton />
+
           {/* Notification Popup */}
           <NotificationPopup />
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sidebar from "./sidebar";
 import Navbar from "./navbar";
 import AnnouncementBanner from "@/components/announcements/announcement-banner";
+import CommandPalette from "@/components/shared/command-palette/CommandPalette";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useSelectedYearStore } from "@/stores/selected-year-store";
 
@@ -22,6 +23,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
 
   return (
     <div className="min-h-screen bg-[#DAE4EB]">
+      <CommandPalette />
       {/* Mobile overlay */}
       {isSidebarOpen && (
         <button
