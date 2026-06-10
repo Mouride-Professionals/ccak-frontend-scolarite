@@ -14,45 +14,22 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import {
-  useAssessmentGradeSheet,
-  usePublishAssessmentGrades,
-} from "@/hooks/use-assessments";
-import { useCreateGrade, useUpdateGrade } from "@/hooks/use-grades";
+import { useExamGradeSheet, useCreateExamGrade, useUpdateExamGrade } from "@/hooks/use-exam-grades";
 import { useDownloadGradeSheetPdf, useDownloadGradeSheetExcel, useImportGradeSheet } from "@/hooks/use-fiche-de-note";
-import { ASSESSMENT_TYPE_LABELS } from "@/types/assessment";
-import type { AssessmentType, AssessmentGradeSheetRow } from "@/types/assessment";
+import type { GradeSheetStudentRow } from "@/types/fiche-de-note";
 import type { ImportGradesResult } from "@/types/fiche-de-note";
 
-const TYPE_COLORS: Record<string, string> = {
-  WRITTEN:      "bg-blue-100 text-blue-700",
-  ORAL:         "bg-purple-100 text-purple-700",
-  LAB:          "bg-yellow-100 text-yellow-700",
-  QCM:          "bg-orange-100 text-orange-700",
-  PRESENTATION: "bg-pink-100 text-pink-700",
-};
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-export default function AssessmentDetailPage() {
-  const params = useSafeParams<{ id: string }>();
-  const id = params?.id as string;
+export default function ExamGradeSheetPage() {
+  const params = useSafeParams<{ examScheduleId: string }>();
+  const examScheduleId = params?.examScheduleId as string;
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data, isLoading, refetch } = useAssessmentGradeSheet(id);
-  const publishMutation = usePublishAssessmentGrades(id);
-  const createGrade = useCreateGrade();
-  const updateGrade = useUpdateGrade();
+  const { data, isLoading, refetch } = useExamGradeSheet(examScheduleId);
+  const createGrade = useCreateExamGrade(examScheduleId);
+  const updateGrade = useUpdateExamGrade(examScheduleId);
 
-  const ctx = { type: "assessment" as const, id };
+  const ctx = { type: "exam_schedule" as const, id: examScheduleId };
   const downloadPdf   = useDownloadGradeSheetPdf(ctx);
   const downloadExcel = useDownloadGradeSheetExcel(ctx);
   const importGrades  = useImportGradeSheet(ctx);
@@ -66,10 +43,12 @@ export default function AssessmentDetailPage() {
     type: "success" as "success" | "error",
   });
 
-  const assessment = data?.assessment;
-  const students = data?.students ?? [];
+  const schedule   = data?.exam_schedule;
+  const students   = data?.students ?? [];
+  const useAnonyma = schedule?.use_exam_number ?? false;
 
-  const getScore = (row: AssessmentGradeSheetRow) =>
+  // scores keyed by student_id always (even in anonyma mode)
+  const getScore = (row: GradeSheetStudentRow) =>
     scores[row.student_id] !== undefined
       ? scores[row.student_id]
       : row.score !== null && row.score !== undefined
@@ -81,7 +60,7 @@ export default function AssessmentDetailPage() {
   };
 
   const handleSaveRow = useCallback(
-    async (row: AssessmentGradeSheetRow) => {
+    async (row: GradeSheetStudentRow) => {
       const rawScore = scores[row.student_id];
       if (rawScore === undefined || rawScore === "") return;
 
@@ -91,19 +70,13 @@ export default function AssessmentDetailPage() {
       setSavingRow(row.student_id);
       try {
         const payload = {
-          student_id: row.student_id,
-          course_id: assessment!.course_id,
           course_enrollment_id: row.course_enrollment_id,
-          assessment_id: assessment!.id,
-          type: "CC",
           score,
           max_score: row.max_score ?? 20,
-          weight: assessment?.coefficient ?? 1,
-          status: "DRAFT",
         };
 
         if (row.grade_id) {
-          await updateGrade.mutateAsync({ id: row.grade_id, input: payload });
+          await updateGrade.mutateAsync(payload);
         } else {
           await createGrade.mutateAsync(payload);
         }
@@ -115,23 +88,13 @@ export default function AssessmentDetailPage() {
           return next;
         });
       } catch {
-        setToast({ isOpen: true, message: "Erreur lors de l'enregistrement de la note.", type: "error" });
+        setToast({ isOpen: true, message: "Erreur lors de l'enregistrement.", type: "error" });
       } finally {
         setSavingRow(null);
       }
     },
-    [scores, assessment, createGrade, updateGrade, refetch]
+    [scores, createGrade, updateGrade, refetch]
   );
-
-  const handlePublish = async () => {
-    if (!confirm("Publier les notes de ce contrôle ? Cette action est irréversible.")) return;
-    try {
-      await publishMutation.mutateAsync();
-      setToast({ isOpen: true, message: "Notes publiées avec succès.", type: "success" });
-    } catch {
-      setToast({ isOpen: true, message: "Erreur lors de la publication.", type: "error" });
-    }
-  };
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -152,107 +115,69 @@ export default function AssessmentDetailPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout title="Détail du contrôle continu">
+      <DashboardLayout title="Saisie des notes d'examen">
         <div className="space-y-6">
           {/* Back */}
           <button
             type="button"
-            onClick={() => router.push("/assessments")}
+            onClick={() => router.push("/exam-grades")}
             className="text-sm font-medium text-[#00365F] transition-colors hover:text-[#008D36]"
           >
-            ← Retour aux contrôles
+            ← Retour aux fiches de notes
           </button>
 
           {isLoading ? (
             <div className="rounded-lg border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
               Chargement...
             </div>
-          ) : !assessment ? (
+          ) : !schedule ? (
             <div className="rounded-lg border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-500">
-              Contrôle introuvable.
+              Épreuve introuvable.
             </div>
           ) : (
             <>
               {/* Header card */}
               <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="space-y-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-lg font-semibold text-[#00365F]">{assessment.title}</h2>
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[assessment.type] ?? "bg-zinc-100 text-zinc-600"}`}>
-                        {ASSESSMENT_TYPE_LABELS[assessment.type as AssessmentType] ?? assessment.type_label}
-                      </span>
-                      {assessment.is_grades_published && (
-                        <span className="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                          Notes publiées
+                      <h2 className="text-lg font-semibold text-[#00365F]">
+                        {schedule.course_code} — {schedule.course_name}
+                      </h2>
+                      {useAnonyma && (
+                        <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          Anonymat
                         </span>
                       )}
                     </div>
-                    <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+                    <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4">
                       <div>
-                        <dt className="text-zinc-400">Matière</dt>
-                        <dd className="font-medium text-zinc-700">
-                          {assessment.course ? `${assessment.course.code} — ${assessment.course.name}` : "—"}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-zinc-400">Enseignant</dt>
-                        <dd className="font-medium text-zinc-700">
-                          {assessment.faculty_member?.full_name ?? "—"}
-                        </dd>
+                        <dt className="text-zinc-400">Session</dt>
+                        <dd className="font-medium text-zinc-700">{schedule.session_name}</dd>
                       </div>
                       <div>
                         <dt className="text-zinc-400">Date</dt>
                         <dd className="font-medium text-zinc-700">
-                          {assessment.date ? formatDate(assessment.date) : "—"}
+                          {new Date(schedule.date).toLocaleDateString("fr-FR")}
                         </dd>
                       </div>
-                      {assessment.start_time && (
-                        <div>
-                          <dt className="text-zinc-400">Heure</dt>
-                          <dd className="font-medium text-zinc-700">{assessment.start_time}</dd>
-                        </div>
-                      )}
-                      {assessment.duration_minutes && (
-                        <div>
-                          <dt className="text-zinc-400">Durée</dt>
-                          <dd className="font-medium text-zinc-700">{assessment.duration_minutes} min</dd>
-                        </div>
-                      )}
-                      {assessment.room && (
+                      <div>
+                        <dt className="text-zinc-400">Horaire</dt>
+                        <dd className="font-medium text-zinc-700">
+                          {schedule.start_time} – {schedule.end_time}
+                        </dd>
+                      </div>
+                      {schedule.room && (
                         <div>
                           <dt className="text-zinc-400">Salle</dt>
-                          <dd className="font-medium text-zinc-700">{assessment.room}</dd>
+                          <dd className="font-medium text-zinc-700">{schedule.room}</dd>
                         </div>
                       )}
-                      {assessment.coefficient && (
-                        <div>
-                          <dt className="text-zinc-400">Coefficient CC</dt>
-                          <dd className="font-medium text-zinc-700">{assessment.coefficient}</dd>
-                        </div>
-                      )}
+                      <div>
+                        <dt className="text-zinc-400">Semestre</dt>
+                        <dd className="font-medium text-zinc-700">S{schedule.semester_number}</dd>
+                      </div>
                     </dl>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/assessments/${id}/edit`)}
-                      className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50"
-                    >
-                      Modifier
-                    </button>
-                    {!assessment.is_grades_published && (
-                      <button
-                        type="button"
-                        onClick={handlePublish}
-                        disabled={publishMutation.isPending || gradedCount === 0}
-                        className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {publishMutation.isPending ? "Publication..." : "Publier les notes"}
-                      </button>
-                    )}
                   </div>
                 </div>
               </div>
@@ -267,7 +192,7 @@ export default function AssessmentDetailPage() {
                     </p>
                   </div>
 
-                  {/* Export / Import toolbar */}
+                  {/* Toolbar */}
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
@@ -287,7 +212,7 @@ export default function AssessmentDetailPage() {
                     </button>
                     <button
                       type="button"
-                      disabled={assessment.is_grades_published || importGrades.isPending}
+                      disabled={importGrades.isPending}
                       onClick={() => fileInputRef.current?.click()}
                       className="rounded-lg border border-[#008D36] bg-white px-3 py-1.5 text-xs font-medium text-[#008D36] transition-colors hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
@@ -319,15 +244,21 @@ export default function AssessmentDetailPage() {
 
                 {students.length === 0 ? (
                   <div className="p-10 text-center text-sm text-zinc-500">
-                    Aucun étudiant inscrit à cette matière.
+                    Aucun étudiant inscrit à cette épreuve.
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-12">N°</TableHead>
-                        <TableHead>Nom &amp; Prénom</TableHead>
-                        <TableHead>N° Carte</TableHead>
+                        {useAnonyma ? (
+                          <TableHead>Code anonymat</TableHead>
+                        ) : (
+                          <>
+                            <TableHead>Nom &amp; Prénom</TableHead>
+                            <TableHead>N° Carte</TableHead>
+                          </>
+                        )}
                         <TableHead>Note / {students[0]?.max_score ?? 20}</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead />
@@ -342,8 +273,20 @@ export default function AssessmentDetailPage() {
                         return (
                           <TableRow key={row.student_id}>
                             <TableCell className="text-zinc-400">{idx + 1}</TableCell>
-                            <TableCell className="font-medium text-zinc-800">{row.full_name}</TableCell>
-                            <TableCell className="font-mono text-zinc-500">{row.student_number ?? "—"}</TableCell>
+                            {useAnonyma ? (
+                              <TableCell className="font-mono font-medium text-zinc-800">
+                                {row.exam_number ?? "—"}
+                              </TableCell>
+                            ) : (
+                              <>
+                                <TableCell className="font-medium text-zinc-800">
+                                  {row.full_name ?? "—"}
+                                </TableCell>
+                                <TableCell className="font-mono text-zinc-500">
+                                  {row.student_number ?? "—"}
+                                </TableCell>
+                              </>
+                            )}
                             <TableCell>
                               <input
                                 type="number"
@@ -351,7 +294,7 @@ export default function AssessmentDetailPage() {
                                 max={row.max_score ?? 20}
                                 step={0.25}
                                 value={scoreVal}
-                                disabled={assessment.is_grades_published || isSaving}
+                                disabled={isSaving}
                                 onChange={(e) => handleScoreChange(row.student_id, e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSaveRow(row)}
                                 className="w-20 rounded border border-zinc-300 px-2 py-1 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] disabled:bg-zinc-50 disabled:text-zinc-400"
@@ -369,7 +312,7 @@ export default function AssessmentDetailPage() {
                               )}
                             </TableCell>
                             <TableCell className="text-right">
-                              {!assessment.is_grades_published && isDirty && (
+                              {isDirty && (
                                 <button
                                   type="button"
                                   onClick={() => handleSaveRow(row)}

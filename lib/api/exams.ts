@@ -5,6 +5,8 @@ import type {
   ExamSchedule,
   ExamSessionFilters,
   ExamSessionsPaginatedResponse,
+  ExamScheduleFilters,
+  ExamSchedulesPaginatedResponse,
   CreateExamSessionInput,
   UpdateExamSessionInput,
   CreateExamScheduleInput,
@@ -108,4 +110,18 @@ export async function checkConflicts(input: CheckConflictsInput): Promise<Confli
     input as unknown as Record<string, unknown>
   );
   return unwrapData<ConflictResult>(response);
+}
+
+export async function getExamSchedulesList(
+  filters?: ExamScheduleFilters
+): Promise<ExamSchedulesPaginatedResponse> {
+  const params = new URLSearchParams();
+  if (filters?.exam_session_id) params.append("exam_session_id", filters.exam_session_id);
+  if (filters?.academic_year_id) params.append("academic_year_id", filters.academic_year_id);
+  if (filters?.course_id) params.append("course_id", filters.course_id);
+  if (filters?.page) params.append("page", String(filters.page));
+  if (filters?.limit) params.append("limit", String(filters.limit));
+
+  const response = await api.get(`/exam-schedules${params.toString() ? `?${params}` : ""}`);
+  return toPaginated<ExamSchedule, ExamSchedulesPaginatedResponse>(response);
 }

@@ -35,6 +35,7 @@ export interface Enrollment {
   status: RegistrationStatus;
   enrollment_date: string;
   registration_number: string | null;
+  exam_number?: string | null;
   registration_fee_paid: number;
   is_scholarship_holder: boolean;
   scholarship_type: string | null;

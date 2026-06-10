@@ -35,6 +35,7 @@ export interface Grade {
     type: string;
     date: string;
   } | null;
+  exam_schedule_id?: string | null;
   type: string;
   score: number;
   max_score: number;
@@ -130,6 +131,7 @@ export interface CreateGradeInput {
   student_id: string;
   course_id: string;
   assessment_id?: string | null;
+  exam_schedule_id?: string | null;
   type: string;
   score: number;
   max_score: number;
@@ -142,6 +144,7 @@ export interface UpdateGradeInput {
   student_id?: string;
   course_id?: string;
   assessment_id?: string | null;
+  exam_schedule_id?: string | null;
   type?: string;
   score?: number;
   max_score?: number;

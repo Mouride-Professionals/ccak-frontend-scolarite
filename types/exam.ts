@@ -37,6 +37,7 @@ export interface ExamSession {
   end_date: string;
   status: ExamSessionStatus;
   status_label: string;
+  use_exam_number: boolean;
   schedules_count?: number;
   schedules?: ExamSchedule[];
   created_at: string;
@@ -139,6 +140,22 @@ export interface ExamSessionFilters {
 
 export interface ExamSessionsPaginatedResponse {
   data: ExamSession[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+export interface ExamScheduleFilters {
+  page?: number;
+  limit?: number;
+  exam_session_id?: string;
+  academic_year_id?: string;
+  course_id?: string;
+}
+
+export interface ExamSchedulesPaginatedResponse {
+  data: ExamSchedule[];
   total: number;
   page: number;
   limit: number;

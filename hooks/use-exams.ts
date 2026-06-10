@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   ExamSessionFilters,
+  ExamScheduleFilters,
   CreateExamSessionInput,
   UpdateExamSessionInput,
   CreateExamScheduleInput,
@@ -18,6 +19,8 @@ import * as examsApi from "@/lib/api/exams";
 export const examKeys = {
   all: ["exam-sessions"] as const,
   lists: () => [...examKeys.all, "list"] as const,
+  schedulesList: (filters?: ExamScheduleFilters) =>
+    ["exam-schedules", "list", filters] as const,
   list: (filters?: ExamSessionFilters) => [...examKeys.lists(), filters] as const,
   details: () => [...examKeys.all, "detail"] as const,
   detail: (id: string) => [...examKeys.details(), id] as const,
@@ -140,5 +143,13 @@ export function useDeleteExamSchedule(sessionId: string) {
 export function useCheckConflicts() {
   return useMutation({
     mutationFn: (input: CheckConflictsInput) => examsApi.checkConflicts(input),
+  });
+}
+
+export function useExamSchedulesList(filters?: ExamScheduleFilters) {
+  return useQuery({
+    queryKey: examKeys.schedulesList(filters),
+    queryFn: () => examsApi.getExamSchedulesList(filters),
+    staleTime: 30_000,
   });
 }

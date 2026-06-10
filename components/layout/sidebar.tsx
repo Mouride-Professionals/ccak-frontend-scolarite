@@ -115,6 +115,12 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
+        id: "exam-grades",
+        label: "Fiches de notes",
+        href: "/exam-grades",
+        icon: null as any,
+      },
+      {
         id: "evaluations",
         label: "Évaluations",
         href: "/evaluations",
