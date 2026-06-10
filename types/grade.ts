@@ -28,6 +28,13 @@ export interface Grade {
   id: string;
   student_id: string;
   course_id: string;
+  assessment_id?: string | null;
+  assessment?: {
+    id: string;
+    title: string;
+    type: string;
+    date: string;
+  } | null;
   type: string;
   score: number;
   max_score: number;
@@ -119,8 +126,10 @@ export interface EvaluationTypeOption {
 // =====================
 
 export interface CreateGradeInput {
+  course_enrollment_id: string;
   student_id: string;
   course_id: string;
+  assessment_id?: string | null;
   type: string;
   score: number;
   max_score: number;
@@ -132,6 +141,7 @@ export interface CreateGradeInput {
 export interface UpdateGradeInput {
   student_id?: string;
   course_id?: string;
+  assessment_id?: string | null;
   type?: string;
   score?: number;
   max_score?: number;

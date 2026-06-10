@@ -43,8 +43,8 @@ const menuItems: MenuItem[] = [
     ),
   },
   {
-    id: "scolarite",
-    label: "Scolarité",
+    id: "personnes",
+    label: "Personnes",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -56,42 +56,6 @@ const menuItems: MenuItem[] = [
       </svg>
     ),
     children: [
-      {
-        id: "faculties",
-        label: "Établissements",
-        href: "/faculties",
-        icon: null as any,
-      },
-      {
-        id: "departments",
-        label: "Départements",
-        href: "/departments",
-        icon: null as any,
-      },
-      {
-        id: "programmes",
-        label: "Programmes",
-        href: "/programmes",
-        icon: null as any,
-      },
-      {
-        id: "academic-years",
-        label: "Annees Academiques",
-        href: "/academic-years",
-        icon: null as any,
-      },
-      {
-        id: "course-units",
-        label: "Unités d'Enseignement",
-        href: "/course-units",
-        icon: null as any,
-      },
-      {
-        id: "courses",
-        label: "Cours",
-        href: "/courses",
-        icon: null as any,
-      },
       {
         id: "students",
         label: "Étudiants",
@@ -105,47 +69,22 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
-        id: "deliberations",
-        label: "Délibérations",
-        href: "/deliberations",
-        icon: null as any,
-      },
-      {
-        id: "teaching-assignments",
-        label: "Affectations",
-        href: "/teaching-assignments",
-        icon: null as any,
-      },
-      {
-        id: "maquette",
-        label: "Maquette",
-        href: "/maquette",
-        icon: null as any,
-      },
-      {
-        id: "planning-cours",
-        label: "Planning Cours",
-        href: "/planning-cours",
-        icon: null as any,
-      },
-      {
-        id: "documents",
-        label: "Documents",
-        href: "/documents",
-        icon: null as any,
-      },
-      {
         id: "enrollments",
-        label: "Enrollements",
+        label: "Inscriptions",
         href: "/enrollments",
+        icon: null as any,
+      },
+{
+        id: "teaching-assignments",
+        label: "Charges d'enseignement",
+        href: "/teaching-assignments",
         icon: null as any,
       },
     ],
   },
   {
-    id: "exams",
-    label: "Examens",
-    href: "/exams",
+    id: "evaluation",
+    label: "Évaluation",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -156,126 +95,54 @@ const menuItems: MenuItem[] = [
         />
       </svg>
     ),
-  },
-  {
-    id: "notes",
-    label: "Notes",
-    href: "/grades",
-    icon: (
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: "attendance",
-    label: "Assiduité",
-    icon: (
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
     children: [
       {
-        id: "course-logs-new",
-        label: "Nouveau cahier",
-        href: "/course-logs/new",
+        id: "assessments",
+        label: "Contrôles continus",
+        href: "/assessments",
         icon: null as any,
       },
       {
-        id: "course-logs",
-        label: "Historique cahier",
-        href: "/course-logs",
+        id: "assessments-student",
+        label: "CC par étudiant",
+        href: "/assessments/student",
         icon: null as any,
       },
       {
-        id: "attendance-mark",
-        label: "Pointage",
-        href: "/attendance/mark",
+        id: "exams",
+        label: "Sessions d'examen",
+        href: "/exams",
         icon: null as any,
       },
       {
-        id: "attendance-student",
-        label: "Présences étudiant",
-        href: "/attendance/student",
-        icon: null as any,
-      },
-      {
-        id: "attendance-course",
-        label: "Rapport cours",
-        href: "/attendance/course",
-        icon: null as any,
-      },
-      {
-        id: "attendance-dispensations",
-        label: "Dispensations",
-        href: "/attendance/dispensations",
-        icon: null as any,
-      },
-    ],
-  },
-  {
-    id: "evaluations",
-    label: "Évaluations",
-    icon: (
-      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-    ),
-    children: [
-      {
-        id: "evaluations-management",
-        label: "Gestion",
+        id: "evaluations",
+        label: "Évaluations",
         href: "/evaluations",
         icon: null as any,
       },
       {
-        id: "evaluations-new",
-        label: "Créer",
-        href: "/evaluations/new",
+        id: "evaluations-student",
+        label: "Vue étudiants",
+        href: "/evaluations/student",
         icon: null as any,
       },
       {
-        id: "evaluations-student",
-        label: "Étudiants",
-        href: "/evaluations/student",
+        id: "grades",
+        label: "Notes",
+        href: "/grades",
+        icon: null as any,
+      },
+      {
+        id: "deliberations",
+        label: "Délibérations",
+        href: "/deliberations",
         icon: null as any,
       },
     ],
   },
-  // {
-  //   id: "stats",
-  //   label: "Statistiques",
-  //   href: "/stats",
-  //   icon: (
-  //     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-  //       <path
-  //         strokeLinecap="round"
-  //         strokeLinejoin="round"
-  //         strokeWidth={2}
-  //         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-  //       />
-  //     </svg>
-  //   ),
-  // },
   {
-    id: "calendar",
-    label: "Calendrier",
+    id: "emplois-du-temps",
+    label: "Emplois du temps",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -291,30 +158,6 @@ const menuItems: MenuItem[] = [
         id: "calendar-home",
         label: "Vue d'ensemble",
         href: "/calendar",
-        icon: null as any,
-      },
-      {
-        id: "calendar-setup",
-        label: "Configuration",
-        href: "/calendar/setup",
-        icon: null as any,
-      },
-      {
-        id: "calendar-holidays",
-        label: "Jours fériés",
-        href: "/calendar/holidays",
-        icon: null as any,
-      },
-      {
-        id: "calendar-rooms",
-        label: "Salles",
-        href: "/calendar/rooms",
-        icon: null as any,
-      },
-      {
-        id: "calendar-schedules",
-        label: "Création EDT",
-        href: "/calendar/schedules",
         icon: null as any,
       },
       {
@@ -336,25 +179,76 @@ const menuItems: MenuItem[] = [
         icon: null as any,
       },
       {
-        id: "calendar-availability",
-        label: "Disponibilités",
-        href: "/calendar/availability",
+        id: "planning-cours",
+        label: "Planning Cours",
+        href: "/planning-cours",
+        icon: null as any,
+      },
+      {
+        id: "calendar-schedules",
+        label: "Création EDT",
+        href: "/calendar/schedules",
         icon: null as any,
       },
     ],
   },
   {
-    id: "sync",
-    label: "Synchronisation",
-    href: "/sync",
-    requiresAdmin: true,
+    id: "assiduite",
+    label: "Assiduité",
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+    children: [
+      {
+        id: "course-logs",
+        label: "Cahier de textes",
+        href: "/course-logs",
+        icon: null as any,
+      },
+      {
+        id: "attendance-mark",
+        label: "Feuilles de présence",
+        href: "/attendance/mark",
+        icon: null as any,
+      },
+      {
+        id: "attendance-student",
+        label: "Présences étudiant",
+        href: "/attendance/student",
+        icon: null as any,
+      },
+      {
+        id: "attendance-course",
+        label: "Rapport cours",
+        href: "/attendance/course",
+        icon: null as any,
+      },
+      {
+        id: "attendance-dispensations",
+        label: "Dispenses",
+        href: "/attendance/dispensations",
+        icon: null as any,
+      },
+    ],
+  },
+  {
+    id: "documents",
+    label: "Documents officiels",
+    href: "/documents",
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
     ),
@@ -387,11 +281,115 @@ const menuItems: MenuItem[] = [
       },
       {
         id: "templates",
-        label: "Templates",
+        label: "Modèles de messages",
         href: "/dashboard/templates",
         icon: null as any,
       },
     ],
+  },
+  {
+    id: "parametrage",
+    label: "Paramétrage",
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    ),
+    children: [
+      {
+        id: "faculties",
+        label: "Établissements",
+        href: "/faculties",
+        icon: null as any,
+      },
+      {
+        id: "departments",
+        label: "Départements",
+        href: "/departments",
+        icon: null as any,
+      },
+      {
+        id: "programmes",
+        label: "Programmes",
+        href: "/programmes",
+        icon: null as any,
+      },
+      {
+        id: "maquette",
+        label: "Maquette pédagogique",
+        href: "/maquette",
+        icon: null as any,
+      },
+      {
+        id: "course-units",
+        label: "Unités d'Enseignement",
+        href: "/course-units",
+        icon: null as any,
+      },
+      {
+        id: "courses",
+        label: "ECUE",
+        href: "/courses",
+        icon: null as any,
+      },
+      {
+        id: "academic-years",
+        label: "Années académiques",
+        href: "/academic-years",
+        icon: null as any,
+      },
+      {
+        id: "calendar-setup",
+        label: "Paramètres EDT",
+        href: "/calendar/setup",
+        icon: null as any,
+      },
+      {
+        id: "calendar-holidays",
+        label: "Jours fériés",
+        href: "/calendar/holidays",
+        icon: null as any,
+      },
+      {
+        id: "calendar-rooms",
+        label: "Salles",
+        href: "/calendar/rooms",
+        icon: null as any,
+      },
+      {
+        id: "calendar-availability",
+        label: "Disponibilités",
+        href: "/calendar/availability",
+        icon: null as any,
+      },
+    ],
+  },
+  {
+    id: "sync",
+    label: "Synchronisation",
+    href: "/sync",
+    requiresAdmin: true,
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+    ),
   },
 ];
 
@@ -402,7 +400,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["scolarite"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { data: session } = useSession();
   const isAdmin = getRealmRoles(session?.accessToken).includes("ADMIN");
 
