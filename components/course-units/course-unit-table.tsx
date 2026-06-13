@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { CourseUnit } from "@/types/course-unit";
 
 interface CourseUnitTableProps {
@@ -10,6 +11,7 @@ interface CourseUnitTableProps {
 }
 
 export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: CourseUnitTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (courseUnits.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -38,6 +40,9 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Crédits
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+                Coef
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
                 Type
@@ -71,6 +76,9 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                   <div className="text-sm text-zinc-900">{courseUnit.credits}</div>
                 </td>
                 <td className="px-6 py-4">
+                  <div className="text-sm text-zinc-900">{courseUnit.coefficient ?? "—"}</div>
+                </td>
+                <td className="px-6 py-4">
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
                       courseUnit.type === "OBLIGATOIRE"
@@ -94,7 +102,7 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(courseUnit.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -140,7 +148,7 @@ export default function CourseUnitTable({ courseUnits, onEdit, onDelete }: Cours
                         />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(courseUnit.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

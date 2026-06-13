@@ -9,6 +9,7 @@ export interface CourseUnit {
   name: string;
   semesterNumber: number;
   credits: number;
+  coefficient?: number;
   type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive: boolean;
   createdAt: string;
@@ -21,6 +22,7 @@ export interface CreateCourseUnitInput {
   name: string;
   semesterNumber: number;
   credits: number;
+  coefficient?: number;
   type: "OBLIGATOIRE" | "OPTIONNEL";
   isActive?: boolean;
 }
@@ -36,6 +38,14 @@ export interface CourseUnitFilters {
   academicProgramId?: string;
   type?: "OBLIGATOIRE" | "OPTIONNEL";
   isActive?: boolean;
+}
+
+export interface CourseUnitsResponse {
+  data: CourseUnit[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
 }
 
 export interface AcademicProgram {

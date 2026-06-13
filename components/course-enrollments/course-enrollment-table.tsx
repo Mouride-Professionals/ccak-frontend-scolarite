@@ -1,6 +1,7 @@
 "use client";
 
 import type { CourseEnrollment } from "@/types/course-enrollment";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import CourseEnrollmentStatusBadge from "./course-enrollment-status-badge";
 
 interface CourseEnrollmentTableProps {
@@ -16,6 +17,7 @@ export default function CourseEnrollmentTable({
   onDelete,
   onEdit,
 }: CourseEnrollmentTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (enrollments.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -105,7 +107,7 @@ export default function CourseEnrollmentTable({
                         </svg>
                       </button>
                     )}
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(enrollment.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -126,7 +128,7 @@ export default function CourseEnrollmentTable({
                         </svg>
                       </button>
                     )}
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(enrollment.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

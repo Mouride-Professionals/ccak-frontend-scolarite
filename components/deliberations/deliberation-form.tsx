@@ -1,29 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
+import { z } from "zod";
 import type { CreateDeliberationSessionInput } from "@/types/deliberation";
-import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
+import type { AcademicProgram, FacultyMember } from "@/types/academic";
+import { useCurrentAcademicYear, useAcademicYear } from "@/hooks/use-academic-years";
+import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 
 interface DeliberationFormProps {
   onSubmit: (data: CreateDeliberationSessionInput) => void;
   onCancel?: () => void;
   programs: AcademicProgram[];
-  years: AcademicYear[];
   facultyMembers: FacultyMember[];
   isLoading?: boolean;
   initialData?: Partial<CreateDeliberationSessionInput>;
 }
 
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+const DeliberationFormSchema = z
+  .object({
+    academic_program_id: z.string().min(1, "Le programme académique est requis"),
+    academic_year_id: z.string().min(1, "L'année académique est requise"),
+    semester: z
+      .number({ error: "Le semestre est requis" })
+      .int("Le semestre doit être un nombre entier")
+      .min(1, "Le semestre doit être compris entre 1 et 10")
+      .max(10, "Le semestre doit être compris entre 1 et 10"),
+    session_name: z
+      .string()
+      .trim()
+      .min(5, "Le nom de la session doit contenir au moins 5 caractères")
+      .max(120, "Le nom de la session ne peut pas dépasser 120 caractères"),
+    session_date: z
+      .string()
+      .min(1, "La date de session est requise")
+      .regex(ISO_DATE_REGEX, "La date de session doit être au format YYYY-MM-DD"),
+    presided_by: z.string().min(1, "Le président du jury est requis"),
+    jury_members: z.array(z.string()).min(1, "Au moins un membre du jury est requis"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.jury_members.includes(data.presided_by)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["jury_members"],
+        message: "Le président du jury ne peut pas être aussi membre du jury",
+      });
+    }
+  });
+
+type DeliberationFormData = z.infer<typeof DeliberationFormSchema>;
+
 export default function DeliberationForm({
   onSubmit,
   onCancel,
   programs,
-  years,
   facultyMembers,
   isLoading = false,
   initialData,
 }: DeliberationFormProps) {
-  const [formData, setFormData] = useState<CreateDeliberationSessionInput>({
+  const isReadOnly = useIsReadOnly();
+  const { data: currentYear } = useCurrentAcademicYear();
+  const [formData, setFormData] = useState<DeliberationFormData>({
     academic_program_id: initialData?.academic_program_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
     semester: initialData?.semester ?? 1,
@@ -33,18 +72,52 @@ export default function DeliberationForm({
     jury_members: initialData?.jury_members ?? [],
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { data: displayYear } = useAcademicYear(formData.academic_year_id, !!formData.academic_year_id);
 
-  const handleChange = (field: keyof CreateDeliberationSessionInput, value: unknown) => {
+  useEffect(() => {
+    if (currentYear && !initialData?.academic_year_id) {
+      setFormData((prev) => ({ ...prev, academic_year_id: currentYear.id }));
+    }
+  }, [currentYear, initialData?.academic_year_id]);
+
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const canSubmit =
+    formData.session_name.trim().length > 0 &&
+    formData.session_date.trim().length > 0 &&
+    formData.academic_program_id.trim().length > 0 &&
+    formData.academic_year_id.trim().length > 0 &&
+    formData.presided_by.trim().length > 0 &&
+    formData.jury_members.length > 0;
+  const getErrorId = (field: keyof DeliberationFormData) => `${field}-error`;
+
+  const handleChange = <K extends keyof DeliberationFormData>(
+    field: K,
+    value: DeliberationFormData[K]
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
-    if (errors[field]) {
+    const fieldKey = String(field);
+    if (errors[fieldKey]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
-        delete newErrors[field];
+        delete newErrors[fieldKey];
         return newErrors;
       });
     }
+  };
+
+  const handlePresidentChange = (presidentId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      presided_by: presidentId,
+      jury_members: prev.jury_members.filter((memberId) => memberId !== presidentId),
+    }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.presided_by;
+      delete next.jury_members;
+      return next;
+    });
   };
 
   const handleJuryMemberToggle = (memberId: string) => {
@@ -56,48 +129,16 @@ export default function DeliberationForm({
     handleChange("jury_members", newMembers);
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.session_name.trim()) {
-      newErrors.session_name = "Le nom de la session est requis";
-    } else if (formData.session_name.trim().length < 5) {
-      newErrors.session_name = "Le nom doit contenir au moins 5 caractères";
-    }
-
-    if (!formData.academic_program_id) {
-      newErrors.academic_program_id = "Le programme académique est requis";
-    }
-
-    if (!formData.academic_year_id) {
-      newErrors.academic_year_id = "L'année académique est requise";
-    }
-
-    if (!formData.semester || formData.semester < 1 || formData.semester > 10) {
-      newErrors.semester = "Le semestre doit être entre 1 et 10";
-    }
-
-    if (!formData.session_date) {
-      newErrors.session_date = "La date de session est requise";
-    }
-
-    if (!formData.presided_by) {
-      newErrors.presided_by = "Le président du jury est requis";
-    }
-
-    if (formData.jury_members.length < 1) {
-      newErrors.jury_members = "Au moins un membre du jury est requis";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      onSubmit(formData);
+    const parsed = DeliberationFormSchema.safeParse(formData);
+    if (!parsed.success) {
+      setErrors(zodErrorToFieldErrors(parsed.error));
+      return;
     }
+
+    setErrors({});
+    onSubmit(parsed.data);
   };
 
   // Filter out the president from available jury members
@@ -124,11 +165,17 @@ export default function DeliberationForm({
               value={formData.session_name}
               onChange={(e) => handleChange("session_name", e.target.value)}
               placeholder="| Saisir"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+                errors.session_name ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.session_name)}
+              aria-describedby={errors.session_name ? getErrorId("session_name") : undefined}
             />
             {errors.session_name && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.session_name}</p>
+              <p id={getErrorId("session_name")} className="mt-1.5 text-xs text-red-600">
+                {errors.session_name}
+              </p>
             )}
           </div>
 
@@ -142,11 +189,17 @@ export default function DeliberationForm({
               id="session_date"
               value={formData.session_date}
               onChange={(e) => handleChange("session_date", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+                errors.session_date ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.session_date)}
+              aria-describedby={errors.session_date ? getErrorId("session_date") : undefined}
             />
             {errors.session_date && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.session_date}</p>
+              <p id={getErrorId("session_date")} className="mt-1.5 text-xs text-red-600">
+                {errors.session_date}
+              </p>
             )}
           </div>
         </div>
@@ -167,8 +220,14 @@ export default function DeliberationForm({
               id="academic_program_id"
               value={formData.academic_program_id}
               onChange={(e) => handleChange("academic_program_id", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+              className={`block w-full appearance-none rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+                errors.academic_program_id ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.academic_program_id)}
+              aria-describedby={
+                errors.academic_program_id ? getErrorId("academic_program_id") : undefined
+              }
             >
               <option value="">Sélectionner un programme</option>
               {programs.map((program) => (
@@ -178,32 +237,18 @@ export default function DeliberationForm({
               ))}
             </select>
             {errors.academic_program_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_program_id}</p>
+              <p id={getErrorId("academic_program_id")} className="mt-1.5 text-xs text-red-600">
+                {errors.academic_program_id}
+              </p>
             )}
           </div>
 
           {/* Academic Year */}
           <div>
-            <label htmlFor="academic_year_id" className="mb-2 block text-sm text-zinc-900">
-              Année académique <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="academic_year_id"
-              value={formData.academic_year_id}
-              onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-              disabled={isLoading}
-            >
-              <option value="">Sélectionner une année</option>
-              {years.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_current && "(Actuelle)"}
-                </option>
-              ))}
-            </select>
-            {errors.academic_year_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id}</p>
-            )}
+            <label className="mb-2 block text-sm text-zinc-900">Année académique</label>
+            <p className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm text-zinc-700">
+              {displayYear?.name ?? currentYear?.name ?? "Chargement..."}
+            </p>
           </div>
 
           {/* Semester */}
@@ -214,9 +259,13 @@ export default function DeliberationForm({
             <select
               id="semester"
               value={formData.semester}
-              onChange={(e) => handleChange("semester", parseInt(e.target.value, 10))}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+              onChange={(e) => handleChange("semester", Number.parseInt(e.target.value, 10))}
+              className={`block w-full appearance-none rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+                errors.semester ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.semester)}
+              aria-describedby={errors.semester ? getErrorId("semester") : undefined}
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((sem) => (
                 <option key={sem} value={sem}>
@@ -224,7 +273,11 @@ export default function DeliberationForm({
                 </option>
               ))}
             </select>
-            {errors.semester && <p className="mt-1.5 text-xs text-red-600">{errors.semester}</p>}
+            {errors.semester && (
+              <p id={getErrorId("semester")} className="mt-1.5 text-xs text-red-600">
+                {errors.semester}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -243,9 +296,13 @@ export default function DeliberationForm({
             <select
               id="presided_by"
               value={formData.presided_by}
-              onChange={(e) => handleChange("presided_by", e.target.value)}
-              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
+              onChange={(e) => handlePresidentChange(e.target.value)}
+              className={`block w-full appearance-none rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
+                errors.presided_by ? "border-red-300" : "border-zinc-300"
+              }`}
               disabled={isLoading}
+              aria-invalid={Boolean(errors.presided_by)}
+              aria-describedby={errors.presided_by ? getErrorId("presided_by") : undefined}
             >
               <option value="">Sélectionner un président</option>
               {facultyMembers.map((member) => (
@@ -255,7 +312,9 @@ export default function DeliberationForm({
               ))}
             </select>
             {errors.presided_by && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.presided_by}</p>
+              <p id={getErrorId("presided_by")} className="mt-1.5 text-xs text-red-600">
+                {errors.presided_by}
+              </p>
             )}
           </div>
 
@@ -268,7 +327,13 @@ export default function DeliberationForm({
                 {formData.jury_members.length > 1 ? "s" : ""})
               </span>
             </label>
-            <div className="max-h-56 space-y-2 overflow-y-auto rounded-md border border-zinc-300 bg-white p-4">
+            <div
+              className={`max-h-56 space-y-2 overflow-y-auto rounded-md border bg-white p-4 ${
+                errors.jury_members ? "border-red-300" : "border-zinc-300"
+              }`}
+              aria-invalid={Boolean(errors.jury_members)}
+              aria-describedby={errors.jury_members ? getErrorId("jury_members") : undefined}
+            >
               {availableJuryMembers.length === 0 ? (
                 <p className="text-sm text-zinc-500">
                   Veuillez d&apos;abord sélectionner un président
@@ -295,7 +360,9 @@ export default function DeliberationForm({
               )}
             </div>
             {errors.jury_members && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.jury_members}</p>
+              <p id={getErrorId("jury_members")} className="mt-1.5 text-xs text-red-600">
+                {errors.jury_members}
+              </p>
             )}
           </div>
         </div>
@@ -316,7 +383,7 @@ export default function DeliberationForm({
         <button
           type="submit"
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || !canSubmit || isReadOnly}
         >
           {isLoading
             ? initialData

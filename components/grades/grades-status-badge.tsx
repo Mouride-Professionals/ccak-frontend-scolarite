@@ -12,8 +12,8 @@ const statusConfig = {
     textColor: "text-zinc-700",
     bgColor: "bg-zinc-50",
   },
-  [GradeStatus.PENDING]: {
-    label: "En attente",
+  [GradeStatus.SUBMITTED]: {
+    label: "Soumise",
     dotColor: "bg-amber-500",
     textColor: "text-zinc-700",
     bgColor: "bg-amber-50",
@@ -24,11 +24,11 @@ const statusConfig = {
     textColor: "text-zinc-700",
     bgColor: "bg-green-50",
   },
-  [GradeStatus.REJECTED]: {
-    label: "Rejetée",
-    dotColor: "bg-red-500",
+  [GradeStatus.PUBLISHED]: {
+    label: "Publiée",
+    dotColor: "bg-blue-500",
     textColor: "text-zinc-700",
-    bgColor: "bg-red-50",
+    bgColor: "bg-blue-50",
   },
 };
 

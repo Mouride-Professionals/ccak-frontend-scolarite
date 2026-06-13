@@ -5,7 +5,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Document, CreateDocumentInput, UpdateDocumentInput } from "@/types/student";
+import type { CreateDocumentInput, UpdateDocumentInput } from "@/types/student";
 import * as documentsApi from "@/lib/api/documents";
 
 // =====================
@@ -109,8 +109,8 @@ export function useApproveDocument() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, reviewedBy, notes }: { id: string; reviewedBy: string; notes?: string }) =>
-      documentsApi.approveDocument(id, reviewedBy, notes),
+    mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
+      documentsApi.approveDocument(id, notes),
     onSuccess: (data) => {
       queryClient.setQueryData(documentKeys.detail(data.id), data);
       queryClient.invalidateQueries({ queryKey: documentKeys.list(data.student_id) });
@@ -125,8 +125,8 @@ export function useRejectDocument() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, reviewedBy, notes }: { id: string; reviewedBy: string; notes: string }) =>
-      documentsApi.rejectDocument(id, reviewedBy, notes),
+    mutationFn: ({ id, reason, notes }: { id: string; reason: string; notes?: string }) =>
+      documentsApi.rejectDocument(id, reason, notes),
     onSuccess: (data) => {
       queryClient.setQueryData(documentKeys.detail(data.id), data);
       queryClient.invalidateQueries({ queryKey: documentKeys.list(data.student_id) });

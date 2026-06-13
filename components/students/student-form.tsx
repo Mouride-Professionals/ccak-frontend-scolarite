@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CreateStudentInput, Student } from "@/types/student";
-import { Gender, DocumentType } from "@/types/student";
+import { Gender, DocumentType, Provenance, IDType } from "@/types/student";
 import DocumentUploader from "./document-uploader";
+import { StudentSchema, type StudentFormData } from "@/lib/validations/schemas";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
+import { formatPhone, formatPhoneInput, parsePhone } from "@/lib/format";
 
 interface StudentFormProps {
   onSubmit: (data: CreateStudentInput) => void;
@@ -18,139 +24,116 @@ export default function StudentForm({
   isLoading = false,
   initialData,
 }: StudentFormProps) {
-  const [formData, setFormData] = useState<CreateStudentInput>({
-    full_name: initialData?.full_name ?? "",
-    gender: initialData?.gender ?? Gender.M,
-    date_of_birth: initialData?.date_of_birth ?? "",
-    place_of_birth: initialData?.place_of_birth ?? "",
-    nationality: initialData?.nationality ?? "",
-    phone: initialData?.phone ?? "",
-    emergency_contact_name: initialData?.emergency_contact_name ?? "",
-    emergency_contact_phone: initialData?.emergency_contact_phone ?? "",
-    address: initialData?.address ?? "",
-    documents: [],
+  const isReadOnly = useIsReadOnly();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    setError,
+    watch,
+    formState: { errors },
+  } = useForm<StudentFormData>({
+    resolver: zodResolver(StudentSchema),
+    defaultValues: {
+      first_name: initialData?.first_name ?? "",
+      last_name: initialData?.last_name ?? "",
+      ine: initialData?.ine ?? "",
+      registration_number: initialData?.registration_number ?? "",
+      provenance: initialData?.provenance ?? undefined,
+      gender: initialData?.gender ?? Gender.M,
+      date_of_birth: initialData?.date_of_birth ?? "",
+      place_of_birth: initialData?.place_of_birth ?? "",
+      nationality: initialData?.nationality ?? "",
+      phone: initialData?.phone ? formatPhone(initialData.phone) : "+221 ",
+      phone_2: initialData?.phone_2 ? formatPhone(initialData.phone_2) : "",
+      email: initialData?.email ?? "",
+      type_of_id: initialData?.type_of_id ?? undefined,
+      id_details: initialData?.id_details ?? "",
+      emergency_contact_name: initialData?.emergency_contact_name ?? "",
+      emergency_contact_phone: initialData?.emergency_contact_phone ? formatPhone(initialData.emergency_contact_phone) : "+221 ",
+      address: initialData?.address ?? "",
+      documents: [],
+    },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  // registration_number is read-only when editing a student that already has one
+  const isRegistrationNumberReadOnly = !!(initialData && initialData.registration_number);
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleChange = (field: keyof CreateStudentInput, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
+  const phoneReg = register("phone");
+  const phone2Reg = register("phone_2");
+  const emergencyPhoneReg = register("emergency_contact_phone");
 
   const handleDocumentUpload = (files: File[], type: DocumentType) => {
-    // Pour la création, on stocke temporairement les fichiers
-    // Ils seront traités lors de la soumission du formulaire
-    setFormData((prev) => ({
-      ...prev,
-      documents: [...(prev.documents || []), ...files],
-    }));
-
-    // Clear documents error
-    if (errors.documents) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.documents;
-        return newErrors;
-      });
-    }
+    const currentDocs = watch("documents") || [];
+    setValue("documents", [...currentDocs, ...files]);
   };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.full_name.trim()) {
-      newErrors.full_name = "Le nom complet est requis";
-    } else if (formData.full_name.trim().length < 2) {
-      newErrors.full_name = "Le nom doit contenir au moins 2 caractères";
-    }
-
-    if (!formData.date_of_birth) {
-      newErrors.date_of_birth = "La date de naissance est requise";
-    } else {
-      const birthDate = new Date(formData.date_of_birth);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      if (age < 15 || age > 100) {
-        newErrors.date_of_birth = "L'âge doit être entre 15 et 100 ans";
+  const handleFormSubmit = async (data: StudentFormData) => {
+    setSubmitError(null);
+    try {
+      await onSubmit({
+        ...data,
+        phone: parsePhone(data.phone),
+        phone_2: parsePhone(data.phone_2) || undefined,
+        emergency_contact_phone: parsePhone(data.emergency_contact_phone),
+      } as CreateStudentInput);
+    } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof StudentFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
       }
-    }
-
-    if (!formData.place_of_birth.trim()) {
-      newErrors.place_of_birth = "Le lieu de naissance est requis";
-    }
-
-    if (!formData.nationality.trim()) {
-      newErrors.nationality = "La nationalité est requise";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Le numéro de téléphone est requis";
-    } else if (!/^\+221\d{9}$/.test(formData.phone.trim())) {
-      newErrors.phone = "Le numéro de téléphone doit être au format +221XXXXXXXXX";
-    }
-
-    if (!formData.emergency_contact_name.trim()) {
-      newErrors.emergency_contact_name = "Le nom du contact d'urgence est requis";
-    }
-
-    if (!formData.emergency_contact_phone.trim()) {
-      newErrors.emergency_contact_phone = "Le téléphone du contact d'urgence est requis";
-    } else if (!/^\+221\d{9}$/.test(formData.emergency_contact_phone.trim())) {
-      newErrors.emergency_contact_phone =
-        "Le numéro de téléphone doit être au format +221XXXXXXXXX";
-    }
-
-    if (!formData.address.trim()) {
-      newErrors.address = "L'adresse est requise";
-    }
-
-    // Validation des documents - au moins une photo de profil requise
-    if (!formData.documents || formData.documents.length === 0) {
-      newErrors.documents = "Au moins un document (photo de profil) est requis";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onSubmit(formData);
+      const userError = toUserError(error);
+      setSubmitError(userError.message);
+      console.error("Form submission error:", userError.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
       {/* INFORMATIONS PERSONNELLES */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
           Informations personnelles
         </h3>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {/* Full Name */}
+          {/* First Name */}
           <div>
-            <label htmlFor="full_name" className="mb-2 block text-sm text-zinc-900">
-              Nom complet <span className="text-red-500">*</span>
+            <label htmlFor="first_name" className="mb-2 block text-sm text-zinc-900">
+              Prénom <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              id="full_name"
-              value={formData.full_name}
-              onChange={(e) => handleChange("full_name", e.target.value)}
-              placeholder="Prénom NOM"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              id="first_name"
+              {...register("first_name")}
+              placeholder="Prénom"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.first_name ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.full_name && <p className="mt-1.5 text-xs text-red-600">{errors.full_name}</p>}
+            {errors.first_name && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.first_name.message}</p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label htmlFor="last_name" className="mb-2 block text-sm text-zinc-900">
+              Nom <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="last_name"
+              {...register("last_name")}
+              placeholder="NOM"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.last_name ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.last_name && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.last_name.message}</p>
+            )}
           </div>
 
           {/* Gender */}
@@ -160,8 +143,7 @@ export default function StudentForm({
             </label>
             <select
               id="gender"
-              value={formData.gender}
-              onChange={(e) => handleChange("gender", e.target.value as Gender)}
+              {...register("gender")}
               className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
               disabled={isLoading}
             >
@@ -178,13 +160,12 @@ export default function StudentForm({
             <input
               type="date"
               id="date_of_birth"
-              value={formData.date_of_birth}
-              onChange={(e) => handleChange("date_of_birth", e.target.value)}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...register("date_of_birth")}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.date_of_birth ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.date_of_birth && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.date_of_birth}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.date_of_birth.message}</p>
             )}
           </div>
 
@@ -196,14 +177,13 @@ export default function StudentForm({
             <input
               type="text"
               id="place_of_birth"
-              value={formData.place_of_birth}
-              onChange={(e) => handleChange("place_of_birth", e.target.value)}
+              {...register("place_of_birth")}
               placeholder="Ville, Pays"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.place_of_birth ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.place_of_birth && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.place_of_birth}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.place_of_birth.message}</p>
             )}
           </div>
 
@@ -215,14 +195,127 @@ export default function StudentForm({
             <input
               type="text"
               id="nationality"
-              value={formData.nationality}
-              onChange={(e) => handleChange("nationality", e.target.value)}
+              {...register("nationality")}
               placeholder="Sénégalaise"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.nationality ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.nationality && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.nationality}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.nationality.message}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* INFORMATIONS ACADÉMIQUES */}
+      <div>
+        <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+          Informations académiques
+        </h3>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {/* INE */}
+          <div>
+            <label htmlFor="ine" className="mb-2 block text-sm text-zinc-900">
+              INE
+            </label>
+            <input
+              type="text"
+              id="ine"
+              {...register("ine")}
+              placeholder="Identifiant National Étudiant"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.ine ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.ine && <p className="mt-1.5 text-xs text-red-600">{errors.ine.message}</p>}
+          </div>
+
+          {/* Registration Number (CCAK) */}
+          <div>
+            <label htmlFor="registration_number" className="mb-2 block text-sm text-zinc-900">
+              N° Inscription CCAK
+              {isRegistrationNumberReadOnly && (
+                <span className="ml-2 text-xs text-zinc-400">(lecture seule)</span>
+              )}
+            </label>
+            <input
+              type="text"
+              id="registration_number"
+              {...register("registration_number")}
+              placeholder="Numéro CCAK"
+              readOnly={isRegistrationNumberReadOnly}
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${isRegistrationNumberReadOnly ? "cursor-not-allowed bg-zinc-50 text-zinc-500" : ""} ${errors.registration_number ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.registration_number && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.registration_number.message}</p>
+            )}
+          </div>
+
+          {/* Provenance */}
+          <div>
+            <label htmlFor="provenance" className="mb-2 block text-sm text-zinc-900">
+              Provenance
+            </label>
+            <select
+              id="provenance"
+              {...register("provenance")}
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              disabled={isLoading}
+            >
+              <option value="">— Sélectionner —</option>
+              <option value={Provenance.ETAT}>État</option>
+              <option value={Provenance.PLATEFORME}>Plateforme</option>
+            </select>
+            {errors.provenance && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.provenance.message}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* PIÈCE D'IDENTITÉ */}
+      <div>
+        <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
+          Pièce d&apos;identité
+        </h3>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {/* Type de pièce */}
+          <div>
+            <label htmlFor="type_of_id" className="mb-2 block text-sm text-zinc-900">
+              Type de pièce
+            </label>
+            <select
+              id="type_of_id"
+              {...register("type_of_id")}
+              className="block w-full appearance-none rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              disabled={isLoading}
+            >
+              <option value="">— Sélectionner —</option>
+              <option value={IDType.NATIONAL_ID}>Carte nationale d&apos;identité</option>
+              <option value={IDType.PASSPORT}>Passeport</option>
+              <option value={IDType.DRIVING_LICENSE}>Permis de conduire</option>
+              <option value={IDType.OTHER}>Autre</option>
+            </select>
+            {errors.type_of_id && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.type_of_id.message}</p>
+            )}
+          </div>
+
+          {/* Numéro / détails */}
+          <div>
+            <label htmlFor="id_details" className="mb-2 block text-sm text-zinc-900">
+              Numéro de la pièce
+            </label>
+            <input
+              type="text"
+              id="id_details"
+              {...register("id_details")}
+              placeholder="Numéro ou référence"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.id_details ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.id_details && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.id_details.message}</p>
             )}
           </div>
         </div>
@@ -242,13 +335,54 @@ export default function StudentForm({
             <input
               type="tel"
               id="phone"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              placeholder="+221771234567"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...phoneReg}
+              onBlur={(e) => {
+                setValue("phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                phoneReg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.phone && <p className="mt-1.5 text-xs text-red-600">{errors.phone}</p>}
+            {errors.phone && <p className="mt-1.5 text-xs text-red-600">{errors.phone.message}</p>}
+          </div>
+
+          {/* Phone 2 */}
+          <div>
+            <label htmlFor="phone_2" className="mb-2 block text-sm text-zinc-900">
+              Téléphone 2
+            </label>
+            <input
+              type="tel"
+              id="phone_2"
+              {...phone2Reg}
+              onBlur={(e) => {
+                setValue("phone_2", formatPhoneInput(e.target.value) || "", { shouldValidate: true });
+                phone2Reg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.phone_2 ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.phone_2 && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.phone_2.message}</p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="mb-2 block text-sm text-zinc-900">
+              Email personnel
+            </label>
+            <input
+              type="email"
+              id="email"
+              {...register("email")}
+              placeholder="prenom.nom@email.com"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.email ? "border-red-300" : "border-zinc-300"}`}
+              disabled={isLoading}
+            />
+            {errors.email && <p className="mt-1.5 text-xs text-red-600">{errors.email.message}</p>}
           </div>
 
           {/* Address */}
@@ -258,14 +392,15 @@ export default function StudentForm({
             </label>
             <textarea
               id="address"
-              value={formData.address}
-              onChange={(e) => handleChange("address", e.target.value)}
+              {...register("address")}
               placeholder="Adresse complète"
               rows={3}
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.address ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
-            {errors.address && <p className="mt-1.5 text-xs text-red-600">{errors.address}</p>}
+            {errors.address && (
+              <p className="mt-1.5 text-xs text-red-600">{errors.address.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -273,7 +408,7 @@ export default function StudentForm({
       {/* CONTACT D'URGENCE */}
       <div>
         <h3 className="mb-4 text-base font-bold uppercase tracking-wide text-zinc-900">
-          Contact d'urgence
+          Contact d&apos;urgence
         </h3>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {/* Emergency Contact Name */}
@@ -284,14 +419,13 @@ export default function StudentForm({
             <input
               type="text"
               id="emergency_contact_name"
-              value={formData.emergency_contact_name}
-              onChange={(e) => handleChange("emergency_contact_name", e.target.value)}
+              {...register("emergency_contact_name")}
               placeholder="Prénom NOM"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.emergency_contact_name ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.emergency_contact_name && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_name}</p>
+              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_name.message}</p>
             )}
           </div>
 
@@ -303,14 +437,19 @@ export default function StudentForm({
             <input
               type="tel"
               id="emergency_contact_phone"
-              value={formData.emergency_contact_phone}
-              onChange={(e) => handleChange("emergency_contact_phone", e.target.value)}
-              placeholder="+221771234567"
-              className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F]"
+              {...emergencyPhoneReg}
+              onBlur={(e) => {
+                setValue("emergency_contact_phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                emergencyPhoneReg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
+              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.emergency_contact_phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
             {errors.emergency_contact_phone && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.emergency_contact_phone}</p>
+              <p className="mt-1.5 text-xs text-red-600">
+                {errors.emergency_contact_phone.message}
+              </p>
             )}
           </div>
         </div>
@@ -327,10 +466,13 @@ export default function StudentForm({
           isLoading={isLoading}
           acceptedTypes=".pdf,.jpg,.jpeg,.png"
         />
-        {errors.documents && <p className="mt-2 text-xs text-red-600">{errors.documents}</p>}
+        {errors.documents && (
+          <p className="mt-2 text-xs text-red-600">{errors.documents.message}</p>
+        )}
       </div>
 
       {/* Footer */}
+      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
       <div className="flex items-center justify-end gap-3 border-t border-zinc-200 pt-6">
         {onCancel && (
           <button
@@ -345,7 +487,7 @@ export default function StudentForm({
         <button
           type="submit"
           className="rounded-lg bg-[#008D36] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || isReadOnly}
         >
           {isLoading
             ? initialData

@@ -1,14 +1,18 @@
 "use client";
 
 import { getSession } from "next-auth/react";
+import { sanitizePayload } from "@/lib/sanitize";
+import { logError } from "@/lib/error-handler";
 
 type ApiOptions = Omit<RequestInit, "body" | "headers"> & {
   /** Relative path (appends to base) or absolute URL */
   path: string;
   /** When true, treats empty responses as null */
   expectJson?: boolean;
+  /** When true, do not write failed responses to console logging. */
+  suppressErrorLogging?: boolean;
   /** Request body: JSON-serializable object or standard BodyInit */
-  body?: BodyInit | Record<string, unknown> | null;
+  body?: BodyInit | object | null;
   headers?: HeadersInit;
 };
 
@@ -25,16 +29,18 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
-  (typeof window === "undefined" ? "" : window.location.origin);
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
 
 const getAuthToken = async (): Promise<string | undefined> => {
   const session = await getSession();
   return session?.accessToken;
 };
 
-async function handleResponse<T>(res: Response, expectJson: boolean): Promise<T> {
+async function handleResponse<T>(
+  res: Response,
+  expectJson: boolean,
+  suppressErrorLogging = false
+): Promise<T> {
   if (res.ok) {
     if (expectJson === false || res.status === 204) {
       return null as T;
@@ -51,13 +57,36 @@ async function handleResponse<T>(res: Response, expectJson: boolean): Promise<T>
     // non-JSON error body
   }
   const error = new ApiError("Request failed", res.status, res.statusText, body);
+
+  if (process.env.NODE_ENV === "development") {
+    console.warn("[apiFetch] Non-OK response", {
+      status: res.status,
+      statusText: res.statusText,
+      redirected: res.redirected,
+      responseUrl: res.url,
+    });
+  }
+
+  // Security: Log errors without exposing sensitive data
+  if (!suppressErrorLogging) {
+    logError(error, `API ${res.status}`);
+  }
+
   throw error;
 }
 
 export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
-  const { path, expectJson = true, headers, body, ...rest } = options;
+  const { path, expectJson = true, suppressErrorLogging = false, headers, body, ...rest } = options;
 
-  const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
+  if (!path.startsWith("http") && !BASE_URL) {
+    throw new Error("NEXT_PUBLIC_API_BASE_URL is required for relative API paths.");
+  }
+
+  const rawUrl = path.startsWith("http") ? path : `${BASE_URL}${path}`;
+  const url =
+    process.env.NODE_ENV === "production" && rawUrl.startsWith("http://")
+      ? rawUrl.replace("http://", "https://")
+      : rawUrl;
 
   const authToken = await getAuthToken();
 
@@ -69,6 +98,7 @@ export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
     !(body instanceof Blob);
 
   const mergedHeaders: HeadersInit = {
+    Accept: "application/json",
     ...(isJsonBody ? { "Content-Type": "application/json" } : null),
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : null),
     ...headers,
@@ -77,11 +107,28 @@ export async function apiFetch<T = unknown>(options: ApiOptions): Promise<T> {
   const init: RequestInit = {
     ...rest,
     headers: mergedHeaders,
-    body: isJsonBody ? JSON.stringify(body) : (body as BodyInit),
+    // Sanitize string fields before sending to reduce XSS risk.
+    body: isJsonBody ? JSON.stringify(sanitizePayload(body)) : (body as BodyInit),
   };
 
-  const res = await fetch(url, init);
-  return handleResponse<T>(res, expectJson);
+  let res: Response;
+  try {
+    res = await fetch(url, init);
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[apiFetch] Network/CORS failure", {
+        url,
+        method: init.method ?? "GET",
+        hasAuthToken: Boolean(authToken),
+        error,
+      });
+    }
+    throw error;
+  }
+  // Do not force sign-out at transport layer.
+  // Some endpoints can return 401 for domain/permission mismatches, and global sign-out
+  // here creates redirect loops. Authentication flow is handled by NextAuth middleware/session.
+  return handleResponse<T>(res, expectJson, suppressErrorLogging);
 }
 
 // Convenience helpers

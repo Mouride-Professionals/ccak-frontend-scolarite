@@ -38,7 +38,7 @@ export interface CourseEnrollment {
     student_id: string;
     student?: {
       id: string;
-      student_number: string;
+      student_number: string | null;
       full_name: string;
     };
   };
@@ -64,6 +64,18 @@ export interface Course {
   name: string;
   credits: number;
   description?: string;
+  prerequisites?: string[];
+  capacity?: number;
+  enrolled_count?: number;
+}
+
+export interface CourseAvailability {
+  course_id: string;
+  is_available: boolean;
+  remaining_seats: number | null;
+  total_seats: number | null;
+  enrolled_count: number | null;
+  message?: string;
 }
 
 // =====================
@@ -107,7 +119,7 @@ export interface CourseEnrollmentFilters {
  */
 export interface CourseEnrollmentListItem {
   id: string;
-  student_number: string; // from Enrollment.Student
+  student_number: string | null; // from Enrollment.Student
   full_name: string; // from Enrollment.Student
   course_code: string; // from Course
   course_name: string; // from Course

@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -22,7 +23,7 @@ import type { CreateGradeInput } from "@/types/grade";
 
 export default function GradeDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const gradeId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -297,7 +298,10 @@ export default function GradeDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Saisi par</p>
                 <p className="mt-1 text-sm text-zinc-900">
-                  {grade.entered_by_user?.full_name || grade.entered_by}
+                  {grade.entered_by_user?.full_name ||
+                    (typeof grade.entered_by === "string"
+                      ? grade.entered_by
+                      : grade.entered_by?.full_name || grade.entered_by?.email || "—")}
                 </p>
               </div>
               <div>

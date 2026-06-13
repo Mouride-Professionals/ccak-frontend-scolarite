@@ -1,15 +1,137 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { Course } from "@/types/course";
 
 interface CourseTableProps {
   courses: Course[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  viewMode?: "table" | "grid";
 }
 
-export default function CourseTable({ courses, onEdit, onDelete }: CourseTableProps) {
+const getPrerequisiteLabels = (course: Course, courses: Course[]) => {
+  const map = new Map(courses.map((item) => [item.id, `${item.code} - ${item.name}`]));
+  return (course.prerequisites || []).map((id) => map.get(id) || id);
+};
+
+export default function CourseTable({
+  courses,
+  onEdit,
+  onDelete,
+  viewMode = "table",
+}: CourseTableProps) {
+  const isReadOnly = useIsReadOnly();
+  if (courses.length === 0) {
+    return (
+      <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
+        <p className="text-sm text-zinc-500">Aucun cours trouvé</p>
+      </div>
+    );
+  }
+
+  if (viewMode === "grid") {
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {courses.map((course) => {
+          const prerequisites = getPrerequisiteLabels(course, courses);
+          return (
+            <div
+              key={course.id}
+              className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    {course.code}
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold text-zinc-900">{course.name}</h3>
+                </div>
+                <span
+                  className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                    course.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {course.is_active ? "Actif" : "Inactif"}
+                </span>
+              </div>
+
+              <p className="mt-3 text-xs text-zinc-500 line-clamp-2">
+                {course.description || "Sans description"}
+              </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-zinc-600">
+                <div>
+                  Crédits: <span className="font-medium">{course.credits}</span>
+                </div>
+                <div>
+                  Coeff: <span className="font-medium">{course.coefficient}</span>
+                </div>
+                <div className="col-span-2">
+                  CM/TD/TP/TPE: {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/
+                  {course.hours_tpe ?? 0} · VHT:{" "}
+                  <span className="font-medium">
+                    {course.hours_lecture +
+                      course.hours_td +
+                      course.hours_tp +
+                      (course.hours_tpe ?? 0)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <p className="text-xs font-medium text-zinc-600">Prérequis</p>
+                {prerequisites.length > 0 ? (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {prerequisites.slice(0, 2).map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                    {prerequisites.length > 2 && (
+                      <span className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700">
+                        +{prerequisites.length - 2}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mt-1 text-xs text-zinc-500">Aucun</p>
+                )}
+              </div>
+
+              <div className="mt-4 flex items-center justify-end gap-2">
+                <button
+                  onClick={() => !isReadOnly && onEdit(course.id)}
+                  disabled={isReadOnly}
+                  className="rounded-lg px-2 py-1 text-xs font-medium text-[#00365F] hover:bg-zinc-100"
+                >
+                  Éditer
+                </button>
+                <Link
+                  href={`/courses/${course.id}/detail`}
+                  className="rounded-lg px-2 py-1 text-xs font-medium text-[#00365F] hover:bg-zinc-100"
+                >
+                  Voir
+                </Link>
+                <button
+                  onClick={() => !isReadOnly && onDelete(course.id)}
+                  disabled={isReadOnly}
+                  className="rounded-lg px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
       <table className="w-full">
@@ -19,22 +141,18 @@ export default function CourseTable({ courses, onEdit, onDelete }: CourseTablePr
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Nom</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Crédits</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">
-              Heures (CM/TD/TP)
+              CM/TD/TP/TPE (VHT)
             </th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Coefficient</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Prérequis</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-zinc-900">Statut</th>
             <th className="px-6 py-3 text-right text-sm font-semibold text-zinc-900">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-200">
-          {courses.length === 0 ? (
-            <tr>
-              <td colSpan={7} className="px-6 py-8 text-center">
-                <p className="text-sm text-zinc-500">Aucun cours trouvé</p>
-              </td>
-            </tr>
-          ) : (
-            courses.map((course) => (
+          {courses.map((course) => {
+            const prerequisites = getPrerequisiteLabels(course, courses);
+            return (
               <tr key={course.id} className="bg-white transition-colors hover:bg-zinc-50/50">
                 <td className="px-6 py-5 text-sm font-medium text-zinc-900">{course.code}</td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
@@ -47,9 +165,38 @@ export default function CourseTable({ courses, onEdit, onDelete }: CourseTablePr
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.credits}</td>
                 <td className="px-6 py-5 text-sm text-zinc-600">
-                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}
+                  {course.hours_lecture}/{course.hours_td}/{course.hours_tp}/{course.hours_tpe ?? 0}{" "}
+                  <span className="text-xs text-zinc-400">
+                    (
+                    {course.hours_lecture +
+                      course.hours_td +
+                      course.hours_tp +
+                      (course.hours_tpe ?? 0)}
+                    h)
+                  </span>
                 </td>
                 <td className="px-6 py-5 text-sm text-zinc-600">{course.coefficient}</td>
+                <td className="px-6 py-5 text-sm text-zinc-600">
+                  {prerequisites.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {prerequisites.slice(0, 2).map((label) => (
+                        <span
+                          key={label}
+                          className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700"
+                        >
+                          {label}
+                        </span>
+                      ))}
+                      {prerequisites.length > 2 && (
+                        <span className="rounded-full bg-zinc-100 px-2 py-1 text-[11px] text-zinc-700">
+                          +{prerequisites.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-zinc-400">Aucun</span>
+                  )}
+                </td>
                 <td className="px-6 py-5 text-sm">
                   <span
                     className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
@@ -62,7 +209,8 @@ export default function CourseTable({ courses, onEdit, onDelete }: CourseTablePr
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
                     <button
-                      onClick={() => onEdit(course.id)}
+                      onClick={() => !isReadOnly && onEdit(course.id)}
+                      disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
                       title="Éditer"
                     >
@@ -106,7 +254,8 @@ export default function CourseTable({ courses, onEdit, onDelete }: CourseTablePr
                       </svg>
                     </Link>
                     <button
-                      onClick={() => onDelete(course.id)}
+                      onClick={() => !isReadOnly && onDelete(course.id)}
+                      disabled={isReadOnly}
                       className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Supprimer"
                     >
@@ -127,8 +276,8 @@ export default function CourseTable({ courses, onEdit, onDelete }: CourseTablePr
                   </div>
                 </td>
               </tr>
-            ))
-          )}
+            );
+          })}
         </tbody>
       </table>
     </div>

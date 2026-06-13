@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCourses, getCourse, createCourse, updateCourse, deleteCourse } from "@/lib/api/courses";
 import { getCourseUnits } from "@/lib/api/course-units";
-import { Course, CreateCourseInput, UpdateCourseInput, CourseFilters } from "@/types/course";
+import { CreateCourseInput, UpdateCourseInput, CourseFilters } from "@/types/course";
 
 export const useCourses = (filters?: CourseFilters) => {
   return useQuery({

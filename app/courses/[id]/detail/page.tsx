@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -11,7 +12,7 @@ import { useCourse, useDeleteCourse } from "@/hooks/use-courses";
 
 export default function CourseDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const courseId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -97,7 +98,7 @@ export default function CourseDetailPage() {
             </div>
             <div className="flex items-center gap-3">
               <Link
-                href={`/courses/${course.id}`}
+                href={`/courses?edit=${course.id}`}
                 className="flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

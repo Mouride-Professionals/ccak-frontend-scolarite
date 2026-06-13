@@ -1,11 +1,14 @@
 import { DocumentStatus } from "@/types/document";
 
 interface DocumentStatusBadgeProps {
-  status: DocumentStatus;
+  status: DocumentStatus | string;
   className?: string;
 }
 
-const statusConfig = {
+const statusConfig: Record<
+  string,
+  { label: string; dotColor: string; textColor: string; bgColor: string }
+> = {
   [DocumentStatus.DRAFT]: {
     label: "Brouillon",
     dotColor: "bg-zinc-500",
@@ -26,8 +29,15 @@ const statusConfig = {
   },
 };
 
+const defaultConfig = {
+  label: "Document",
+  dotColor: "bg-zinc-400",
+  textColor: "text-zinc-700",
+  bgColor: "bg-zinc-100",
+};
+
 export default function DocumentStatusBadge({ status, className = "" }: DocumentStatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] ?? defaultConfig;
 
   return (
     <span

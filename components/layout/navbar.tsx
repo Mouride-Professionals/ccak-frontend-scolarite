@@ -2,25 +2,92 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import NotificationList from "@/components/notifications/NotificationList";
-
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-
-// 👇 1. On importe ton composant ici
 import NotificationPopup from "@/components/notifications/NotificationPopup";
+import SearchTriggerButton from "@/components/shared/command-palette/SearchTriggerButton";
+import { useAcademicYears } from "@/hooks/use-academic-years";
+import { useSelectedYear } from "@/hooks/use-selected-year";
+import type { AcademicYear } from "@/types/academic-year";
 
 interface NavbarProps {
   title: string;
+  onMenuToggle?: () => void;
+  isSidebarOpen?: boolean;
 }
 
-export default function Navbar({ title }: NavbarProps) {
+function YearOption({
+  year,
+  isSelected,
+  isCurrent,
+  onSelect,
+}: {
+  year: AcademicYear;
+  isSelected: boolean;
+  isCurrent: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-zinc-50 ${
+        isSelected ? "bg-zinc-50 font-medium" : ""
+      }`}
+    >
+      {isCurrent ? (
+        <span className="h-2 w-2 rounded-full bg-green-500" />
+      ) : (
+        <svg
+          className="h-3.5 w-3.5 text-zinc-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
+        </svg>
+      )}
+      <span className={isCurrent ? "text-[#00365F]" : "text-zinc-600"}>{year.name}</span>
+      {isSelected && (
+        <svg
+          className="ml-auto h-3.5 w-3.5 text-[#00365F]"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+export default function Navbar({ title, onMenuToggle, isSidebarOpen }: NavbarProps) {
   const { data: session } = useSession();
+  const { selectedYear, isReadOnly, setSelectedYear, currentYearId } = useSelectedYear();
+  const { data: yearsResponse } = useAcademicYears({ limit: 50 });
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showYearMenu, setShowYearMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const yearMenuRef = useRef<HTMLDivElement>(null);
+
+  const allYears = yearsResponse?.data ?? [];
+  const currentYears = allYears.filter((y) => y.id === currentYearId);
+  const archivedYears = allYears
+    .filter((y) => y.id !== currentYearId)
+    .sort((a, b) => {
+      const dateA = a.start_date ?? a.name;
+      const dateB = b.start_date ?? b.name;
+      return dateB.localeCompare(dateA);
+    });
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -30,6 +97,9 @@ export default function Navbar({ title }: NavbarProps) {
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
+      }
+      if (yearMenuRef.current && !yearMenuRef.current.contains(event.target as Node)) {
+        setShowYearMenu(false);
       }
     };
 
@@ -49,6 +119,12 @@ export default function Navbar({ title }: NavbarProps) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {
+        // ignore storage errors
+      }
       // Get Keycloak configuration from environment
       const keycloakBaseUrl = process.env.NEXT_PUBLIC_KEYCLOAK_BASE_URL;
       const keycloakRealm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM;
@@ -74,55 +150,142 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed left-[230px] right-0 top-0 z-30 h-16 border-b border-zinc-200 bg-white">
-      <div className="flex h-full items-center justify-between px-8">
+    <nav className="fixed left-0 right-0 top-0 z-30 h-16 border-b border-zinc-200 bg-white md:left-[230px]">
+      <div className="flex h-full items-center justify-between px-4 md:px-8">
         {/* Title */}
-        <h1 className="text-2xl font-semibold text-[#00365F]">{title}</h1>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded={isSidebarOpen ?? false}
+            onClick={onMenuToggle}
+            className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white p-2 text-[#00365F] shadow-sm transition hover:bg-zinc-50 md:hidden"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <h1 className="text-lg font-semibold text-[#00365F] md:text-2xl">{title}</h1>
+        </div>
 
-        {/* User Info & Notifications */}
-        <div className="flex items-center gap-4">
-          {/* Notification Bell */}
-          <div className="relative" ref={notificationRef}>
+        {/* Year Switcher */}
+        {selectedYear && (
+          <div className="relative hidden sm:block" ref={yearMenuRef}>
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative rounded-lg p-2 text-[#00365F] transition-colors hover:bg-zinc-100"
+              type="button"
+              onClick={() => setShowYearMenu((v) => !v)}
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition ${
+                isReadOnly
+                  ? "border-amber-300 bg-amber-50 hover:bg-amber-100"
+                  : "border-zinc-200 bg-zinc-50 hover:bg-zinc-100"
+              }`}
             >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isReadOnly ? (
+                <svg
+                  className="h-3.5 w-3.5 text-amber-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              ) : (
+                <span className="h-2 w-2 rounded-full bg-green-500" />
+              )}
+              <span className={`font-medium ${isReadOnly ? "text-amber-700" : "text-[#00365F]"}`}>
+                {selectedYear.name}
+              </span>
+              <svg
+                className={`h-3.5 w-3.5 ${isReadOnly ? "text-amber-500" : "text-zinc-400"}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  d="M19 9l-7 7-7-7"
                 />
               </svg>
-              {/* Notification Badge */}
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500"></span>
             </button>
 
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div className="absolute right-0 mt-2">
-                <NotificationList />
+            {showYearMenu && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-lg border border-zinc-200 bg-white shadow-lg">
+                {currentYears.length > 0 && (
+                  <>
+                    <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                      Année en cours
+                    </div>
+                    {currentYears.map((year) => (
+                      <YearOption
+                        key={year.id}
+                        year={year}
+                        isSelected={selectedYear.id === year.id}
+                        isCurrent
+                        onSelect={() => {
+                          setSelectedYear(year);
+                          setShowYearMenu(false);
+                        }}
+                      />
+                    ))}
+                  </>
+                )}
+                {archivedYears.length > 0 && (
+                  <>
+                    <div
+                      className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 ${currentYears.length > 0 ? "border-t border-zinc-100" : ""}`}
+                    >
+                      Années archivées
+                    </div>
+                    {archivedYears.map((year) => (
+                      <YearOption
+                        key={year.id}
+                        year={year}
+                        isSelected={selectedYear.id === year.id}
+                        isCurrent={false}
+                        onSelect={() => {
+                          setSelectedYear(year);
+                          setShowYearMenu(false);
+                        }}
+                      />
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>
+        )}
 
-          {/* 👇 2. LA GREFFE EST ICI ! */}
-          {/* J'ai supprimé l'ancien <button> avec le SVG statique */}
-          {/* Et j'ai mis ton composant intelligent à la place */}
+        {/* User Info & Notifications */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Global Search */}
+          <SearchTriggerButton />
+
+          {/* Notification Popup */}
           <NotificationPopup />
 
           {/* User Profile */}
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-3 rounded-lg transition-colors hover:bg-zinc-50 px-2 py-1"
+              className="flex items-center gap-3 rounded-lg px-2 py-1 transition-colors hover:bg-zinc-50"
             >
-              <div className="text-right">
+              <div className="hidden text-right sm:block">
                 <p className="text-sm font-medium text-[#00365F]">{userName}</p>
                 <p className="text-xs text-zinc-500">{userEmail}</p>
               </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#00365F] text-sm font-semibold text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#00365F] text-sm font-semibold text-white sm:h-10 sm:w-10">
                 {userInitials}
               </div>
             </button>

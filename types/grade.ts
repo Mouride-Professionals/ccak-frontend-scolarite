@@ -7,21 +7,17 @@
 // =====================
 
 export enum GradeStatus {
-  DRAFT = "draft",
-  PENDING = "pending",
-  VALIDATED = "validated",
-  REJECTED = "rejected",
+  DRAFT = "DRAFT",
+  SUBMITTED = "SUBMITTED",
+  VALIDATED = "VALIDATED",
+  PUBLISHED = "PUBLISHED",
 }
 
 export enum EvaluationType {
-  EXAM = "exam",
-  QUIZ = "quiz",
-  HOMEWORK = "homework",
-  PROJECT = "project",
-  PRESENTATION = "presentation",
-  LAB = "lab",
-  MIDTERM = "midterm",
-  FINAL = "final",
+  CC = "CC",
+  EXAM = "EXAM",
+  TP = "TP",
+  ORAL = "ORAL",
 }
 
 // =====================
@@ -32,11 +28,34 @@ export interface Grade {
   id: string;
   student_id: string;
   course_id: string;
+  assessment_id?: string | null;
+  assessment?: {
+    id: string;
+    title: string;
+    type: string;
+    date: string;
+  } | null;
+  exam_schedule_id?: string | null;
   type: string;
   score: number;
   max_score: number;
   weight: number;
-  entered_by: string;
+  entered_by:
+    | string
+    | {
+        id: string;
+        email: string;
+        full_name?: string | null;
+        is_active?: boolean;
+        email_verified_at?: string | null;
+        last_login_at?: string | null;
+        created_at?: string;
+        updated_at?: string;
+        keycloak_id?: string | null;
+        notification_preferences?: Record<string, unknown> | null;
+        email_frequency?: string | null;
+        enable_digest?: boolean;
+      };
   status: string;
   entered_at: string;
   validated_at: string | null;
@@ -48,7 +67,7 @@ export interface Grade {
   // Populated fields
   student?: {
     id: string;
-    student_number: string;
+    student_number: string | null;
     full_name: string;
   };
   course?: {
@@ -64,7 +83,7 @@ export interface Grade {
 
 export interface Student {
   id: string;
-  student_number: string;
+  student_number: string | null;
   full_name: string;
   email: string;
   phone?: string;
@@ -108,8 +127,11 @@ export interface EvaluationTypeOption {
 // =====================
 
 export interface CreateGradeInput {
+  course_enrollment_id: string;
   student_id: string;
   course_id: string;
+  assessment_id?: string | null;
+  exam_schedule_id?: string | null;
   type: string;
   score: number;
   max_score: number;
@@ -121,6 +143,8 @@ export interface CreateGradeInput {
 export interface UpdateGradeInput {
   student_id?: string;
   course_id?: string;
+  assessment_id?: string | null;
+  exam_schedule_id?: string | null;
   type?: string;
   score?: number;
   max_score?: number;

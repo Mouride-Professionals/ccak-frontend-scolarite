@@ -1,26 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ProgrammeForm from "@/components/programmes/programme-form";
 import { useCreateAcademicProgram, useDepartments } from "@/hooks/use-academic";
+import { toUserError } from "@/lib/error-handler";
 import type { CreateProgrammeInput } from "@/types/programme";
 
 export default function NewProgrammePage() {
   const router = useRouter();
   const createMutation = useCreateAcademicProgram();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Load form data
   const { data: departments, isLoading: loadingDepartments } = useDepartments();
 
   const handleSubmit = async (data: CreateProgrammeInput) => {
+    setSubmitError(null);
     try {
       await createMutation.mutateAsync(data);
       router.push("/programmes");
     } catch (error) {
       console.error("Error creating academic programme:", error);
-      alert("Erreur lors de la création du programme. Veuillez réessayer.");
+      setSubmitError(
+        toUserError(error, "Erreur lors de la création du programme. Veuillez réessayer.").message
+      );
     }
   };
 
@@ -31,6 +37,14 @@ export default function NewProgrammePage() {
           <div className="mb-8">
             <p className="text-sm text-zinc-600">Créez un nouveau programme académique</p>
           </div>
+          {submitError && (
+            <div
+              className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
+              {submitError}
+            </div>
+          )}
 
           {/* Form */}
           <div className="rounded-lg border border-zinc-200 bg-white p-6">

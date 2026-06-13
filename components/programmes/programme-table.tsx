@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { AcademicProgram } from "@/types/academic";
 import { AcademicLevel } from "@/types/academic";
 
@@ -11,6 +12,7 @@ interface ProgrammeTableProps {
 }
 
 export default function ProgrammeTable({ programmes, onEdit, onDelete }: ProgrammeTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (programmes.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -97,7 +99,7 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(programme.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -143,7 +145,7 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
                         />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(programme.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

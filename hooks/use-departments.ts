@@ -6,7 +6,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
-  Department,
   DepartmentFilters,
   CreateDepartmentInput,
   UpdateDepartmentInput,
