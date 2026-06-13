@@ -119,28 +119,34 @@ export async function checkCourseAvailability(
       `/courses/${courseId}/availability?academic_year_id=${academicYearId}&semester=${semester}`
     );
     const payload = unwrapData<Record<string, unknown>>(response);
+    // Backend returns { course, availability: { available, current, max, remaining } }
+    const avail = (payload?.availability as Record<string, unknown>) ?? payload ?? {};
 
     return {
       course_id: courseId,
       is_available:
-        Boolean(payload?.is_available) ||
-        Boolean(payload?.available) ||
-        Number(payload?.remaining_seats ?? 0) > 0,
+        Boolean(avail?.is_available) ||
+        Boolean(avail?.available) ||
+        Number(avail?.remaining_seats ?? avail?.remaining ?? 0) > 0,
       remaining_seats:
-        typeof payload?.remaining_seats === "number" ? payload.remaining_seats : null,
+        typeof avail?.remaining_seats === "number"
+          ? avail.remaining_seats
+          : typeof avail?.remaining === "number"
+            ? avail.remaining
+            : null,
       total_seats:
-        typeof payload?.total_seats === "number"
-          ? payload.total_seats
-          : typeof payload?.capacity === "number"
-            ? payload.capacity
+        typeof avail?.total_seats === "number"
+          ? avail.total_seats
+          : typeof avail?.max === "number"
+            ? avail.max
             : null,
       enrolled_count:
-        typeof payload?.enrolled_count === "number"
-          ? payload.enrolled_count
-          : typeof payload?.current_enrollment === "number"
-            ? payload.current_enrollment
+        typeof avail?.enrolled_count === "number"
+          ? avail.enrolled_count
+          : typeof avail?.current === "number"
+            ? avail.current
             : null,
-      message: typeof payload?.message === "string" ? payload.message : undefined,
+      message: typeof avail?.message === "string" ? avail.message : undefined,
     };
   } catch {
     return {

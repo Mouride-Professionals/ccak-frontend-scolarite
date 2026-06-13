@@ -17,7 +17,6 @@ import {
   useDeleteCourseEnrollment,
   useCreateCourseEnrollment,
   useCourses,
-  useAcademicYears,
 } from "@/hooks/use-course-enrollments";
 import { useEnrollment } from "@/hooks/use-enrollments";
 import { CourseEnrollmentStatus, type CourseEnrollmentFilters } from "@/types/course-enrollment";
@@ -65,7 +64,6 @@ export default function EnrollmentCoursesPageClient() {
 
   // Load form data
   const { data: courses, isLoading: loadingCourses } = useCourses();
-  const { data: years, isLoading: loadingYears } = useAcademicYears();
 
   const handleViewClick = (id: string) => {
     // Vous pouvez créer une page de détail si nécessaire
@@ -243,7 +241,7 @@ export default function EnrollmentCoursesPageClient() {
           subtitle="Formulaire d'ajout de cours"
           size="lg"
         >
-          {loadingCourses || loadingYears ? (
+          {loadingCourses ? (
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
@@ -259,7 +257,6 @@ export default function EnrollmentCoursesPageClient() {
               }}
               enrollments={enrollment ? [enrollment] : []}
               courses={courses ?? []}
-              years={years ?? []}
               alreadyEnrolledCourseIds={(data?.data ?? [])
                 .filter((item) => item.status !== CourseEnrollmentStatus.DROPPED)
                 .map((item) => item.course_id)}
