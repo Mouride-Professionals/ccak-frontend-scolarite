@@ -455,7 +455,6 @@ export default function EnrollmentsPage() {
               onSubmit={handleCreateSubmit}
               onCancel={() => setIsCreateModalOpen(false)}
               programs={programs ?? []}
-              years={years ?? []}
               students={students ?? []}
               isLoading={createMutation.isPending}
             />
@@ -483,7 +482,6 @@ export default function EnrollmentsPage() {
               onSubmit={handleEditSubmit}
               onCancel={() => setEditingEnrollmentId(null)}
               programs={programs ?? []}
-              years={years ?? []}
               students={students ?? []}
               isLoading={updateMutation.isPending}
             />

@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { CreateEnrollmentInput, AcademicProgram, AcademicYear } from "@/types/enrollment";
+import type { CreateEnrollmentInput, AcademicProgram } from "@/types/enrollment";
+import { useCurrentAcademicYear, useAcademicYear } from "@/hooks/use-academic-years";
 import { RegistrationStatus } from "@/types/enrollment";
 import type { Student } from "@/types/student";
 import { EnrollmentSchema, type EnrollmentFormData } from "@/lib/validations/schemas";
 import { extractValidationErrors, toUserError } from "@/lib/error-handler";
 import StudentSearch from "@/components/students/student-search";
-import { useLevels } from "@/hooks/use-levels";
 import { useDegreeCycles } from "@/hooks/use-degree-cycles";
 
 interface EnrollmentFormProps {
@@ -18,7 +18,6 @@ interface EnrollmentFormProps {
   onCancel?: () => void;
   students: Student[];
   programs: AcademicProgram[];
-  years: AcademicYear[];
   isLoading?: boolean;
   initialData?: Partial<CreateEnrollmentInput>;
 }
@@ -28,7 +27,6 @@ export default function EnrollmentForm({
   onCancel,
   students,
   programs,
-  years,
   isLoading = false,
   initialData,
 }: EnrollmentFormProps) {
@@ -65,9 +63,16 @@ export default function EnrollmentForm({
   const [selectedStudentLabel, setSelectedStudentLabel] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { data: levelsData } = useLevels();
-  const { data: degreeCycles } = useDegreeCycles();
-  const levels = levelsData?.data ?? [];
+  const { data: degreeCycles = [] } = useDegreeCycles();
+  const { data: currentYear } = useCurrentAcademicYear();
+  const yearId = watch("academic_year_id");
+  const { data: displayYear } = useAcademicYear(yearId, !!yearId);
+
+  useEffect(() => {
+    if (currentYear && !initialData?.academic_year_id) {
+      setValue("academic_year_id", currentYear.id);
+    }
+  }, [currentYear, setValue, initialData?.academic_year_id]);
 
   const isScholarshipHolder = watch("is_scholarship_holder");
   const isRegisteredElsewhere = watch("is_registered_elsewhere");
@@ -187,25 +192,11 @@ export default function EnrollmentForm({
 
           {/* Academic Year */}
           <div>
-            <label htmlFor="academic_year_id" className="mb-2 block text-sm text-zinc-900">
-              Année académique <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="academic_year_id"
-              {...register("academic_year_id")}
-              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.academic_year_id ? "border-red-300" : "border-zinc-300"}`}
-              disabled={isLoading}
-            >
-              <option value="">Sélectionner une année</option>
-              {years.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_current && "(Actuelle)"}
-                </option>
-              ))}
-            </select>
-            {errors.academic_year_id && (
-              <p className="mt-1.5 text-xs text-red-600">{errors.academic_year_id.message}</p>
-            )}
+            <label className="mb-2 block text-sm text-zinc-900">Année académique</label>
+            <input type="hidden" {...register("academic_year_id")} />
+            <p className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm text-zinc-700">
+              {displayYear?.name ?? currentYear?.name ?? "Chargement..."}
+            </p>
           </div>
 
           {/* Level */}
@@ -220,25 +211,18 @@ export default function EnrollmentForm({
               disabled={isLoading}
             >
               <option value="">— Sélectionner un niveau —</option>
-              {degreeCycles && degreeCycles.length > 0
-                ? degreeCycles.map((cycle) => {
-                    const cycleLevels = levels.filter((l) => l.degree_cycle_id === cycle.id);
-                    if (cycleLevels.length === 0) return null;
-                    return (
-                      <optgroup key={cycle.id} label={cycle.name}>
-                        {cycleLevels.map((level) => (
-                          <option key={level.id} value={level.id}>
-                            {level.name} ({level.code})
-                          </option>
-                        ))}
-                      </optgroup>
-                    );
-                  })
-                : levels.map((level) => (
-                    <option key={level.id} value={level.id}>
-                      {level.name} ({level.code})
-                    </option>
-                  ))}
+              {degreeCycles.map((cycle) => {
+                if (cycle.levels.length === 0) return null;
+                return (
+                  <optgroup key={cycle.id} label={cycle.name}>
+                    {cycle.levels.map((level) => (
+                      <option key={level.id} value={level.id}>
+                        {level.name} ({level.code})
+                      </option>
+                    ))}
+                  </optgroup>
+                );
+              })}
             </select>
           </div>
 

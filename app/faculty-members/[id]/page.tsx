@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useFacultyMember } from "@/hooks/use-faculty-members-management";
 import { FacultyContractType, FacultyRank } from "@/types/academic";
+import { formatPhone } from "@/lib/format";
 
 const rankLabels: Record<string, string> = {
   [FacultyRank.PROFESSEUR]: "Professeur",
@@ -18,7 +19,7 @@ const rankLabels: Record<string, string> = {
 const contractLabels: Record<string, string> = {
   [FacultyContractType.PERMANENT]: "Permanent",
   [FacultyContractType.TEMPORARY]: "Temporaire",
-  [FacultyContractType.VACATAIRE]: "Vacataire",
+  [FacultyContractType.HOURLY]: "Vacataire",
 };
 
 export default function FacultyMemberProfilePage() {
@@ -97,7 +98,7 @@ export default function FacultyMemberProfilePage() {
                   </div>
                   <div>
                     <p className="text-xs uppercase text-zinc-400">Téléphone</p>
-                    <p className="text-sm text-zinc-700">{faculty.phone || "—"}</p>
+                    <p className="text-sm text-zinc-700">{formatPhone(faculty.phone)}</p>
                   </div>
                   <div>
                     <p className="text-xs uppercase text-zinc-400">Adresse</p>

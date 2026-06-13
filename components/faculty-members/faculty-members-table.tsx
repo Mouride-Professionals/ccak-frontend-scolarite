@@ -21,7 +21,7 @@ const rankLabels: Record<string, string> = {
 const contractLabels: Record<string, string> = {
   PERMANENT: "Permanent",
   TEMPORARY: "Temporaire",
-  VACATAIRE: "Vacataire",
+  HOURLY: "Vacataire",
 };
 
 export default function FacultyMembersTable({

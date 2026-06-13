@@ -8,7 +8,6 @@ import DeliberationForm from "@/components/deliberations/deliberation-form";
 import {
   useCreateDeliberationSession,
   useAcademicPrograms,
-  useAcademicYears,
   useFacultyMembers,
 } from "@/hooks/use-deliberations";
 import { toUserError } from "@/lib/error-handler";
@@ -21,7 +20,6 @@ export default function NewDeliberationPage() {
 
   // Load form data
   const { data: programs, isLoading: loadingPrograms } = useAcademicPrograms();
-  const { data: years, isLoading: loadingYears } = useAcademicYears();
   const { data: facultyMembers, isLoading: loadingFaculty } = useFacultyMembers();
 
   const handleSubmit = async (data: CreateDeliberationSessionInput) => {
@@ -37,7 +35,7 @@ export default function NewDeliberationPage() {
     }
   };
 
-  const isLoadingData = loadingPrograms || loadingYears || loadingFaculty;
+  const isLoadingData = loadingPrograms || loadingFaculty;
 
   return (
     <ProtectedRoute>
@@ -70,7 +68,6 @@ export default function NewDeliberationPage() {
               <DeliberationForm
                 onSubmit={handleSubmit}
                 programs={programs ?? []}
-                years={years ?? []}
                 facultyMembers={facultyMembers ?? []}
                 isLoading={createMutation.isPending}
               />

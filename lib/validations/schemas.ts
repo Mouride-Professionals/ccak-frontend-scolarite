@@ -9,7 +9,7 @@ import { RegistrationStatus } from "@/types/enrollment";
 import { AcademicLevel } from "@/types/academic";
 
 // Common validation patterns
-const PHONE_REGEX = /^\+221\d{9}$/;
+const PHONE_REGEX = /^\+221\s?\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/;
 const NAME_REGEX = /^[a-zA-ZÀ-ÿ\s'-]+$/;
 const CODE_REGEX = /^[A-Z0-9-]+$/;
 
@@ -56,10 +56,10 @@ export const StudentSchema = z.object({
   phone: z
     .string()
     .min(1, "Le numéro de téléphone est requis")
-    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX"),
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221 XX XXX XX XX"),
   phone_2: z
     .string()
-    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221 XX XXX XX XX")
     .optional()
     .nullable()
     .or(z.literal("")),
@@ -74,7 +74,7 @@ export const StudentSchema = z.object({
   emergency_contact_phone: z
     .string()
     .min(1, "Le téléphone du contact d'urgence est requis")
-    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX"),
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221 XX XXX XX XX"),
   address: z.string().min(5, "L'adresse doit contenir au moins 5 caractères").max(200),
   documents: z.array(z.instanceof(File)).optional(),
 });
@@ -301,13 +301,13 @@ export const GuardianSchema = z.object({
   relationship: z.string().min(1, "La relation est requise").max(50),
   phone: z
     .string()
-    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221 XX XXX XX XX")
     .optional()
     .nullable()
     .or(z.literal("")),
   phone_2: z
     .string()
-    .regex(PHONE_REGEX, "Le numéro doit être au format +221XXXXXXXXX")
+    .regex(PHONE_REGEX, "Le numéro doit être au format +221 XX XXX XX XX")
     .optional()
     .nullable()
     .or(z.literal("")),

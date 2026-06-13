@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { z } from "zod";
 import type { CreateDeliberationSessionInput } from "@/types/deliberation";
-import type { AcademicProgram, AcademicYear, FacultyMember } from "@/types/academic";
+import type { AcademicProgram, FacultyMember } from "@/types/academic";
+import { useCurrentAcademicYear, useAcademicYear } from "@/hooks/use-academic-years";
 import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 
 interface DeliberationFormProps {
   onSubmit: (data: CreateDeliberationSessionInput) => void;
   onCancel?: () => void;
   programs: AcademicProgram[];
-  years: AcademicYear[];
   facultyMembers: FacultyMember[];
   isLoading?: boolean;
   initialData?: Partial<CreateDeliberationSessionInput>;
@@ -56,12 +56,12 @@ export default function DeliberationForm({
   onSubmit,
   onCancel,
   programs,
-  years,
   facultyMembers,
   isLoading = false,
   initialData,
 }: DeliberationFormProps) {
   const isReadOnly = useIsReadOnly();
+  const { data: currentYear } = useCurrentAcademicYear();
   const [formData, setFormData] = useState<DeliberationFormData>({
     academic_program_id: initialData?.academic_program_id ?? "",
     academic_year_id: initialData?.academic_year_id ?? "",
@@ -71,6 +71,14 @@ export default function DeliberationForm({
     presided_by: initialData?.presided_by ?? "",
     jury_members: initialData?.jury_members ?? [],
   });
+
+  const { data: displayYear } = useAcademicYear(formData.academic_year_id, !!formData.academic_year_id);
+
+  useEffect(() => {
+    if (currentYear && !initialData?.academic_year_id) {
+      setFormData((prev) => ({ ...prev, academic_year_id: currentYear.id }));
+    }
+  }, [currentYear, initialData?.academic_year_id]);
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const canSubmit =
@@ -237,34 +245,10 @@ export default function DeliberationForm({
 
           {/* Academic Year */}
           <div>
-            <label htmlFor="academic_year_id" className="mb-2 block text-sm text-zinc-900">
-              Année académique <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="academic_year_id"
-              value={formData.academic_year_id}
-              onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className={`block w-full appearance-none rounded-md border bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
-                errors.academic_year_id ? "border-red-300" : "border-zinc-300"
-              }`}
-              disabled={isLoading}
-              aria-invalid={Boolean(errors.academic_year_id)}
-              aria-describedby={
-                errors.academic_year_id ? getErrorId("academic_year_id") : undefined
-              }
-            >
-              <option value="">Sélectionner une année</option>
-              {years.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_current && "(Actuelle)"}
-                </option>
-              ))}
-            </select>
-            {errors.academic_year_id && (
-              <p id={getErrorId("academic_year_id")} className="mt-1.5 text-xs text-red-600">
-                {errors.academic_year_id}
-              </p>
-            )}
+            <label className="mb-2 block text-sm text-zinc-900">Année académique</label>
+            <p className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm text-zinc-700">
+              {displayYear?.name ?? currentYear?.name ?? "Chargement..."}
+            </p>
           </div>
 
           {/* Semester */}

@@ -12,6 +12,7 @@ import {
   useCreateFacultyDocument,
 } from "@/hooks/use-faculty-members-management";
 import { toUserError } from "@/lib/error-handler";
+import { formatPhoneInput, parsePhone } from "@/lib/format";
 import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 import { FacultyContractType, FacultyDocumentType, FacultyRank } from "@/types/academic";
 
@@ -257,7 +258,7 @@ export default function FacultyRegistrationPage() {
   const [formData, setFormData] = useState<FacultyRegistrationFormData>({
     full_name: "",
     email: "",
-    phone: "",
+    phone: "+221 ",
     address: "",
     department_id: "",
     rank: FacultyRank.ASSISTANT,
@@ -370,7 +371,7 @@ export default function FacultyRegistrationPage() {
       const createdFaculty = await createFacultyMutation.mutateAsync({
         full_name: validData.full_name,
         email: validData.email,
-        phone: validData.phone,
+        phone: parsePhone(validData.phone),
         address: validData.address || undefined,
         department_id: validData.department_id,
         rank: validData.rank,
@@ -500,6 +501,8 @@ export default function FacultyRegistrationPage() {
                     id="phone"
                     value={formData.phone}
                     onChange={(event) => setFieldValue("phone", event.target.value)}
+                    onBlur={(e) => setFieldValue("phone", formatPhoneInput(e.target.value) || "+221 ")}
+                    placeholder="+221 XX XXX XX XX"
                     className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
                       fieldErrors.phone ? "border-red-300" : "border-zinc-300"
                     }`}
@@ -655,7 +658,7 @@ export default function FacultyRegistrationPage() {
                   >
                     {Object.values(FacultyContractType).map((type) => (
                       <option key={type} value={type}>
-                        {type}
+                        {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[type] ?? type}
                       </option>
                     ))}
                   </select>
@@ -667,7 +670,7 @@ export default function FacultyRegistrationPage() {
                 </div>
                 <div>
                   <label htmlFor="salary" className="mb-2 block text-sm font-medium text-zinc-700">
-                    Salaire mensuel
+                    Salaire mensuel (FCFA)
                   </label>
                   <input
                     id="salary"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { Student } from "@/types/student";
+import { formatPhone } from "@/lib/format";
 import StudentStatusBadge from "./student-status-badge";
 
 interface StudentTableProps {
@@ -66,7 +67,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="text-sm text-zinc-700">{student.full_name}</div>
-                  <div className="mt-1 text-xs text-zinc-500 lg:hidden">{student.phone || "—"}</div>
+                  <div className="mt-1 text-xs text-zinc-500 lg:hidden">{formatPhone(student.phone)}</div>
                 </td>
                 <td className="hidden px-4 py-4 sm:px-6 sm:py-5 md:table-cell">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
@@ -81,7 +82,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                   })}
                 </td>
                 <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
-                  {student.phone}
+                  {formatPhone(student.phone)}
                 </td>
                 <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 xl:table-cell">
                   {student.email ?? "—"}

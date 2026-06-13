@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo, useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ListHeader from "@/components/ui/list-header";
@@ -8,6 +8,7 @@ import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
 import FacultySearch from "@/components/faculty-members/faculty-search";
 import { useAcademicYears } from "@/hooks/use-enrollments";
+import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
 import { useCourses } from "@/hooks/use-courses";
 import {
   useActivityTypes,
@@ -78,6 +79,7 @@ export default function ScheduleCreationPage() {
   const { data: roomsData } = useRooms({ page: 1, limit: 50 });
   const { data: activityTypes } = useActivityTypes({ page: 1, limit: 50 });
   const { data: years } = useAcademicYears();
+  const { data: currentYear } = useCurrentAcademicYear();
 
   const createSchedule = useCreateSchedule();
   const updateSchedule = useUpdateSchedule();
@@ -112,6 +114,10 @@ export default function ScheduleCreationPage() {
     });
     return map;
   }, [schedules?.data]);
+
+  useEffect(() => {
+    if (currentYear) setForm((prev) => ({ ...prev, academic_year_id: currentYear.id }));
+  }, [currentYear]);
 
   const canPlanByDrag =
     !!form.faculty_member_id &&
@@ -338,21 +344,9 @@ export default function ScheduleCreationPage() {
                   <label className="mb-2 block text-sm font-medium text-zinc-700">
                     Année académique
                   </label>
-                  <select
-                    value={form.academic_year_id}
-                    onChange={(event) =>
-                      setForm((prev) => ({ ...prev, academic_year_id: event.target.value }))
-                    }
-                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-                  >
-                    <option value="">Sélectionner</option>
-                    {Array.isArray(years) &&
-                      years.map((year) => (
-                        <option key={year.id} value={year.id}>
-                          {year.name}
-                        </option>
-                      ))}
-                  </select>
+                  <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                    {currentYear?.name ?? "Chargement..."}
+                  </p>
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-zinc-700">Jour</label>

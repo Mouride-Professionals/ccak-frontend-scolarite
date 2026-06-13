@@ -9,6 +9,7 @@ import Toast from "@/components/ui/toast";
 import { useDepartments } from "@/hooks/use-departments";
 import { useFacultyMember, useUpdateFacultyMember } from "@/hooks/use-faculty-members-management";
 import { FacultyContractType, FacultyRank } from "@/types/academic";
+import { formatPhone, formatPhoneInput, parsePhone } from "@/lib/format";
 
 export default function FacultyMemberEditPage() {
   const params = useSafeParams<{ id: string }>();
@@ -39,7 +40,7 @@ export default function FacultyMemberEditPage() {
     if (!faculty) return;
     setFormData({
       full_name: faculty.full_name ?? "",
-      phone: faculty.phone ?? "",
+      phone: faculty.phone ? formatPhone(faculty.phone) : "+221 ",
       address: faculty.address ?? "",
       department_id: faculty.department_id ?? "",
       rank: faculty.rank ?? FacultyRank.ASSISTANT,
@@ -55,7 +56,7 @@ export default function FacultyMemberEditPage() {
         id: facultyId,
         input: {
           full_name: formData.full_name,
-          phone: formData.phone,
+          phone: parsePhone(formData.phone),
           address: formData.address || undefined,
           department_id: formData.department_id,
           rank: formData.rank,
@@ -110,6 +111,9 @@ export default function FacultyMemberEditPage() {
                   value={formData.phone}
                   onChange={(event) =>
                     setFormData((prev) => ({ ...prev, phone: event.target.value }))
+                  }
+                  onBlur={(e) =>
+                    setFormData((prev) => ({ ...prev, phone: formatPhoneInput(e.target.value) || "+221 " }))
                   }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 />
@@ -184,7 +188,7 @@ export default function FacultyMemberEditPage() {
                 >
                   {Object.values(FacultyContractType).map((type) => (
                     <option key={type} value={type}>
-                      {type}
+                      {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[type] ?? type}
                     </option>
                   ))}
                 </select>

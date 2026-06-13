@@ -10,6 +10,7 @@ export interface DegreeCycle {
   name: string;
   code: string;
   type: DegreeCycleType;
-  created_at: string;
-  updated_at: string;
+  levels: import("./level").Level[];
+  created_at?: string;
+  updated_at?: string;
 }

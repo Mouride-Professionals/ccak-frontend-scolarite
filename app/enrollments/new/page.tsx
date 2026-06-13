@@ -10,7 +10,6 @@ import ConfirmDialog from "@/components/ui/confirm-dialog";
 import {
   useCreateEnrollment,
   useAcademicPrograms,
-  useAcademicYears,
   useStudents,
 } from "@/hooks/use-enrollments";
 import type { CreateEnrollmentInput } from "@/types/enrollment";
@@ -19,9 +18,8 @@ export default function NewEnrollmentPage() {
   const router = useRouter();
   const createMutation = useCreateEnrollment();
   const { data: programs, isLoading: isProgramsLoading } = useAcademicPrograms();
-  const { data: years, isLoading: isYearsLoading } = useAcademicYears();
   const { data: students, isLoading: isStudentsLoading } = useStudents();
-  const isFormLoading = isProgramsLoading || isYearsLoading || isStudentsLoading;
+  const isFormLoading = isProgramsLoading || isStudentsLoading;
 
   const [toast, setToast] = useState<{
     isOpen: boolean;
@@ -94,7 +92,6 @@ export default function NewEnrollmentPage() {
                 onCancel={handleCancel}
                 students={students ?? []}
                 programs={programs ?? []}
-                years={years ?? []}
                 isLoading={createMutation.isPending}
               />
             )}

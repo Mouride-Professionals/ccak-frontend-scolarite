@@ -10,6 +10,7 @@ import EnrollmentStatusBadge from "@/components/enrollments/enrollment-status-ba
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useEnrollment, useDeleteEnrollment } from "@/hooks/use-enrollments";
+import { formatFCFA, formatPhone } from "@/lib/format";
 
 export default function EnrollmentDetailPage() {
   const router = useRouter();
@@ -190,8 +191,7 @@ export default function EnrollmentDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Frais d'inscription payés</p>
                 <p className="mt-1 text-2xl font-bold text-zinc-900">
-                  {enrollment.registration_fee_paid.toLocaleString("fr-FR")}{" "}
-                  <span className="text-base font-normal">FCFA</span>
+                  {formatFCFA(enrollment.registration_fee_paid)}
                 </p>
               </div>
             </div>
@@ -277,7 +277,7 @@ export default function EnrollmentDetailPage() {
               {enrollment.student?.phone && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.phone}</p>
+                  <p className="mt-1 text-sm text-zinc-900">{formatPhone(enrollment.student.phone)}</p>
                 </div>
               )}
               {enrollment.student?.address && (
@@ -309,7 +309,7 @@ export default function EnrollmentDetailPage() {
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {enrollment.student.emergency_contact_phone}
+                      {formatPhone(enrollment.student.emergency_contact_phone)}
                     </p>
                   </div>
                 )}

@@ -318,7 +318,6 @@ export default function DeliberationsPage() {
               onSubmit={handleCreateSubmit}
               onCancel={() => setIsCreateModalOpen(false)}
               programs={Array.isArray(programs) ? programs : []}
-              years={Array.isArray(years) ? years : []}
               facultyMembers={Array.isArray(facultyMembers) ? facultyMembers : []}
               isLoading={createMutation.isPending}
             />
@@ -347,7 +346,6 @@ export default function DeliberationsPage() {
               onSubmit={handleEditSubmit}
               onCancel={() => setEditSessionId(null)}
               programs={Array.isArray(programs) ? programs : []}
-              years={Array.isArray(years) ? years : []}
               facultyMembers={Array.isArray(facultyMembers) ? facultyMembers : []}
               isLoading={updateMutation.isPending}
               initialData={{

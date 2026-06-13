@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
 import FacultySearch from "@/components/faculty-members/faculty-search";
 import { useCourses } from "@/hooks/use-courses";
-import { useAcademicYears } from "@/hooks/use-enrollments";
+import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
 import {
   useCreateTeachingAssignment,
   useTeachingAssignmentConflictCheck,
@@ -17,7 +17,7 @@ import { TeachingRole } from "@/types/teaching-assignment";
 export default function TeachingAssignmentNewPage() {
   const router = useRouter();
   const { data: coursesData } = useCourses({ page: 1, limit: 100 });
-  const { data: years } = useAcademicYears();
+  const { data: currentYear } = useCurrentAcademicYear();
   const createMutation = useCreateTeachingAssignment();
   const conflictMutation = useTeachingAssignmentConflictCheck();
   const [toast, setToast] = useState({
@@ -35,6 +35,10 @@ export default function TeachingAssignmentNewPage() {
     hours: "",
     hourlyRate: "",
   });
+
+  useEffect(() => {
+    if (currentYear) setForm((prev) => ({ ...prev, academicYearId: currentYear.id }));
+  }, [currentYear]);
 
   const handleSubmit = async () => {
     if (!form.facultyId || !form.courseId || !form.academicYearId || !form.hours) {
@@ -122,21 +126,9 @@ export default function TeachingAssignmentNewPage() {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Année académique *
               </label>
-              <select
-                value={form.academicYearId}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, academicYearId: event.target.value }))
-                }
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-              >
-                <option value="">Sélectionner</option>
-                {Array.isArray(years) &&
-                  years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.name} {year.is_current && "(Actuelle)"}
-                    </option>
-                  ))}
-              </select>
+              <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                {currentYear?.name ?? "Chargement..."}
+              </p>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">Rôle *</label>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { z } from "zod";
 import type { Course, CreateCourseEnrollmentInput } from "@/types/course-enrollment";
 import { CourseEnrollmentStatus } from "@/types/course-enrollment";
-import type { Enrollment, AcademicYear } from "@/types/enrollment";
+import type { Enrollment } from "@/types/enrollment";
+import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
 import { useCourseAvailabilities } from "@/hooks/use-course-enrollments";
 import { useCourseBasketStore } from "@/stores/course-basket-store";
 import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
@@ -22,7 +23,6 @@ interface CourseEnrollmentFormProps {
   onCancel?: () => void;
   enrollments?: Enrollment[];
   courses?: Course[];
-  years?: AcademicYear[];
   alreadyEnrolledCourseIds?: string[];
   isLoading?: boolean;
   initialData?: CreateCourseEnrollmentInput;
@@ -52,12 +52,12 @@ export default function CourseEnrollmentForm({
   onCancel,
   enrollments = [],
   courses = [],
-  years = [],
   alreadyEnrolledCourseIds = [],
   isLoading = false,
   initialData,
 }: CourseEnrollmentFormProps) {
   const isReadOnly = useIsReadOnly();
+  const { data: currentYear } = useCurrentAcademicYear();
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState<CourseEnrollmentFormData>({
     enrollment_id: initialData?.enrollment_id ?? "",
@@ -66,6 +66,12 @@ export default function CourseEnrollmentForm({
     enrollment_date: initialData?.enrollment_date ?? new Date().toISOString().split("T")[0],
     status: initialData?.status ?? CourseEnrollmentStatus.ENROLLED,
   });
+  useEffect(() => {
+    if (currentYear && !formData.academic_year_id) {
+      setFormData((prev) => ({ ...prev, academic_year_id: currentYear.id }));
+    }
+  }, [currentYear, formData.academic_year_id]);
+
   const [errors, setErrors] = useState<FieldErrors>({});
   const getErrorId = (field: keyof CourseEnrollmentFormData | "basket") => `${field}-error`;
 
@@ -227,31 +233,9 @@ export default function CourseEnrollmentForm({
             <label htmlFor="academic_year_id" className="mb-2 block text-sm text-zinc-900">
               Année académique <span className="text-red-500">*</span>
             </label>
-            <select
-              id="academic_year_id"
-              value={formData.academic_year_id}
-              onChange={(e) => handleChange("academic_year_id", e.target.value)}
-              className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${
-                errors.academic_year_id ? "border-red-300" : "border-zinc-300"
-              }`}
-              disabled={isLoading}
-              aria-invalid={Boolean(errors.academic_year_id)}
-              aria-describedby={
-                errors.academic_year_id ? getErrorId("academic_year_id") : undefined
-              }
-            >
-              <option value="">| Sélectionner une année</option>
-              {years.map((year) => (
-                <option key={year.id} value={year.id}>
-                  {year.name} {year.is_current && "(Actuelle)"}
-                </option>
-              ))}
-            </select>
-            {errors.academic_year_id && (
-              <p id={getErrorId("academic_year_id")} className="mt-1.5 text-xs text-red-600">
-                {errors.academic_year_id}
-              </p>
-            )}
+            <p className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm text-zinc-700">
+              {currentYear?.name ?? "Chargement..."}
+            </p>
           </div>
 
           <div>

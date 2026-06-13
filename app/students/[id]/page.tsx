@@ -27,6 +27,7 @@ import {
 } from "@/hooks/use-documents";
 import { useCreatePriorDiploma, useDeletePriorDiploma } from "@/hooks/use-prior-diplomas";
 import { DocumentType } from "@/types/student";
+import { formatPhone } from "@/lib/format";
 
 type TabType = "info" | "guardians" | "diplomas" | "documents" | "status";
 
@@ -256,12 +257,31 @@ export default function StudentDetailPage() {
       <DashboardLayout title="Détails de l'Étudiant">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-zinc-900">{student.full_name}</h2>
-            <p className="mt-1 text-sm text-zinc-500">
-              {student.student_number} • Créé le{" "}
-              {new Date(student.created_at).toLocaleDateString("fr-FR")}
-            </p>
+          <div className="flex items-center gap-4">
+            {/* Photo avatar */}
+            {student.photo_url ? (
+              <img
+                src={student.photo_url}
+                alt={student.full_name}
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-zinc-200"
+              />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-200 text-xl font-semibold text-zinc-600 ring-2 ring-zinc-200">
+                {student.full_name
+                  .split(" ")
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((w) => w[0].toUpperCase())
+                  .join("")}
+              </div>
+            )}
+            <div>
+              <h2 className="text-2xl font-semibold text-zinc-900">{student.full_name}</h2>
+              <p className="mt-1 text-sm text-zinc-500">
+                {student.student_number} • Créé le{" "}
+                {new Date(student.created_at).toLocaleDateString("fr-FR")}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <StudentStatusBadge status={student.status} />
@@ -415,11 +435,11 @@ export default function StudentDetailPage() {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.phone ?? "—"}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{formatPhone(student.phone)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone 2</p>
-                    <p className="mt-1 text-sm text-zinc-900">{student.phone_2 ?? "—"}</p>
+                    <p className="mt-1 text-sm text-zinc-900">{formatPhone(student.phone_2)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Email personnel</p>
@@ -453,7 +473,7 @@ export default function StudentDetailPage() {
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {student.emergency_contact_phone ?? "—"}
+                      {formatPhone(student.emergency_contact_phone)}
                     </p>
                   </div>
                 </div>
@@ -513,7 +533,7 @@ export default function StudentDetailPage() {
                           </p>
                           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-zinc-500">Téléphone:</span> {guardian.phone}
+                              <span className="text-zinc-500">Téléphone:</span> {formatPhone(guardian.phone)}
                             </div>
                             <div>
                               <span className="text-zinc-500">Email:</span> {guardian.email}

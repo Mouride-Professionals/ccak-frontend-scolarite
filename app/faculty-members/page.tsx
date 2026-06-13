@@ -23,7 +23,7 @@ const rankOptions = [
 const contractOptions = [
   { value: FacultyContractType.PERMANENT, label: "Permanent" },
   { value: FacultyContractType.TEMPORARY, label: "Temporaire" },
-  { value: FacultyContractType.VACATAIRE, label: "Vacataire" },
+  { value: FacultyContractType.HOURLY, label: "Vacataire" },
 ];
 
 export default function FacultyMembersPage() {

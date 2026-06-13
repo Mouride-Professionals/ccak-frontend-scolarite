@@ -31,7 +31,7 @@ export enum FacultyRank {
 export enum FacultyContractType {
   PERMANENT = "PERMANENT",
   TEMPORARY = "TEMPORARY",
-  VACATAIRE = "VACATAIRE",
+  HOURLY = "HOURLY",
 }
 
 export enum FacultyDocumentType {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import Toast from "@/components/ui/toast";
-import { useAcademicYears } from "@/hooks/use-enrollments";
+import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
 import { useAcademicCalendar, useSaveAcademicCalendar } from "@/hooks/use-calendar";
 import type { AcademicCalendar, DayOfWeek } from "@/types/calendar";
 
@@ -24,7 +24,7 @@ const overlapsBreak = (
 ) => breaks.some((breakItem) => breakItem.start < slot.end && breakItem.end > slot.start);
 
 export default function CalendarSetupPage() {
-  const { data: years } = useAcademicYears();
+  const { data: currentYear } = useCurrentAcademicYear();
   const [yearId, setYearId] = useState("");
   const { data: calendar } = useAcademicCalendar(yearId || undefined);
   const saveMutation = useSaveAcademicCalendar();
@@ -43,6 +43,10 @@ export default function CalendarSetupPage() {
     hour_slots: [{ start: "08:00", end: "10:00" }],
     breaks: [{ start: "12:00", end: "13:00", label: "Pause déjeuner" }],
   });
+
+  useEffect(() => {
+    if (currentYear && !yearId) setYearId(currentYear.id);
+  }, [currentYear, yearId]);
 
   useEffect(() => {
     if (!calendar) return;
@@ -130,19 +134,9 @@ export default function CalendarSetupPage() {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Année académique
               </label>
-              <select
-                value={yearId}
-                onChange={(event) => setYearId(event.target.value)}
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-              >
-                <option value="">Sélectionner</option>
-                {Array.isArray(years) &&
-                  years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.name} {year.is_current ? "(Actuelle)" : ""}
-                    </option>
-                  ))}
-              </select>
+              <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                {currentYear?.name ?? "Chargement..."}
+              </p>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">Période</label>

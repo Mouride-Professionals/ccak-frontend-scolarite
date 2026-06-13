@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
@@ -8,6 +8,7 @@ import ListHeader from "@/components/ui/list-header";
 import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
 import { useAcademicYears } from "@/hooks/use-enrollments";
+import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
 import {
   useCreateHoliday,
   useDeleteHoliday,
@@ -27,6 +28,7 @@ const toIsoDate = (value: string) => value.slice(0, 10);
 
 export default function HolidaysPage() {
   const { data: years } = useAcademicYears();
+  const { data: currentYear } = useCurrentAcademicYear();
   const [filters, setFilters] = useState({
     page: 1,
     limit: 100,
@@ -56,6 +58,10 @@ export default function HolidaysPage() {
     is_recurring: false,
     academic_year_id: "",
   });
+
+  useEffect(() => {
+    if (currentYear) setForm((prev) => ({ ...prev, academic_year_id: currentYear.id }));
+  }, [currentYear]);
 
   const monthGrid = useMemo(() => {
     const [yearValue, monthValue] = selectedMonth.split("-").map(Number);
@@ -301,21 +307,9 @@ export default function HolidaysPage() {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
                   Année académique
                 </label>
-                <select
-                  value={form.academic_year_id}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, academic_year_id: event.target.value }))
-                  }
-                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-                >
-                  <option value="">Sélectionner</option>
-                  {Array.isArray(years) &&
-                    years.map((year) => (
-                      <option key={year.id} value={year.id}>
-                        {year.name}
-                      </option>
-                    ))}
-                </select>
+                <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+                  {currentYear?.name ?? "Chargement..."}
+                </p>
               </div>
               <label className="flex items-center gap-2 text-sm text-zinc-600">
                 <input

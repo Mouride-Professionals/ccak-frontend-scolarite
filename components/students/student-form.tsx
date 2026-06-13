@@ -9,6 +9,7 @@ import { Gender, DocumentType, Provenance, IDType } from "@/types/student";
 import DocumentUploader from "./document-uploader";
 import { StudentSchema, type StudentFormData } from "@/lib/validations/schemas";
 import { extractValidationErrors, toUserError } from "@/lib/error-handler";
+import { formatPhone, formatPhoneInput, parsePhone } from "@/lib/format";
 
 interface StudentFormProps {
   onSubmit: (data: CreateStudentInput) => void;
@@ -43,13 +44,13 @@ export default function StudentForm({
       date_of_birth: initialData?.date_of_birth ?? "",
       place_of_birth: initialData?.place_of_birth ?? "",
       nationality: initialData?.nationality ?? "",
-      phone: initialData?.phone ?? "",
-      phone_2: initialData?.phone_2 ?? "",
+      phone: initialData?.phone ? formatPhone(initialData.phone) : "+221 ",
+      phone_2: initialData?.phone_2 ? formatPhone(initialData.phone_2) : "",
       email: initialData?.email ?? "",
       type_of_id: initialData?.type_of_id ?? undefined,
       id_details: initialData?.id_details ?? "",
       emergency_contact_name: initialData?.emergency_contact_name ?? "",
-      emergency_contact_phone: initialData?.emergency_contact_phone ?? "",
+      emergency_contact_phone: initialData?.emergency_contact_phone ? formatPhone(initialData.emergency_contact_phone) : "+221 ",
       address: initialData?.address ?? "",
       documents: [],
     },
@@ -57,6 +58,10 @@ export default function StudentForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   // registration_number is read-only when editing a student that already has one
   const isRegistrationNumberReadOnly = !!(initialData && initialData.registration_number);
+
+  const phoneReg = register("phone");
+  const phone2Reg = register("phone_2");
+  const emergencyPhoneReg = register("emergency_contact_phone");
 
   const handleDocumentUpload = (files: File[], type: DocumentType) => {
     const currentDocs = watch("documents") || [];
@@ -66,7 +71,12 @@ export default function StudentForm({
   const handleFormSubmit = async (data: StudentFormData) => {
     setSubmitError(null);
     try {
-      await onSubmit(data as CreateStudentInput);
+      await onSubmit({
+        ...data,
+        phone: parsePhone(data.phone),
+        phone_2: parsePhone(data.phone_2) || undefined,
+        emergency_contact_phone: parsePhone(data.emergency_contact_phone),
+      } as CreateStudentInput);
     } catch (error) {
       const validationErrors = extractValidationErrors(error);
       if (Object.keys(validationErrors).length > 0) {
@@ -325,8 +335,12 @@ export default function StudentForm({
             <input
               type="tel"
               id="phone"
-              {...register("phone")}
-              placeholder="+221771234567"
+              {...phoneReg}
+              onBlur={(e) => {
+                setValue("phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                phoneReg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
@@ -341,8 +355,12 @@ export default function StudentForm({
             <input
               type="tel"
               id="phone_2"
-              {...register("phone_2")}
-              placeholder="+221771234567"
+              {...phone2Reg}
+              onBlur={(e) => {
+                setValue("phone_2", formatPhoneInput(e.target.value) || "", { shouldValidate: true });
+                phone2Reg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.phone_2 ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
@@ -419,8 +437,12 @@ export default function StudentForm({
             <input
               type="tel"
               id="emergency_contact_phone"
-              {...register("emergency_contact_phone")}
-              placeholder="+221771234567"
+              {...emergencyPhoneReg}
+              onBlur={(e) => {
+                setValue("emergency_contact_phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                emergencyPhoneReg.onBlur(e);
+              }}
+              placeholder="+221 XX XXX XX XX"
               className={`block w-full rounded-md border bg-white px-4 py-2.5 text-sm text-[#00365F] placeholder-zinc-400 focus:border-[#00365F] focus:outline-none focus:ring-1 focus:ring-[#00365F] ${errors.emergency_contact_phone ? "border-red-300" : "border-zinc-300"}`}
               disabled={isLoading}
             />
