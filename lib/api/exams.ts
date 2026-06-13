@@ -123,5 +123,5 @@ export async function getExamSchedulesList(
   if (filters?.limit) params.append("limit", String(filters.limit));
 
   const response = await api.get(`/exam-schedules${params.toString() ? `?${params}` : ""}`);
-  return toPaginated<ExamSchedule, ExamSchedulesPaginatedResponse>(response);
+  return toPaginated<ExamSchedule>(response);
 }
