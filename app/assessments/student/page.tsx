@@ -46,9 +46,7 @@ export default function AssessmentStudentPage() {
       : undefined
   );
 
-  const grades = Array.isArray(gradesResponse)
-    ? gradesResponse
-    : ((gradesResponse as unknown as { data?: typeof gradesResponse })?.data ?? []);
+  const grades = gradesResponse?.data ?? [];
 
   return (
     <ProtectedRoute>
