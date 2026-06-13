@@ -6,10 +6,10 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import EnrollmentForm from "@/components/enrollments/enrollment-form";
 import Toast from "@/components/ui/toast";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import {
   useCreateEnrollment,
   useAcademicPrograms,
-  useAcademicYears,
   useStudents,
 } from "@/hooks/use-enrollments";
 import type { CreateEnrollmentInput } from "@/types/enrollment";
@@ -18,9 +18,8 @@ export default function NewEnrollmentPage() {
   const router = useRouter();
   const createMutation = useCreateEnrollment();
   const { data: programs, isLoading: isProgramsLoading } = useAcademicPrograms();
-  const { data: years, isLoading: isYearsLoading } = useAcademicYears();
   const { data: students, isLoading: isStudentsLoading } = useStudents();
-  const isFormLoading = isProgramsLoading || isYearsLoading || isStudentsLoading;
+  const isFormLoading = isProgramsLoading || isStudentsLoading;
 
   const [toast, setToast] = useState<{
     isOpen: boolean;
@@ -31,15 +30,26 @@ export default function NewEnrollmentPage() {
     message: "",
     type: "success",
   });
+  const [pendingEnrollment, setPendingEnrollment] = useState<CreateEnrollmentInput | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleSubmit = async (data: CreateEnrollmentInput) => {
+    setPendingEnrollment(data);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    if (!pendingEnrollment) return;
+
     try {
-      await createMutation.mutateAsync(data);
+      await createMutation.mutateAsync(pendingEnrollment);
       setToast({
         isOpen: true,
         message: "Enrollement créé avec succès",
         type: "success",
       });
+      setIsConfirmOpen(false);
+      setPendingEnrollment(null);
       setTimeout(() => {
         router.push("/enrollments");
       }, 1500);
@@ -64,7 +74,7 @@ export default function NewEnrollmentPage() {
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-zinc-900">Nouvel Enrollement</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Enregistrer un nouvel enrollement d'étudiant
+              Enregistrer un nouvel enrollement d&apos;étudiant
             </p>
           </div>
 
@@ -82,12 +92,27 @@ export default function NewEnrollmentPage() {
                 onCancel={handleCancel}
                 students={students ?? []}
                 programs={programs ?? []}
-                years={years ?? []}
                 isLoading={createMutation.isPending}
               />
             )}
           </div>
         </div>
+
+        <ConfirmDialog
+          isOpen={isConfirmOpen}
+          onClose={() => {
+            if (createMutation.isPending) return;
+            setIsConfirmOpen(false);
+            setPendingEnrollment(null);
+          }}
+          onConfirm={handleConfirmSubmit}
+          title="Confirmer l'enrollement"
+          message="Voulez-vous confirmer cet enrollement ? Vérifiez les informations avant validation."
+          confirmText="Confirmer"
+          cancelText="Modifier"
+          variant="warning"
+          isLoading={createMutation.isPending}
+        />
 
         <Toast
           isOpen={toast.isOpen}

@@ -39,7 +39,7 @@ export interface GeneratedDocument {
   generated_at: string; // ISO date string
   issued_at?: string; // ISO date string
   revoked_at?: string; // ISO date string
-  metadata?: Record<string, unknown>; // Additional document metadata
+  metadata?: Record<string, unknown> | string[] | null; // Additional document metadata
 
   // Populated relations (optional, for joined queries)
   student?: {

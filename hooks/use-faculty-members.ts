@@ -5,8 +5,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { FacultyMember } from "@/types/academic";
-import { mockFacultyMembers } from "@/lib/api/mock-data";
+import { getFacultyMembers } from "@/lib/api/deliberations";
 
 // =====================
 // QUERY KEYS
@@ -27,7 +26,7 @@ export const facultyMembersKeys = {
 export function useFacultyMembers() {
   return useQuery({
     queryKey: facultyMembersKeys.lists(),
-    queryFn: async () => mockFacultyMembers,
+    queryFn: () => getFacultyMembers(),
     staleTime: 60000, // 1 minute
   });
 }

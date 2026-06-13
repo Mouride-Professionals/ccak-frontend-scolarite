@@ -36,6 +36,24 @@ const statusConfig = {
     textColor: "text-zinc-700",
     bgColor: "bg-red-50",
   },
+  [StudentStatus.PENDING]: {
+    label: "En attente",
+    dotColor: "bg-sky-400",
+    textColor: "text-zinc-700",
+    bgColor: "bg-sky-50",
+  },
+  [StudentStatus.CANCELLED]: {
+    label: "Annulé",
+    dotColor: "bg-zinc-500",
+    textColor: "text-zinc-600",
+    bgColor: "bg-zinc-100",
+  },
+  [StudentStatus.INACTIVE]: {
+    label: "Inactif",
+    dotColor: "bg-zinc-400",
+    textColor: "text-zinc-600",
+    bgColor: "bg-zinc-50",
+  },
 };
 
 export default function StudentStatusBadge({ status, className = "" }: StudentStatusBadgeProps) {

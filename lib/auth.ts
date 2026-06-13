@@ -1,7 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import KeycloakProvider from "next-auth/providers/keycloak";
-import { buildKeycloakIssuer, buildKeycloakTokenUrl, buildKeycloakLogoutUrl } from "@/lib/keycloak";
+import { buildKeycloakIssuer, buildKeycloakTokenUrl } from "@/lib/keycloak";
 
 type RefreshableToken = JWT & {
   accessToken?: string;
@@ -69,6 +69,44 @@ const refreshAccessToken = async (token: RefreshableToken): Promise<RefreshableT
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    callbackUrl: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.callback-url"
+          : "next-auth.callback-url",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    csrfToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Host-next-auth.csrf-token"
+          : "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   pages: {
     signIn: "/login",
   },
@@ -107,6 +145,9 @@ export const authOptions: NextAuthOptions = {
       return refreshAccessToken(token as RefreshableToken);
     },
     async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub;
+      }
       session.accessToken = token.accessToken as string | undefined;
       session.idToken = token.idToken as string | undefined;
       session.error = token.error as "RefreshAccessTokenError" | undefined;

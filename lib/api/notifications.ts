@@ -1,4 +1,5 @@
 import { authFetch } from "./auth-fetch";
+import { toPaginated } from "@/lib/api/api-response";
 
 export interface Notification {
   id: string;
@@ -7,7 +8,7 @@ export interface Notification {
   channel: string;
   title: string;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   is_read: boolean;
   read_at: string | null;
   created_at: string;
@@ -20,7 +21,7 @@ export interface SendNotificationPayload {
   message: string;
   type: string;
   channels?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationListResponse {
@@ -43,16 +44,27 @@ export const notificationsApi = {
     search?: string;
   }): Promise<NotificationListResponse> => {
     const queryParams = new URLSearchParams();
-    if (params?.type) queryParams.append("type", params.type);
-    if (params?.is_read !== undefined) queryParams.append("is_read", params.is_read.toString());
+    if (params?.type) queryParams.append("filter[type]", params.type);
+    if (params?.is_read !== undefined)
+      queryParams.append("filter[is_read]", params.is_read.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
-    if (params?.per_page)
-      queryParams.append("per_page", params.per_page.toString());
-    if (params?.search) queryParams.append("search", params.search);
+    if (params?.per_page) queryParams.append("per_page", params.per_page.toString());
+    if (params?.search) queryParams.append("filter[search]", params.search);
 
     const url = `/notifications${queryParams.toString() ? `?${queryParams}` : ""}`;
     const response = await authFetch(url);
-    return response.json();
+    const payload = await response.json();
+    const normalized = toPaginated<Notification>(payload);
+
+    return {
+      data: normalized.data,
+      meta: {
+        current_page: normalized.page,
+        per_page: normalized.limit,
+        total: normalized.total,
+        last_page: normalized.total_pages,
+      },
+    };
   },
 
   // Send notification (admin only)

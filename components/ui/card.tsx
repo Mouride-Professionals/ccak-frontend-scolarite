@@ -13,12 +13,15 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}
+        className={cn(
+          "rounded-lg border border-zinc-200 bg-white text-zinc-900 shadow-sm",
+          className
+        )}
         {...props}
       >
         {hasHeader ? (
           <div className="flex items-center px-6 py-4">
-            {title ? <h3 className="text-sm font-semibold">{title}</h3> : null}
+            {title ? <h3 className="text-sm font-semibold text-zinc-900">{title}</h3> : null}
             {rightSlot ? <div className="ml-auto flex items-center">{rightSlot}</div> : null}
           </div>
         ) : null}

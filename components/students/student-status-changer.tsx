@@ -87,6 +87,11 @@ export default function StudentStatusChanger({
       label: "Exclu",
       description: "Étudiant exclu définitivement",
     },
+    {
+      value: StudentStatus.INACTIVE,
+      label: "Inactif",
+      description: "Étudiant inactif",
+    },
   ];
 
   return (

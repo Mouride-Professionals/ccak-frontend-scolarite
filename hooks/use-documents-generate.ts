@@ -6,14 +6,12 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
-  GeneratedDocument,
   DocumentFilters,
   GenerateTranscriptInput,
   GenerateCertificateInput,
   GenerateIdCardInput,
   GenerateDiplomaInput,
   GenerateAttestationInput,
-  DocumentVerificationResponse,
 } from "@/types/document";
 import * as documentsApi from "@/lib/api/documents-genarate";
 
@@ -91,6 +89,7 @@ export function useGenerateTranscript() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -107,6 +106,7 @@ export function useGenerateCertificate() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -123,6 +123,7 @@ export function useGenerateIdCard() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -139,6 +140,7 @@ export function useGenerateDiploma() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -155,6 +157,7 @@ export function useGenerateAttestation() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -198,6 +201,7 @@ export function useIssueDocument() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }
@@ -218,6 +222,7 @@ export function useRevokeDocument() {
       queryClient.invalidateQueries({
         queryKey: documentKeys.list(data.student_id),
       });
+      queryClient.invalidateQueries({ queryKey: ["documents", "all"] });
     },
   });
 }

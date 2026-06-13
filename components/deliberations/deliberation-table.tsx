@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { DeliberationSession } from "@/types/deliberation";
 import DeliberationStatusBadge from "./deliberation-status-badge";
 
@@ -11,6 +12,7 @@ interface DeliberationTableProps {
 }
 
 export default function DeliberationTable({ sessions, onEdit, onDelete }: DeliberationTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (sessions.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -94,7 +96,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(session.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -159,7 +161,7 @@ export default function DeliberationTable({ sessions, onEdit, onDelete }: Delibe
                         />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(session.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

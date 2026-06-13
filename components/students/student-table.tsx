@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import type { Student } from "@/types/student";
+import { formatPhone } from "@/lib/format";
 import StudentStatusBadge from "./student-status-badge";
 
 interface StudentTableProps {
@@ -11,6 +13,7 @@ interface StudentTableProps {
 }
 
 export default function StudentTable({ students, onEdit, onDelete }: StudentTableProps) {
+  const isReadOnly = useIsReadOnly();
   if (students.length === 0) {
     return (
       <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
@@ -22,28 +25,31 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-200 bg-[#00365F]/10">
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Numéro étudiant
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Nom complet
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 md:table-cell">
                 Genre
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
                 Date de naissance
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 lg:table-cell">
                 Téléphone
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4 xl:table-cell">
+                Email
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Statut
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F]">
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#00365F] sm:px-6 sm:py-4">
                 Actions
               </th>
             </tr>
@@ -51,7 +57,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
           <tbody className="divide-y divide-zinc-100">
             {students.map((student) => (
               <tr key={student.id} className="bg-white transition-colors hover:bg-zinc-50/50">
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <Link
                     href={`/students/${student.id}`}
                     className="text-sm font-medium text-[#00365F] hover:text-[#008D36] transition-colors"
@@ -59,28 +65,34 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                     {student.student_number}
                   </Link>
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="text-sm text-zinc-700">{student.full_name}</div>
+                  <div className="mt-1 text-xs text-zinc-500 lg:hidden">{formatPhone(student.phone)}</div>
                 </td>
-                <td className="px-6 py-5">
+                <td className="hidden px-4 py-4 sm:px-6 sm:py-5 md:table-cell">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">
                     {student.gender === "M" ? "Masculin" : "Féminin"}
                   </span>
                 </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
                   {new Date(student.date_of_birth).toLocaleDateString("fr-FR", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
                   })}
                 </td>
-                <td className="px-6 py-5 text-sm text-zinc-600">{student.phone}</td>
-                <td className="px-6 py-5">
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 lg:table-cell">
+                  {formatPhone(student.phone)}
+                </td>
+                <td className="hidden px-4 py-4 text-sm text-zinc-600 sm:px-6 sm:py-5 xl:table-cell">
+                  {student.email ?? "—"}
+                </td>
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <StudentStatusBadge status={student.status} />
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="flex items-center justify-end gap-2">
-                    {onEdit && (
+                    {onEdit && !isReadOnly && (
                       <button
                         onClick={() => onEdit(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-[#00365F]"
@@ -126,7 +138,7 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                         />
                       </svg>
                     </Link>
-                    {onDelete && (
+                    {onDelete && !isReadOnly && (
                       <button
                         onClick={() => onDelete(student.id)}
                         className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600"

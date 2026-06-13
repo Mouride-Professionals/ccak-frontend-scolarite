@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { templatesApi } from "@/lib/api/templates";
 import type { EmailTemplate } from "@/lib/api/templates";
 import Portal from "@/components/ui/Portal";
+import { toUserError } from "@/lib/error-handler";
 
 interface TemplatePreviewModalProps {
   template: EmailTemplate;
@@ -16,6 +19,16 @@ export default function TemplatePreviewModal({
   onClose,
 }: TemplatePreviewModalProps) {
   const [sampleData, setSampleData] = useState<Record<string, string>>({});
+  const {
+    data: previewData,
+    isLoading: loadingPreview,
+    error: previewError,
+  } = useQuery({
+    queryKey: ["email-template-preview", template.name, sampleData],
+    queryFn: () => templatesApi.getTemplatePreview(template.name, sampleData),
+    enabled: isOpen,
+    staleTime: 0,
+  });
 
   const generateSampleData = () => {
     const data: Record<string, string> = {};
@@ -108,7 +121,7 @@ export default function TemplatePreviewModal({
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  Générer des données d'exemple
+                  Générer des données d&apos;exemple
                 </button>
               </div>
 
@@ -123,7 +136,9 @@ export default function TemplatePreviewModal({
                           {variable}
                         </code>
                         {sampleData[variable] && (
-                          <span className="text-xs text-gray-500">= "{sampleData[variable]}"</span>
+                          <span className="text-xs text-gray-500">
+                            = &quot;{sampleData[variable]}&quot;
+                          </span>
                         )}
                       </div>
                     ))}
@@ -133,56 +148,27 @@ export default function TemplatePreviewModal({
 
               {/* Preview Area */}
               <div className="mb-4">
-                <h4 className="mb-2 text-sm font-medium text-gray-900">Aperçu de l'email:</h4>
+                <h4 className="mb-2 text-sm font-medium text-gray-900">Aperçu de l&apos;email:</h4>
                 <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                  <div className="rounded-md bg-white p-6 shadow-sm">
-                    <div className="mb-4 rounded-t-md bg-gradient-to-r from-[#667eea] to-[#764ba2] p-6 text-center">
-                      <img src="/logo.svg" alt="UCAK" className="mx-auto h-16" />
+                  {loadingPreview ? (
+                    <div className="rounded-md bg-white p-6 text-center text-sm text-zinc-500 shadow-sm">
+                      Génération de l&apos;aperçu...
                     </div>
-                    <div className="p-6">
-                      <h2 className="mb-4 text-xl font-semibold">
-                        {sampleData["title"] || template.display_name}
-                      </h2>
-                      <p className="mb-2">Bonjour {sampleData["user.name"] || "Utilisateur"},</p>
-                      <p className="mb-4 text-gray-700">
-                        {sampleData["message"] ||
-                          "Ceci est un exemple de message pour ce template."}
-                      </p>
-                      {template.name === "grade_published" && (
-                        <div className="mb-4">
-                          <p>
-                            Votre note pour {sampleData["grade.subject"] || "Mathématiques"} a été
-                            publiée.
-                          </p>
-                          <p className="mt-2 text-lg font-semibold">
-                            Note: {sampleData["grade.score"] || "85/100"}
-                          </p>
-                        </div>
-                      )}
-                      {template.name === "enrollment_confirmed" && (
-                        <div className="mb-4">
-                          <p>
-                            Votre inscription à{" "}
-                            {sampleData["course.name"] || "Licence Informatique"} a été confirmée.
-                          </p>
-                        </div>
-                      )}
-                      <a
-                        href="#"
-                        className="inline-block rounded-md bg-[#667eea] px-6 py-3 text-white no-underline"
-                      >
-                        Voir les détails
-                      </a>
+                  ) : previewError ? (
+                    <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                      {toUserError(previewError, "Impossible de générer l\u2019aperçu.").message}
                     </div>
-                    <div className="bg-gray-50 p-4 text-center text-xs text-gray-600">
-                      <p>&copy; 2025 UCAK. Tous droits réservés.</p>
-                      <p>
-                        <a href="#" className="text-[#667eea]">
-                          Visiter notre site
-                        </a>
-                      </p>
+                  ) : previewData?.html ? (
+                    <iframe
+                      title={`Aperçu template ${template.name}`}
+                      srcDoc={previewData.html}
+                      className="h-[460px] w-full rounded-md border border-zinc-200 bg-white"
+                    />
+                  ) : (
+                    <div className="rounded-md bg-white p-6 text-center text-sm text-zinc-500 shadow-sm">
+                      Aperçu indisponible.
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 

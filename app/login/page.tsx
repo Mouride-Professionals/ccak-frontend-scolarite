@@ -1,4 +1,5 @@
 import LoginRedirect from "./login-redirect";
+import { normalizeRedirectUrl } from "@/lib/url-validator";
 
 type LoginPageProps = {
   searchParams?:
@@ -10,23 +11,7 @@ const defaultCallbackUrl = "/dashboard";
 
 const normalizeCallbackUrl = (value?: string | string[]) => {
   const rawValue = Array.isArray(value) ? value[0] : value;
-  if (!rawValue) return defaultCallbackUrl;
-
-  if (rawValue.startsWith("/")) {
-    return rawValue;
-  }
-
-  const baseUrl = process.env.NEXTAUTH_URL;
-  if (baseUrl && rawValue.startsWith(baseUrl)) {
-    try {
-      const url = new URL(rawValue);
-      return `${url.pathname}${url.search}${url.hash}`;
-    } catch {
-      return defaultCallbackUrl;
-    }
-  }
-
-  return defaultCallbackUrl;
+  return normalizeRedirectUrl(rawValue ?? "", defaultCallbackUrl);
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {

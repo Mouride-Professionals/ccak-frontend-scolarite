@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
+import { useIsReadOnly } from "@/hooks/use-selected-year";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import type { Department, CreateDepartmentInput } from "@/types/department";
 import { useCreateDepartment, useUpdateDepartment } from "@/hooks/use-departments";
 import { useFaculties } from "@/hooks/use-faculties";
 import { toast } from "sonner";
+import { DepartmentSchema, type DepartmentFormData } from "@/lib/validations/schemas";
+import { extractValidationErrors, toUserError } from "@/lib/error-handler";
+import FacultySearch from "@/components/faculty-members/faculty-search";
 
 interface DepartmentFormProps {
   department?: Department;
@@ -14,25 +18,16 @@ interface DepartmentFormProps {
   onCancel?: () => void;
 }
 
-//
-const DepartmentSchema = z.object({
-  faculty_id: z.string().min(1, "Faculty is required"),
-  name: z.string().min(1, "Name is required"),
-  code: z.string().min(1, "Code is required"),
-  head_id: z.string().optional().nullable(),
-  is_active: z.boolean(),
-});
-
-type DepartmentFormData = z.input<typeof DepartmentSchema>;
-
 export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFormProps) {
-  const { mutate: createDepartment, isPending: isCreating } = useCreateDepartment();
-  const { mutate: updateDepartment, isPending: isUpdating } = useUpdateDepartment();
+  const isReadOnly = useIsReadOnly();
+  const { mutateAsync: createDepartment, isPending: isCreating } = useCreateDepartment();
+  const { mutateAsync: updateDepartment, isPending: isUpdating } = useUpdateDepartment();
   const { data: facultiesData } = useFaculties();
 
   const {
     register,
     handleSubmit,
+    setError,
     setValue,
     formState: { errors },
   } = useForm<DepartmentFormData>({
@@ -47,60 +42,65 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
         }
       : { is_active: true },
   });
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [selectedHeadLabel, setSelectedHeadLabel] = useState<string | null>(null);
 
   const onSubmit: SubmitHandler<DepartmentFormData> = async (data) => {
+    setSubmitError(null);
     const input: CreateDepartmentInput = {
       faculty_id: data.faculty_id,
-      name: data.name,
-      code: data.code,
+      name: data.name.trim(),
+      code: data.code.trim().toUpperCase(),
       head_id: data.head_id || null,
       is_active: data.is_active ?? true,
     };
 
-    if (department) {
-      updateDepartment(
-        { id: department.id, input },
-        {
-          onSuccess: () => {
-            toast.success("Department updated successfully");
-            onSuccess?.();
-          },
-          onError: (error) => {
-            toast.error(`Error: ${error.message}`);
-          },
-        }
-      );
-    } else {
-      createDepartment(input, {
-        onSuccess: () => {
-          toast.success("Department created successfully");
-          onSuccess?.();
-        },
-        onError: (error) => {
-          toast.error(`Error: ${error.message}`);
-        },
-      });
+    try {
+      if (department) {
+        await updateDepartment({ id: department.id, input });
+        toast.success("Department updated successfully");
+      } else {
+        await createDepartment(input);
+        toast.success("Department created successfully");
+      }
+      onSuccess?.();
+    } catch (error) {
+      const validationErrors = extractValidationErrors(error);
+      if (Object.keys(validationErrors).length > 0) {
+        Object.entries(validationErrors).forEach(([field, message]) => {
+          setError(field as keyof DepartmentFormData, { type: "server", message });
+        });
+        setSubmitError("Veuillez corriger les champs en erreur.");
+        return;
+      }
+
+      const userError = toUserError(error);
+      setSubmitError(userError.message);
     }
   };
 
   const isPending = isCreating || isUpdating;
   const faculties = facultiesData?.data || [];
+  const initialHeadLabel = department?.head_id ?? "";
+  const displayedHeadLabel = selectedHeadLabel ?? initialHeadLabel;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Faculty */}
       <div>
         <label htmlFor="faculty_id" className="mb-2 block text-sm font-medium text-zinc-700">
-          Faculté *
+          Établissement *
         </label>
         <select
           id="faculty_id"
-          defaultValue={department?.faculty_id || ""}
-          onChange={(e) => setValue("faculty_id", e.target.value)}
+          {...register("faculty_id")}
+          disabled={isPending}
+          aria-invalid={!!errors.faculty_id}
+          aria-describedby={errors.faculty_id ? "faculty_id-error" : undefined}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.faculty_id ? "border-red-300" : "border-zinc-300"}`}
         >
           <option value="" disabled>
-            Sélectionnez une faculté
+            Sélectionnez un établissement
           </option>
           {faculties.map((faculty) => (
             <option key={faculty.id} value={faculty.id}>
@@ -109,7 +109,9 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
           ))}
         </select>
         {errors.faculty_id && (
-          <p className="mt-1 text-sm text-red-600">{errors.faculty_id.message}</p>
+          <p id="faculty_id-error" className="mt-1 text-sm text-red-600">
+            {errors.faculty_id.message}
+          </p>
         )}
       </div>
 
@@ -122,10 +124,17 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
           id="name"
           type="text"
           placeholder="Ex: Informatique"
-          {...register("name")}
+          {...register("name", { setValueAs: (value) => String(value ?? "").trimStart() })}
+          disabled={isPending}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.name ? "border-red-300" : "border-zinc-300"}`}
         />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="name-error" className="mt-1 text-sm text-red-600">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
       {/* Code */}
@@ -137,10 +146,17 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
           id="code"
           type="text"
           placeholder="Ex: INFO"
-          {...register("code")}
+          {...register("code", { setValueAs: (value) => String(value ?? "").toUpperCase() })}
+          disabled={isPending}
+          aria-invalid={!!errors.code}
+          aria-describedby={errors.code ? "code-error" : undefined}
           className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${errors.code ? "border-red-300" : "border-zinc-300"}`}
         />
-        {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>}
+        {errors.code && (
+          <p id="code-error" className="mt-1 text-sm text-red-600">
+            {errors.code.message}
+          </p>
+        )}
       </div>
 
       {/* Head */}
@@ -148,16 +164,31 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
         <label htmlFor="head_id" className="mb-2 block text-sm font-medium text-zinc-700">
           Chef de département (optionnel)
         </label>
-        <select
+        <input
+          type="hidden"
           id="head_id"
-          defaultValue={department?.head_id || ""}
-          onChange={(e) => setValue("head_id", e.target.value || null)}
-          className="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-        >
-          <option value="">Aucun chef assigné</option>
-          <option value="user-1">Dr. Mamadou Diallo</option>
-          <option value="user-2">Dr. Aminata Sow</option>
-        </select>
+          {...register("head_id", {
+            setValueAs: (value) => (value ? String(value).trim() : null),
+          })}
+        />
+        <FacultySearch
+          value={displayedHeadLabel}
+          onSelect={(member) => {
+            setValue("head_id", member.user_id, { shouldDirty: true, shouldValidate: true });
+            setSelectedHeadLabel(`${member.full_name} · ${member.staff_number || "—"}`);
+          }}
+          onClear={() => {
+            setValue("head_id", null, { shouldDirty: true, shouldValidate: true });
+            setSelectedHeadLabel("");
+          }}
+          placeholder="Rechercher par nom ou matricule..."
+          disabled={isPending}
+        />
+        {errors.head_id && (
+          <p id="head_id-error" className="mt-1 text-sm text-red-600">
+            {errors.head_id.message}
+          </p>
+        )}
       </div>
 
       {/* Active */}
@@ -165,8 +196,8 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
         <label className="flex items-center">
           <input
             type="checkbox"
-            defaultChecked={department?.is_active ?? true}
-            onChange={(e) => setValue("is_active", e.target.checked)}
+            {...register("is_active")}
+            disabled={isPending}
             className="rounded border-zinc-300 text-[#008D36] focus:ring-[#008D36]"
           />
           <span className="ml-2 text-sm text-zinc-700">Département actif</span>
@@ -175,6 +206,11 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
 
       {/* Actions */}
       <div className="flex justify-end gap-3 border-t border-zinc-200 pt-6">
+        {submitError && (
+          <p className="mr-auto text-sm text-red-600" role="alert">
+            {submitError}
+          </p>
+        )}
         {onCancel && (
           <button
             type="button"
@@ -187,7 +223,7 @@ export function DepartmentForm({ department, onSuccess, onCancel }: DepartmentFo
         )}
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isReadOnly}
           className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending

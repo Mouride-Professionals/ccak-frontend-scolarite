@@ -5,7 +5,6 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AcademicProgram, Department } from "@/types/academic";
 import type {
   AcademicProgramFilters,
   CreateProgrammeInput,

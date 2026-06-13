@@ -1,6 +1,6 @@
 /**
  * Student Types
- * Based on UML diagram for CCAK academic management system
+ * Based on API_Data_Models_FULL_FINAL.pdf
  */
 
 // =====================
@@ -14,18 +14,104 @@ export enum Gender {
 
 export enum StudentStatus {
   ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
   SUSPENDED = "SUSPENDED",
   GRADUATED = "GRADUATED",
   WITHDRAWN = "WITHDRAWN",
   EXPELLED = "EXPELLED",
+  PENDING = "PENDING",
+  CANCELLED = "CANCELLED",
 }
 
-export enum EnrollmentStatus {
+export enum IDType {
+  PASSPORT = "PASSPORT",
+  NATIONAL_ID = "NATIONAL_ID",
+  DRIVING_LICENSE = "DRIVING_LICENSE",
+  OTHER = "OTHER",
+}
+
+export enum AddressType {
+  HOME = "HOME",
+  UNIVERSITY_CITY = "UNIVERSITY_CITY",
+  WORK = "WORK",
+}
+
+export enum PaymentStatus {
   PENDING = "PENDING",
-  REGISTERED = "REGISTERED",
-  ACTIVE = "ACTIVE",
-  COMPLETED = "COMPLETED",
-  WITHDRAWN = "WITHDRAWN",
+  PARTIALLY_PAID = "PARTIALLY_PAID",
+  FULLY_PAID = "FULLY_PAID",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED",
+}
+
+export enum Provenance {
+  ETAT = "ETAT",
+  PLATEFORME = "PLATEFORME",
+}
+
+// Kept for backward compatibility with mock data
+export enum GuardianRelationship {
+  FATHER = "FATHER",
+  MOTHER = "MOTHER",
+  GUARDIAN = "GUARDIAN",
+}
+
+// =====================
+// NEW INTERFACES
+// =====================
+
+export interface Address {
+  id: string;
+  addressable_type: string;
+  addressable_id: string;
+  type: AddressType;
+  street: string | null;
+  city: string | null;
+  region: string | null;
+  department: string | null;
+  country: string | null;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SocialProfile {
+  id: string;
+  profilable_type: string;
+  profilable_id: string;
+  family_status: string | null;
+  number_of_children: number | null;
+  is_employed: boolean | null;
+  socio_professional_category: string | null;
+  student_regime: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudentBacInfo {
+  id: string;
+  student_id: string;
+  serie: string;
+  year_of_bac: number;
+  bac_result_id: string | null;
+  first_round_average: number | null;
+  second_round_average: number | null;
+  bac_mention: string | null;
+  bac_institution: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PriorDiploma {
+  id: string;
+  diplomable_type: string;
+  diplomable_id: string;
+  name: string;
+  year: number | null;
+  mention: string | null;
+  institution: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // =====================
@@ -38,49 +124,37 @@ export enum EnrollmentStatus {
 export interface Student {
   id: string;
   user_id: string;
-  student_number: string; // Ex: "UCAK2024001"
+  student_number: string | null;
+  registration_number: string | null;
   full_name: string;
+  first_name: string | null;
+  last_name: string | null;
+  ine: string | null;
+  provenance: Provenance | null;
   gender: Gender;
   date_of_birth: string;
   place_of_birth: string;
   nationality: string;
   phone: string;
+  phone_2: string | null;
+  email: string | null;
+  email_university: string | null;
+  type_of_id: IDType | null;
+  id_details: string | null;
   emergency_contact_name: string;
   emergency_contact_phone: string;
   address: string;
   photo_url: string | null;
   status: StudentStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-/**
- * Enrollment (Inscription)
- */
-export interface Enrollment {
-  id: string;
-  student_id: string;
-  academic_program_id: string;
-  academic_year_id: string;
-  current_semester: number;
-  status: EnrollmentStatus;
-  enrollment_date: string;
-  registration_fee_paid: number;
-  is_scholarship: boolean;
-  created_at: string;
-  updated_at: string;
-
   // Relations
-  student?: Student;
-  academic_program?: {
-    id: string;
-    name: string;
-    level: string;
-  };
-  academic_year?: {
-    id: string;
-    name: string;
-  };
+  bac_info?: StudentBacInfo | null;
+  addresses?: Address[];
+  social_profile?: SocialProfile | null;
+  prior_diplomas?: PriorDiploma[];
+  synced_from?: string | null;
+  last_synced_at?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 /**
@@ -110,12 +184,21 @@ export interface SemesterResult {
 // =====================
 
 export interface CreateStudentInput {
-  full_name: string;
+  first_name: string;
+  last_name: string;
+  ine?: string | null;
+  registration_number?: string | null;
+  provenance?: Provenance | null;
   gender: Gender;
   date_of_birth: string;
   place_of_birth: string;
   nationality: string;
   phone: string;
+  phone_2?: string | null;
+  email?: string | null;
+  email_university?: string | null;
+  type_of_id?: IDType | null;
+  id_details?: string | null;
   emergency_contact_name: string;
   emergency_contact_phone: string;
   address: string;
@@ -144,18 +227,15 @@ export interface StudentFilters {
 // GUARDIAN TYPES
 // =====================
 
-export enum GuardianRelationship {
-  FATHER = "FATHER",
-  MOTHER = "MOTHER",
-  GUARDIAN = "GUARDIAN",
-}
-
 export interface Guardian {
   id: string;
   student_id: string;
+  first_name: string | null;
+  last_name: string | null;
   full_name: string;
-  relationship: GuardianRelationship;
+  relationship: string;
   phone: string;
+  phone_2: string | null;
   email: string;
   address: string;
   occupation: string;
@@ -165,9 +245,12 @@ export interface Guardian {
 
 export interface CreateGuardianInput {
   student_id: string;
+  first_name?: string | null;
+  last_name?: string | null;
   full_name: string;
-  relationship: GuardianRelationship;
+  relationship: string;
   phone: string;
+  phone_2?: string | null;
   email: string;
   address: string;
   occupation: string;
@@ -191,13 +274,13 @@ export interface GuardiansResponse {
 // =====================
 
 export enum DocumentType {
+  ATTESTATION = "ATTESTATION",
   CNI = "CNI",
   BIRTH_CERT = "BIRTH_CERT",
   BAC_DIPLOMA = "BAC_DIPLOMA",
   TRANSCRIPT = "TRANSCRIPT",
   PHOTO = "PHOTO",
   MEDICAL = "MEDICAL",
-  OTHER = "OTHER",
 }
 
 export enum DocumentStatus {
@@ -230,8 +313,8 @@ export interface Document {
 export interface CreateDocumentInput {
   student_id: string;
   type: DocumentType;
-  file_path: string;
-  file_name: string;
+  document: File;
+  notes?: string;
   [key: string]: unknown;
 }
 
@@ -240,6 +323,26 @@ export interface UpdateDocumentInput extends Partial<CreateDocumentInput> {
   reviewed_by?: string;
   notes?: string;
   reviewed_at?: string;
+  [key: string]: unknown;
+}
+
+export interface CreateStudentBacInfoInput {
+  student_id: string;
+  serie: string;
+  year_of_bac: number;
+  bac_mention?: string | null;
+  bac_institution?: string | null;
+  first_round_average?: number | null;
+  second_round_average?: number | null;
+  [key: string]: unknown;
+}
+
+export interface CreatePriorDiplomaInput {
+  student_id: string;
+  name: string;
+  year?: number | null;
+  mention?: string | null;
+  institution?: string | null;
   [key: string]: unknown;
 }
 

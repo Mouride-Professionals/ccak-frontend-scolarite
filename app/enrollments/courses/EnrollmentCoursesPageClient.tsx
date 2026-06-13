@@ -1,37 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import CourseEnrollmentTable from "@/components/course-enrollments/course-enrollment-table";
 import CourseEnrollmentForm from "@/components/course-enrollments/course-enrollment-form";
+import type { CreateCourseEnrollmentBatchInput } from "@/components/course-enrollments/course-enrollment-form";
 import Modal from "@/components/ui/modal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
+import Pagination from "@/components/ui/pagination";
 import {
   useCourseEnrollments,
   useDeleteCourseEnrollment,
   useCreateCourseEnrollment,
   useCourses,
-  useAcademicYears,
 } from "@/hooks/use-course-enrollments";
 import { useEnrollment } from "@/hooks/use-enrollments";
-import type {
-  CourseEnrollmentFilters,
-  CreateCourseEnrollmentInput,
-} from "@/types/course-enrollment";
+import { CourseEnrollmentStatus, type CourseEnrollmentFilters } from "@/types/course-enrollment";
+import { useCourseBasketStore } from "@/stores/course-basket-store";
+import { toUserError } from "@/lib/error-handler";
+import { useSelectedYear } from "@/hooks/use-selected-year";
 
 export default function EnrollmentCoursesPageClient() {
   const searchParams = useSearchParams();
   const enrollmentId = searchParams.get("enrollment_id") || "";
+  const { selectedYear } = useSelectedYear();
 
   const [filters, setFilters] = useState<CourseEnrollmentFilters>({
     enrollment_id: enrollmentId,
     page: 1,
     limit: 10,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, academic_year_id: selectedYear?.id, page: 1 }));
+  }, [selectedYear?.id]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
@@ -52,12 +58,12 @@ export default function EnrollmentCoursesPageClient() {
 
   const { data, isLoading, error } = useCourseEnrollments(filters);
   const { data: enrollment } = useEnrollment(enrollmentId);
+  const clearBasket = useCourseBasketStore((state) => state.clear);
   const deleteMutation = useDeleteCourseEnrollment();
   const createMutation = useCreateCourseEnrollment();
 
   // Load form data
   const { data: courses, isLoading: loadingCourses } = useCourses();
-  const { data: years, isLoading: loadingYears } = useAcademicYears();
 
   const handleViewClick = (id: string) => {
     // Vous pouvez créer une page de détail si nécessaire
@@ -94,20 +100,32 @@ export default function EnrollmentCoursesPageClient() {
     }
   };
 
-  const handleCreateSubmit = async (data: CreateCourseEnrollmentInput) => {
+  const handleCreateSubmit = async (payload: CreateCourseEnrollmentBatchInput) => {
     try {
-      await createMutation.mutateAsync(data);
+      await Promise.all(
+        payload.course_ids.map((courseId) =>
+          createMutation.mutateAsync({
+            enrollment_id: payload.enrollment_id,
+            course_id: courseId,
+            academic_year_id: payload.academic_year_id,
+            semester: payload.semester,
+            enrollment_date: payload.enrollment_date,
+            status: payload.status,
+          })
+        )
+      );
+      clearBasket();
       setIsCreateModalOpen(false);
       setToast({
         isOpen: true,
-        message: "Cours ajouté avec succès",
+        message: `${payload.course_ids.length} cours ajouté(s) avec succès`,
         type: "success",
       });
     } catch (error) {
-      console.error("Error creating course enrollment:", error);
+      console.error("Error creating course enrollment batch:", error);
       setToast({
         isOpen: true,
-        message: "Erreur lors de l'ajout du cours",
+        message: toUserError(error).message,
         type: "error",
       });
     }
@@ -119,7 +137,7 @@ export default function EnrollmentCoursesPageClient() {
         <DashboardLayout title="Cours enrolés">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-800">
-              ID d'inscription manquant. Veuillez retourner à la liste des inscriptions.
+              ID d&apos;inscription manquant. Veuillez retourner à la liste des inscriptions.
             </p>
           </div>
         </DashboardLayout>
@@ -198,44 +216,32 @@ export default function EnrollmentCoursesPageClient() {
               onDelete={handleDeleteClick}
             />
 
-            {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
-              <p className="text-sm text-zinc-500">
-                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
-                cours
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
-                  disabled={!data || data.page === 1}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Précédent
-                </button>
-                <button className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white shadow-sm">
-                  {data?.page ?? 1}
-                </button>
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
-                  disabled={!data || data.page >= data.total_pages}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Suivant
-                </button>
-              </div>
-            </div>
+            <Pagination
+              page={data?.page ?? 1}
+              totalPages={data?.total_pages ?? 1}
+              totalItems={data?.total ?? 0}
+              perPage={data?.limit ?? filters.limit ?? 10}
+              itemLabel="cours"
+              onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
+              onPerPageChange={(nextLimit) =>
+                setFilters((prev) => ({ ...prev, limit: nextLimit, page: 1 }))
+              }
+            />
           </>
         )}
 
         {/* Create Modal */}
         <Modal
           isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
+          onClose={() => {
+            clearBasket();
+            setIsCreateModalOpen(false);
+          }}
           title="Ajouter un Cours"
           subtitle="Formulaire d'ajout de cours"
           size="lg"
         >
-          {loadingCourses || loadingYears ? (
+          {loadingCourses ? (
             <div className="flex min-h-[400px] items-center justify-center">
               <div className="text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
@@ -245,10 +251,15 @@ export default function EnrollmentCoursesPageClient() {
           ) : (
             <CourseEnrollmentForm
               onSubmit={handleCreateSubmit}
-              onCancel={() => setIsCreateModalOpen(false)}
+              onCancel={() => {
+                clearBasket();
+                setIsCreateModalOpen(false);
+              }}
               enrollments={enrollment ? [enrollment] : []}
               courses={courses ?? []}
-              years={years ?? []}
+              alreadyEnrolledCourseIds={(data?.data ?? [])
+                .filter((item) => item.status !== CourseEnrollmentStatus.DROPPED)
+                .map((item) => item.course_id)}
               isLoading={createMutation.isPending}
               initialData={{
                 enrollment_id: enrollmentId,

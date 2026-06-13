@@ -2,12 +2,13 @@
  * React Query hooks for Course Enrollments
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useQueries } from "@tanstack/react-query";
 import * as courseEnrollmentsApi from "@/lib/api/course-enrollments";
 import type {
   CourseEnrollmentFilters,
   CreateCourseEnrollmentInput,
   UpdateCourseEnrollmentInput,
+  Course,
 } from "@/types/course-enrollment";
 
 // Query keys
@@ -19,6 +20,8 @@ export const courseEnrollmentKeys = {
   detail: (id: string) => [...courseEnrollmentKeys.details(), id] as const,
   courses: ["courses"] as const,
   academicYears: ["academicYears"] as const,
+  availability: (courseId: string, academicYearId: string, semester: number) =>
+    [...courseEnrollmentKeys.all, "availability", courseId, academicYearId, semester] as const,
 };
 
 /**
@@ -113,4 +116,31 @@ export function useAcademicYears() {
     queryFn: () => courseEnrollmentsApi.getAcademicYears(),
     staleTime: 300000, // 5 minutes
   });
+}
+
+export function useCourseAvailabilities(
+  courses: Course[],
+  academicYearId: string,
+  semester: number,
+  enabled = true
+) {
+  const results = useQueries({
+    queries: courses.map((course) => ({
+      queryKey: courseEnrollmentKeys.availability(course.id, academicYearId, semester),
+      queryFn: () =>
+        courseEnrollmentsApi.checkCourseAvailability(course.id, academicYearId, semester),
+      enabled: enabled && !!academicYearId && semester > 0,
+      staleTime: 30000,
+    })),
+  });
+
+  return results.reduce<
+    Record<string, Awaited<ReturnType<typeof courseEnrollmentsApi.checkCourseAvailability>>>
+  >((acc, result, index) => {
+    const course = courses[index];
+    if (course && result.data) {
+      acc[course.id] = result.data;
+    }
+    return acc;
+  }, {});
 }

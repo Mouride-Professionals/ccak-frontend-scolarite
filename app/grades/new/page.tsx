@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -7,31 +8,34 @@ import DeliberationForm from "@/components/deliberations/deliberation-form";
 import {
   useCreateDeliberationSession,
   useAcademicPrograms,
-  useAcademicYears,
   useFacultyMembers,
 } from "@/hooks/use-deliberations";
+import { toUserError } from "@/lib/error-handler";
 import type { CreateDeliberationSessionInput } from "@/types/deliberation";
 
 export default function NewDeliberationPage() {
   const router = useRouter();
   const createMutation = useCreateDeliberationSession();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Load form data
   const { data: programs, isLoading: loadingPrograms } = useAcademicPrograms();
-  const { data: years, isLoading: loadingYears } = useAcademicYears();
   const { data: facultyMembers, isLoading: loadingFaculty } = useFacultyMembers();
 
   const handleSubmit = async (data: CreateDeliberationSessionInput) => {
+    setSubmitError(null);
     try {
       await createMutation.mutateAsync(data);
       router.push("/deliberations");
     } catch (error) {
       console.error("Error creating deliberation session:", error);
-      alert("Erreur lors de la création de la session. Veuillez réessayer.");
+      setSubmitError(
+        toUserError(error, "Erreur lors de la création de la session. Veuillez réessayer.").message
+      );
     }
   };
 
-  const isLoadingData = loadingPrograms || loadingYears || loadingFaculty;
+  const isLoadingData = loadingPrograms || loadingFaculty;
 
   return (
     <ProtectedRoute>
@@ -42,6 +46,14 @@ export default function NewDeliberationPage() {
               Créez une nouvelle session de jury pour un programme académique
             </p>
           </div>
+          {submitError && (
+            <div
+              className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
+              {submitError}
+            </div>
+          )}
 
           {/* Form */}
           <div className="rounded-lg border border-zinc-200 bg-white p-6">
@@ -56,7 +68,6 @@ export default function NewDeliberationPage() {
               <DeliberationForm
                 onSubmit={handleSubmit}
                 programs={programs ?? []}
-                years={years ?? []}
                 facultyMembers={facultyMembers ?? []}
                 isLoading={createMutation.isPending}
               />

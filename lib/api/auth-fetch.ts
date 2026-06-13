@@ -1,6 +1,16 @@
 import { getSession } from "next-auth/react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:8000/api/v1";
+
+const enforceHttps = (url: string) => {
+  if (process.env.NODE_ENV === "production" && url.startsWith("http://")) {
+    return url.replace("http://", "https://");
+  }
+  return url;
+};
 
 export async function authFetch(endpoint: string, options: RequestInit = {}) {
   const session = await getSession();
@@ -9,7 +19,7 @@ export async function authFetch(endpoint: string, options: RequestInit = {}) {
     throw new Error("Not authenticated");
   }
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = enforceHttps(`${API_BASE_URL}${endpoint}`);
 
   const defaultHeaders: HeadersInit = {
     "Content-Type": "application/json",

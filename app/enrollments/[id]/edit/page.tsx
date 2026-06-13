@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -10,14 +11,13 @@ import {
   useEnrollment,
   useUpdateEnrollment,
   useAcademicPrograms,
-  useAcademicYears,
   useStudents,
 } from "@/hooks/use-enrollments";
 import type { UpdateEnrollmentInput } from "@/types/enrollment";
 
 export default function EditEnrollmentPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const enrollmentId = params.id as string;
 
   const {
@@ -27,7 +27,6 @@ export default function EditEnrollmentPage() {
   } = useEnrollment(enrollmentId);
   const { data: students, isLoading: isStudentsLoading } = useStudents();
   const { data: programs, isLoading: isProgramsLoading } = useAcademicPrograms();
-  const { data: years, isLoading: isYearsLoading } = useAcademicYears();
   const updateMutation = useUpdateEnrollment();
 
   const [toast, setToast] = useState<{
@@ -79,7 +78,7 @@ export default function EditEnrollmentPage() {
     router.push(`/enrollments/${enrollmentId}`);
   };
 
-  if (isEnrollmentLoading || isStudentsLoading || isProgramsLoading || isYearsLoading) {
+  if (isEnrollmentLoading || isStudentsLoading || isProgramsLoading) {
     return (
       <ProtectedRoute>
         <DashboardLayout title="Modifier l'Inscription">
@@ -116,7 +115,6 @@ export default function EditEnrollmentPage() {
               onCancel={handleCancel}
               students={students ?? []}
               programs={programs ?? []}
-              years={years ?? []}
               isLoading={updateMutation.isPending}
             />
           </div>

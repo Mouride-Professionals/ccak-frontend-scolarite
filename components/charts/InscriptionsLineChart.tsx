@@ -1,22 +1,43 @@
 "use client";
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import type { DashboardEnrollmentsTrendPoint } from "@/types/dashboard";
 
-const data = [
-  { month: "Sept", value: 2450 },
-  { month: "Oct", value: 2580 },
-  { month: "Nov", value: 2720 },
-  { month: "Déc", value: 1680 },
-  { month: "Jan", value: 2790 },
-  { month: "Fév", value: 3860 },
-];
+interface InscriptionsLineChartProps {
+  data?: DashboardEnrollmentsTrendPoint[];
+  isLoading?: boolean;
+}
 
-export default function InscriptionsLineChart() {
+export default function InscriptionsLineChart({
+  data = [],
+  isLoading = false,
+}: InscriptionsLineChartProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-[260px] items-center justify-center text-sm text-zinc-500">
+        Chargement...
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[260px] items-center justify-center text-sm text-zinc-500">
+        Aucune donnée disponible.
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data}>
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
+        <XAxis
+          dataKey="month"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 12, fill: "#334155", fontWeight: 500 }}
+        />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#475569" }} />
         <Tooltip />
 
         <Line

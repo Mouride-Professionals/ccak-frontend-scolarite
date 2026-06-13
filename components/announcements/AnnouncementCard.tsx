@@ -3,6 +3,7 @@
 import type { Announcement } from "@/lib/api/announcements";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 interface AnnouncementCardProps {
   announcement: Announcement;
@@ -60,7 +61,10 @@ export default function AnnouncementCard({
         </div>
 
         {/* Content */}
-        <p className="text-sm text-gray-600 mb-3 line-clamp-3">{announcement.content}</p>
+        <div
+          className="mb-3 line-clamp-3 text-sm text-gray-600"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(announcement.content) }}
+        />
 
         {/* Target Audience */}
         {announcement.target_audience?.roles && announcement.target_audience.roles.length > 0 && (

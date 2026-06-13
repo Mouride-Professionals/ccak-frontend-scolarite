@@ -1,22 +1,22 @@
-import { EnrollmentStatus } from "@/types/enrollment";
+import { RegistrationStatus } from "@/types/enrollment";
 
 interface EnrollmentStatusBadgeProps {
-  status: EnrollmentStatus;
+  status: RegistrationStatus;
 }
 
 export default function EnrollmentStatusBadge({ status }: EnrollmentStatusBadgeProps) {
   const getStatusStyles = () => {
     switch (status) {
-      case EnrollmentStatus.PENDING:
+      case RegistrationStatus.DRAFT:
+        return "bg-zinc-100 text-zinc-800 border-zinc-200";
+      case RegistrationStatus.PENDING_VALIDATION:
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case EnrollmentStatus.REGISTERED:
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case EnrollmentStatus.ACTIVE:
+      case RegistrationStatus.VALIDATED:
         return "bg-green-100 text-green-800 border-green-200";
-      case EnrollmentStatus.COMPLETED:
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case EnrollmentStatus.WITHDRAWN:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+      case RegistrationStatus.SUSPENDED:
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case RegistrationStatus.CANCELLED:
+        return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-zinc-100 text-zinc-800 border-zinc-200";
     }
@@ -24,16 +24,16 @@ export default function EnrollmentStatusBadge({ status }: EnrollmentStatusBadgeP
 
   const getStatusLabel = () => {
     switch (status) {
-      case EnrollmentStatus.PENDING:
+      case RegistrationStatus.DRAFT:
+        return "Brouillon";
+      case RegistrationStatus.PENDING_VALIDATION:
         return "En attente";
-      case EnrollmentStatus.REGISTERED:
-        return "Enregistrée";
-      case EnrollmentStatus.ACTIVE:
-        return "Active";
-      case EnrollmentStatus.COMPLETED:
-        return "Terminée";
-      case EnrollmentStatus.WITHDRAWN:
-        return "Retirée";
+      case RegistrationStatus.VALIDATED:
+        return "Validée";
+      case RegistrationStatus.SUSPENDED:
+        return "Suspendue";
+      case RegistrationStatus.CANCELLED:
+        return "Annulée";
       default:
         return status;
     }

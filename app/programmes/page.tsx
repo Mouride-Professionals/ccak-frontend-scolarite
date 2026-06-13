@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -9,6 +9,8 @@ import ProgrammeForm from "@/components/programmes/programme-form";
 import Modal from "@/components/ui/modal";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
+import ListHeader from "@/components/ui/list-header";
+import Pagination from "@/components/ui/pagination";
 import {
   useAcademicPrograms,
   useAcademicProgram,
@@ -17,19 +19,21 @@ import {
   useCreateAcademicProgram,
   useDepartments,
 } from "@/hooks/use-academic";
-import type { AcademicProgram } from "@/types/academic";
 import { AcademicLevel } from "@/types/academic";
 import type { CreateProgrammeInput, AcademicProgramFilters } from "@/types/programme";
 
 function ProgrammesPageContent() {
   const searchParams = useSearchParams();
+  const queryEditId = searchParams.get("edit");
+  const queryDeptId = searchParams.get("department_id");
   const [filters, setFilters] = useState<AcademicProgramFilters>({
     page: 1,
     limit: 10,
+    department_id: queryDeptId || undefined,
   });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editProgrammeId, setEditProgrammeId] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [editProgrammeId, setEditProgrammeId] = useState<string | null>(queryEditId);
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("department_id"));
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
@@ -48,7 +52,6 @@ function ProgrammesPageContent() {
     type: "success",
   });
 
-  // TODO: Implement hooks
   const { data, isLoading, error } = useAcademicPrograms(filters);
   const { data: programmeToEdit } = useAcademicProgram(editProgrammeId || "", !!editProgrammeId);
   const deleteMutation = useDeleteAcademicProgram();
@@ -57,14 +60,6 @@ function ProgrammesPageContent() {
 
   // Load form data
   const { data: departments, isLoading: loadingDepartments } = useDepartments();
-
-  // Check for edit parameter in URL
-  useEffect(() => {
-    const editId = searchParams.get("edit");
-    if (editId) {
-      setEditProgrammeId(editId);
-    }
-  }, [searchParams]);
 
   const handleEditClick = (id: string) => {
     setEditProgrammeId(id);
@@ -163,76 +158,22 @@ function ProgrammesPageContent() {
   return (
     <ProtectedRoute>
       <DashboardLayout title="Programmes Académiques">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-zinc-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Rechercher un programme..."
-                className="block w-80 rounded-lg border border-zinc-300 bg-white py-2 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-500 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-              />
-            </div>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-                showFilters
-                  ? "border-[#008D36] bg-[#008D36]/10 text-[#008D36]"
-                  : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
-              }`}
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              Filtres
-              {(filters.department_id || filters.level || filters.is_active !== undefined) && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#008D36] text-xs font-semibold text-white">
-                  {
-                    [filters.department_id, filters.level, filters.is_active].filter(
-                      (v) => v !== undefined && v !== ""
-                    ).length
-                  }
-                </span>
-              )}
-            </button>
-          </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E]"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Nouveau Programme
-          </button>
-        </div>
+        <ListHeader
+          searchValue={searchQuery}
+          onSearchChange={handleSearch}
+          searchPlaceholder="Rechercher un programme..."
+          onToggleFilters={() => setShowFilters(!showFilters)}
+          isFiltersOpen={showFilters}
+          filtersCount={
+            [
+              filters.department_id,
+              filters.level,
+              filters.is_active !== undefined ? "active" : "",
+            ].filter(Boolean).length
+          }
+          actionLabel="Nouveau Programme"
+          onAction={() => setIsCreateModalOpen(true)}
+        />
 
         {/* Filters Panel */}
         {showFilters && (
@@ -262,12 +203,12 @@ function ProgrammesPageContent() {
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Tous les départements</option>
-                  {/* TODO: Map departments */}
-                  {/* {departments?.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </option>
-                  ))} */}
+                  {Array.isArray(departments) &&
+                    departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -331,32 +272,17 @@ function ProgrammesPageContent() {
               onDelete={handleDeleteClick}
             />
 
-            {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between border-t border-zinc-200 bg-white px-6 py-4">
-              <p className="text-sm text-zinc-500">
-                Affichage de {data ? (data.page - 1) * data.limit + 1 : 0} sur {data?.total ?? 0}{" "}
-                sessions
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) - 1 }))}
-                  disabled={!data || data.page === 1}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Précédent
-                </button>
-                <button className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-semibold text-white shadow-sm">
-                  {data?.page ?? 1}
-                </button>
-                <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }))}
-                  disabled={!data || data.page >= data.total_pages}
-                  className="rounded-lg border border-zinc-300 bg-white px-5 py-2 text-sm font-medium text-[#00365F] transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Suivant
-                </button>
-              </div>
-            </div>
+            <Pagination
+              page={data?.page ?? 1}
+              totalPages={data?.total_pages ?? 1}
+              totalItems={data?.total ?? 0}
+              perPage={data?.limit ?? filters.limit ?? 10}
+              itemLabel="programmes"
+              onPageChange={(nextPage) => setFilters((prev) => ({ ...prev, page: nextPage }))}
+              onPerPageChange={(nextLimit) =>
+                setFilters((prev) => ({ ...prev, limit: nextLimit, page: 1 }))
+              }
+            />
           </>
         )}
 

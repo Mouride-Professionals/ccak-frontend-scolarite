@@ -36,6 +36,7 @@ yarn-error.log*
 # except for example .env.local.example and .env.docker.example files
 !.env.docker.example
 !.env.local.example
+!.env.example
 
 
 
@@ -45,3 +46,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# docs (keep generated/reference docs ignored; allow remediation plan tracking)
+/docs
+!/docs/frontend-audit-remediation-plan.md
+AUDIT_REPORT.md

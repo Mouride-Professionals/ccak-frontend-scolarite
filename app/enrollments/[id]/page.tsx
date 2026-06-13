@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProtectedRoute from "@/components/auth/protected-route";
@@ -9,10 +10,11 @@ import EnrollmentStatusBadge from "@/components/enrollments/enrollment-status-ba
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
 import { useEnrollment, useDeleteEnrollment } from "@/hooks/use-enrollments";
+import { formatFCFA, formatPhone } from "@/lib/format";
 
 export default function EnrollmentDetailPage() {
   const router = useRouter();
-  const params = useParams();
+  const params = useSafeParams<{ id: string }>();
   const enrollmentId = params.id as string;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -165,7 +167,7 @@ export default function EnrollmentDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Type d'inscription</p>
                 <p className="mt-1 text-sm text-zinc-900">
-                  {enrollment.is_scholarship ? (
+                  {enrollment.is_scholarship_holder ? (
                     <span className="inline-flex items-center gap-1">
                       <span>Étudiant boursier</span>
                       <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
@@ -189,8 +191,7 @@ export default function EnrollmentDetailPage() {
               <div>
                 <p className="text-sm font-medium text-zinc-500">Frais d'inscription payés</p>
                 <p className="mt-1 text-2xl font-bold text-zinc-900">
-                  {enrollment.registration_fee_paid.toLocaleString("fr-FR")}{" "}
-                  <span className="text-base font-normal">FCFA</span>
+                  {formatFCFA(enrollment.registration_fee_paid)}
                 </p>
               </div>
             </div>
@@ -276,7 +277,7 @@ export default function EnrollmentDetailPage() {
               {enrollment.student?.phone && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                  <p className="mt-1 text-sm text-zinc-900">{enrollment.student.phone}</p>
+                  <p className="mt-1 text-sm text-zinc-900">{formatPhone(enrollment.student.phone)}</p>
                 </div>
               )}
               {enrollment.student?.address && (
@@ -308,7 +309,7 @@ export default function EnrollmentDetailPage() {
                   <div>
                     <p className="text-sm font-medium text-zinc-500">Téléphone du contact</p>
                     <p className="mt-1 text-sm text-zinc-900">
-                      {enrollment.student.emergency_contact_phone}
+                      {formatPhone(enrollment.student.emergency_contact_phone)}
                     </p>
                   </div>
                 )}

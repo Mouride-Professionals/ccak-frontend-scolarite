@@ -5,12 +5,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type {
-  Faculty,
-  FacultyFilters,
-  CreateFacultyInput,
-  UpdateFacultyInput,
-} from "@/types/faculty";
+import type { FacultyFilters, CreateFacultyInput, UpdateFacultyInput } from "@/types/faculty";
 import * as facultiesApi from "@/lib/api/faculties";
 
 // =====================
