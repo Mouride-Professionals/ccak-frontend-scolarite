@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell } from "recharts";
-import Card from "../ui/card";
+import Card from "../ui/Card";
 import type { DashboardValidationRateData } from "@/types/dashboard";
 
 const COLORS = ["#0A8F3D", "#E11D48"];

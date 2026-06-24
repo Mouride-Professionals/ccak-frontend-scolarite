@@ -21,11 +21,12 @@ export function useSyncLogs(filters?: SyncLogsFilters) {
   });
 }
 
-export function useSyncStats() {
+export function useSyncStats(refetchInterval?: number | false) {
   return useQuery({
     queryKey: syncLogKeys.stats(),
     queryFn: syncLogsApi.getSyncStats,
     staleTime: 60_000,
+    refetchInterval: refetchInterval ?? false,
   });
 }
 

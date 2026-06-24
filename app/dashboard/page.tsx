@@ -8,7 +8,7 @@ import QuickActions from "@/components/cards/QuickActions";
 import InscriptionsLineChart from "@/components/charts/InscriptionsLineChart";
 import ValidationGauge from "@/components/charts/ValidationGauge";
 import RecentActivitiesTable from "@/components/tables/RecentActivitiesTable";
-import { Card } from "@/components/ui/card";
+import Card from "@/components/ui/Card";
 import {
   useDashboardEnrollmentsTrend,
   useDashboardOverview,

@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Card } from "../ui/card";
+import Card from "../ui/Card";
 import type { DashboardRecentActivity } from "@/types/dashboard";
 
 const statusStyles = {

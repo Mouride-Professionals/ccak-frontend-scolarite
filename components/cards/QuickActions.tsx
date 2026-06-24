@@ -1,4 +1,4 @@
-import Card from "@/components/ui/card";
+import Card from "@/components/ui/Card";
 import Link from "next/link";
 import { BarChart3, Calendar, ChevronRight, FileText, UserPlus } from "lucide-react";
 
