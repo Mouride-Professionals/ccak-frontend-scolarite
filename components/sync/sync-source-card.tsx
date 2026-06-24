@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { EntityStats } from "@/types/sync-log";
 import { SyncStatus } from "@/types/sync-log";
 
@@ -33,6 +34,26 @@ const formatDatetime = (value: string | null | undefined) => {
   });
 };
 
+function useElapsedTime(active: boolean) {
+  const [elapsed, setElapsed] = useState(0);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!active) {
+      setElapsed(0);
+      startRef.current = null;
+      return;
+    }
+    startRef.current = Date.now();
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startRef.current!) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [active]);
+
+  return elapsed;
+}
+
 export default function SyncSourceCard({
   label,
   description,
@@ -45,11 +66,16 @@ export default function SyncSourceCard({
 }: SyncSourceCardProps) {
   const lastSynced = formatDatetime(stats?.last_synced_at);
   const statusCfg = stats?.status ? statusConfig[stats.status] : null;
+  const elapsed = useElapsedTime(!!isSyncing);
 
   return (
     <div
-      className={`flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${
-        isStatic ? "border-zinc-200" : "border-[#008D36]/30"
+      className={`flex flex-col gap-4 rounded-xl border bg-white p-5 shadow-sm transition-all hover:shadow-md ${
+        isSyncing
+          ? "border-[#008D36] shadow-[0_0_0_3px_rgba(0,141,54,0.15)]"
+          : isStatic
+            ? "border-zinc-200"
+            : "border-[#008D36]/30"
       }`}
     >
       {/* Header */}
@@ -96,11 +122,21 @@ export default function SyncSourceCard({
 
       {/* Stats */}
       {!isStatic && (
-        <div className="flex items-center gap-4 border-t border-zinc-100 pt-3">
-          {statsLoading ? (
+        <div className="flex flex-col gap-2 border-t border-zinc-100 pt-3">
+          {isSyncing ? (
+            <>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-full animate-[indeterminate_1.4s_ease-in-out_infinite] rounded-full bg-[#008D36]" />
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-zinc-500">Synchronisation en cours…</p>
+                <p className="text-xs font-medium tabular-nums text-zinc-400">{elapsed}s</p>
+              </div>
+            </>
+          ) : statsLoading ? (
             <div className="h-4 w-32 animate-pulse rounded bg-zinc-100" />
           ) : (
-            <>
+            <div className="flex items-center gap-4">
               {stats?.total != null && (
                 <div className="text-center">
                   <p className="text-lg font-bold text-zinc-900">
@@ -126,7 +162,7 @@ export default function SyncSourceCard({
                   <p className="text-xs text-zinc-400">Jamais synchronisé</p>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       )}

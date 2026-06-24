@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import SyncLogTable from "@/components/sync/sync-log-table";
 import SyncSourceCard from "@/components/sync/sync-source-card";
 import Pagination from "@/components/ui/pagination";
 import Toast from "@/components/ui/toast";
-import { useSyncLogs, useSyncStats, useTriggerSync } from "@/hooks/use-sync-logs";
+import { syncLogKeys, useSyncLogs, useSyncStats, useTriggerSync } from "@/hooks/use-sync-logs";
 
 function getRealmRoles(accessToken: string | undefined): string[] {
   if (!accessToken) return [];
@@ -38,6 +38,22 @@ const ENTITY_CONFIG = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    key: "enrollments",
+    label: "Inscriptions",
+    description: "Inscriptions pédagogiques depuis le SI CCAK",
+    isStatic: false,
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
         />
       </svg>
     ),
@@ -145,10 +161,12 @@ const API_ENTITIES = ENTITY_CONFIG.filter((e) => !e.isStatic).map((e) => e.key);
 function SyncPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [page, setPage] = useState(1);
   const [entityFilter, setEntityFilter] = useState<string>("");
-  const [syncingEntity, setSyncingEntity] = useState<string | null>(null); // entity key or "all"
+  const [pendingEntities, setPendingEntities] = useState<Set<string>>(new Set());
+  const triggeredAtRef = useRef<string | null>(null);
   const [toast, setToast] = useState<{
     isOpen: boolean;
     message: string;
@@ -169,31 +187,63 @@ function SyncPageContent() {
     limit: 20,
     entity_type: entityFilter || undefined,
   });
-  const { data: stats, isLoading: statsLoading } = useSyncStats();
+  const { data: stats, isLoading: statsLoading } = useSyncStats(
+    pendingEntities.size > 0 ? 3000 : false,
+  );
   const triggerSync = useTriggerSync();
 
+  // Detect background job completion by watching last_synced_at
+  useEffect(() => {
+    if (!stats || !triggeredAtRef.current || pendingEntities.size === 0) return;
+
+    const triggeredAt = triggeredAtRef.current;
+    const completed = new Set<string>();
+
+    pendingEntities.forEach((key) => {
+      const s = stats[key];
+      if (s?.last_synced_at && new Date(s.last_synced_at) > new Date(triggeredAt)) {
+        completed.add(key);
+      }
+    });
+
+    if (completed.size === 0) return;
+
+    setPendingEntities((prev) => {
+      const next = new Set(prev);
+      completed.forEach((k) => next.delete(k));
+      return next;
+    });
+
+    queryClient.invalidateQueries({ queryKey: syncLogKeys.lists() });
+  }, [stats, pendingEntities, queryClient]);
+
   const handleSync = async (entityKey?: string) => {
-    const key = entityKey ?? "all";
-    setSyncingEntity(key);
+    triggeredAtRef.current = new Date().toISOString();
     try {
       await triggerSync.mutateAsync(entityKey);
+      const toWatch = entityKey ? [entityKey] : API_ENTITIES;
+      setPendingEntities((prev) => {
+        const next = new Set(prev);
+        toWatch.forEach((k) => next.add(k));
+        return next;
+      });
       setToast({
         isOpen: true,
         message: entityKey
-          ? `Synchronisation de "${ENTITY_CONFIG.find((e) => e.key === entityKey)?.label}" réussie.`
-          : "Synchronisation globale déclenchée avec succès.",
+          ? `Synchronisation de "${ENTITY_CONFIG.find((e) => e.key === entityKey)?.label}" lancée en arrière-plan.`
+          : "Synchronisation globale lancée en arrière-plan.",
         type: "success",
       });
     } catch {
       setToast({
         isOpen: true,
-        message: "Erreur lors de la synchronisation.",
+        message: "Erreur lors du déclenchement de la synchronisation.",
         type: "error",
       });
-    } finally {
-      setSyncingEntity(null);
     }
   };
+
+  const isSyncingAll = pendingEntities.size > 0;
 
   if (status === "loading" || (status === "authenticated" && !isAdmin)) {
     return (
@@ -202,8 +252,6 @@ function SyncPageContent() {
       </div>
     );
   }
-
-  const isSyncingAll = syncingEntity === "all";
 
   return (
     <DashboardLayout title="Synchronisation CCAK">
@@ -217,7 +265,7 @@ function SyncPageContent() {
           <button
             type="button"
             onClick={() => handleSync()}
-            disabled={syncingEntity !== null}
+            disabled={isSyncingAll}
             className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#008D36] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
@@ -252,10 +300,7 @@ function SyncPageContent() {
                 isStatic={entity.isStatic}
                 stats={stats?.[entity.key]}
                 statsLoading={statsLoading}
-                isSyncing={
-                  syncingEntity === entity.key ||
-                  (isSyncingAll && API_ENTITIES.includes(entity.key))
-                }
+                isSyncing={pendingEntities.has(entity.key)}
                 onSync={() => handleSync(entity.key)}
               />
             ))}
