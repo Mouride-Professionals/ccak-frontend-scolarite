@@ -10,6 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --animate-indeterminate: indeterminate 1.4s ease-in-out infinite;
+
+  @keyframes indeterminate {
+    0% { transform: translateX(-100%) scaleX(0.3); }
+    50% { transform: translateX(0%) scaleX(0.6); }
+    100% { transform: translateX(100%) scaleX(0.3); }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
