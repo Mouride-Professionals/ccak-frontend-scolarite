@@ -13,6 +13,7 @@ export enum AcademicLevel {
   LICENCE = "LICENCE",
   MASTER = "MASTER",
   DOCTORAT = "DOCTORAT",
+  CLASSE_PREPARATOIRE = "CLASSE_PREPARATOIRE",
 }
 
 export enum CourseType {

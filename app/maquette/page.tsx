@@ -35,7 +35,7 @@ export default function MaquettePage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importDeptId, setImportDeptId] = useState("");
   const [importProgramName, setImportProgramName] = useState("");
-  const [importLevel, setImportLevel] = useState<"LICENCE" | "MASTER" | "DOCTORAT">("LICENCE");
+  const [importLevel, setImportLevel] = useState<"LICENCE" | "MASTER" | "DOCTORAT" | "CLASSE_PREPARATOIRE">("LICENCE");
   const [importDryRun, setImportDryRun] = useState(true);
   const [importResult, setImportResult] = useState<ImportMaquetteResult | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -352,13 +352,14 @@ export default function MaquettePage() {
                     <select
                       value={importLevel}
                       onChange={(e) =>
-                        setImportLevel(e.target.value as "LICENCE" | "MASTER" | "DOCTORAT")
+                        setImportLevel(e.target.value as "LICENCE" | "MASTER" | "DOCTORAT" | "CLASSE_PREPARATOIRE")
                       }
                       className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                     >
                       <option value="LICENCE">Licence</option>
                       <option value="MASTER">Master</option>
                       <option value="DOCTORAT">Doctorat</option>
+                      <option value="CLASSE_PREPARATOIRE">Cycle Préparatoire</option>
                     </select>
                   </div>
                   <label className="flex cursor-pointer items-center gap-2 pb-2">
