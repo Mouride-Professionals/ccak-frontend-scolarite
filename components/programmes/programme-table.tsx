@@ -29,6 +29,8 @@ export default function ProgrammeTable({ programmes, onEdit, onDelete }: Program
         return "Master";
       case AcademicLevel.DOCTORAT:
         return "Doctorat";
+      case AcademicLevel.CLASSE_PREPARATOIRE:
+        return "Cycle Préparatoire";
       default:
         return level;
     }

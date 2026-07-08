@@ -129,6 +129,7 @@ export default function ProgrammeForm({
           <option value={AcademicLevel.LICENCE}>Licence</option>
           <option value={AcademicLevel.MASTER}>Master</option>
           <option value={AcademicLevel.DOCTORAT}>Doctorat</option>
+          <option value={AcademicLevel.CLASSE_PREPARATOIRE}>Cycle Préparatoire</option>
         </select>
         {errors.level && <p className="mt-1 text-sm text-red-600">{errors.level.message}</p>}
       </div>

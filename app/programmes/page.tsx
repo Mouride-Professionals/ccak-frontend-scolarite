@@ -227,6 +227,7 @@ function ProgrammesPageContent() {
                   <option value={AcademicLevel.LICENCE}>Licence</option>
                   <option value={AcademicLevel.MASTER}>Master</option>
                   <option value={AcademicLevel.DOCTORAT}>Doctorat</option>
+                  <option value={AcademicLevel.CLASSE_PREPARATOIRE}>Cycle Préparatoire</option>
                 </select>
               </div>
 

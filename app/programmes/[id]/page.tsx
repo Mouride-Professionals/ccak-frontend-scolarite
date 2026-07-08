@@ -73,6 +73,8 @@ export default function ProgrammeDetailPage() {
         return "Master";
       case AcademicLevel.DOCTORAT:
         return "Doctorat";
+      case AcademicLevel.CLASSE_PREPARATOIRE:
+        return "Cycle Préparatoire";
       default:
         return level;
     }
