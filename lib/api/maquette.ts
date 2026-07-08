@@ -12,7 +12,7 @@ export async function getMaquette(filters?: MaquetteFilters): Promise<MaquetteRe
 export interface ImportMaquetteParams {
   department_id: string;
   program_name?: string;
-  program_level?: "LICENCE" | "MASTER" | "DOCTORAT";
+  program_level?: "LICENCE" | "MASTER" | "DOCTORAT" | "CLASSE_PREPARATOIRE";
   dry_run?: boolean;
 }
 
