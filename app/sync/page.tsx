@@ -62,7 +62,7 @@ const ENTITY_CONFIG = [
     key: "degree_cycles",
     label: "Cycles de formation",
     description: "Licence, Master, Doctorat, Classe Préparatoire",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -78,7 +78,7 @@ const ENTITY_CONFIG = [
     key: "niveaux",
     label: "Niveaux",
     description: "L1, L2, L3, M1, M2, Doctorat…",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -94,7 +94,7 @@ const ENTITY_CONFIG = [
     key: "ufr",
     label: "UFR / Facultés",
     description: "ETISAR, SATA, MET, SMS, ILAMEL, CP",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -110,7 +110,7 @@ const ENTITY_CONFIG = [
     key: "departements",
     label: "Départements",
     description: "HEC, Informatique, Agronomie…",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -126,7 +126,7 @@ const ENTITY_CONFIG = [
     key: "programmes",
     label: "Programmes",
     description: "Licences et spécialités par département",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -142,7 +142,7 @@ const ENTITY_CONFIG = [
     key: "academic_years",
     label: "Années académiques",
     description: "2023-2024, 2024-2025, 2025-2026",
-    isStatic: true,
+    isStatic: false,
     icon: (
       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
