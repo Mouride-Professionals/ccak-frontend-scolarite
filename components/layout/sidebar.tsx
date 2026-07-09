@@ -74,7 +74,13 @@ const menuItems: MenuItem[] = [
         href: "/enrollments",
         icon: null as any,
       },
-{
+      {
+        id: "course-enrollment-matrix",
+        label: "Inscriptions aux cours",
+        href: "/course-enrollments/matrix",
+        icon: null as any,
+      },
+      {
         id: "teaching-assignments",
         label: "Charges d'enseignement",
         href: "/teaching-assignments",
