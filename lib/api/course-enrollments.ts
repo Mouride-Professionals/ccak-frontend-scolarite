@@ -13,6 +13,12 @@ import type {
   UpdateCourseEnrollmentInput,
   Course,
   CourseAvailability,
+  ProgramAvailableCoursesInput,
+  ProgramAvailableCoursesResponse,
+  CourseEnrollmentMatrix,
+  CourseEnrollmentMatrixFilters,
+  SaveCourseEnrollmentMatrixInput,
+  SaveCourseEnrollmentMatrixResult,
 } from "@/types/course-enrollment";
 import type { AcademicYear } from "@/types/enrollment";
 
@@ -59,6 +65,21 @@ export async function createCourseEnrollment(
 }
 
 /**
+ * Enroll one program enrollment in a course through the enrollment-aware API.
+ */
+export async function enrollCourse(
+  enrollmentId: string,
+  input: Omit<CreateCourseEnrollmentInput, "enrollment_id" | "academic_year_id" | "status">
+): Promise<CourseEnrollment> {
+  const response = await api.post(
+    `/enrollments/${enrollmentId}/courses`,
+    input as unknown as Record<string, unknown>
+  );
+  const payload = unwrapData<{ course_enrollment: CourseEnrollment }>(response);
+  return payload.course_enrollment;
+}
+
+/**
  * Update an existing course enrollment
  */
 export async function updateCourseEnrollment(
@@ -99,6 +120,67 @@ export async function updateCourseEnrollmentStatus(
 export async function getCourses(): Promise<Course[]> {
   const response = await api.get("/courses");
   return unwrapData<Course[]>(response);
+}
+
+export async function getAvailableCoursesByProgram(
+  programId: string,
+  input: ProgramAvailableCoursesInput
+): Promise<ProgramAvailableCoursesResponse> {
+  const queryParams = new URLSearchParams();
+  if (input.academic_year_id) queryParams.set("academic_year_id", input.academic_year_id);
+  queryParams.set("semester", input.semester.toString());
+  if (input.student_id) queryParams.set("student_id", input.student_id);
+  if (input.search) queryParams.set("search", input.search);
+
+  const response = await api.get(
+    `/programs/${programId}/available-courses?${queryParams.toString()}`
+  );
+  const payload = unwrapData<ProgramAvailableCoursesResponse>(response);
+  return {
+    ...payload,
+    courses: payload.courses.map((course) => {
+      const prerequisites = course.prerequisites as unknown;
+      const normalizedPrerequisites =
+        prerequisites &&
+        typeof prerequisites === "object" &&
+        "required" in prerequisites &&
+        Array.isArray((prerequisites as { required?: unknown }).required)
+          ? (prerequisites as { required: string[] }).required
+          : course.prerequisites;
+
+      return {
+        ...course,
+        prerequisites: normalizedPrerequisites,
+      };
+    }),
+  };
+}
+
+export async function getCourseEnrollmentMatrix(
+  programId: string,
+  filters: CourseEnrollmentMatrixFilters
+): Promise<CourseEnrollmentMatrix> {
+  const queryParams = new URLSearchParams();
+  queryParams.set("academic_year_id", filters.academic_year_id);
+  queryParams.set("semester", filters.semester.toString());
+  if (filters.status) queryParams.set("status", filters.status);
+  if (filters.search) queryParams.set("search", filters.search);
+
+  const response = await api.get(
+    `/programs/${programId}/course-enrollment-matrix?${queryParams.toString()}`
+  );
+  return unwrapData<CourseEnrollmentMatrix>(response);
+}
+
+export async function saveCourseEnrollmentMatrix(
+  programId: string,
+  input: SaveCourseEnrollmentMatrixInput
+): Promise<SaveCourseEnrollmentMatrixResult> {
+  const response = await api.post(
+    `/programs/${programId}/course-enrollment-matrix`,
+    input as unknown as Record<string, unknown>
+  );
+  return unwrapData<SaveCourseEnrollmentMatrixResult>(response);
 }
 
 /**

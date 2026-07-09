@@ -78,6 +78,107 @@ export interface CourseAvailability {
   message?: string;
 }
 
+export interface ProgramAvailableCoursesInput {
+  academic_year_id?: string;
+  semester: number;
+  student_id?: string;
+  search?: string;
+}
+
+export interface ProgramAvailableCoursesResponse {
+  program: {
+    id: string;
+    name: string;
+    level: string;
+  };
+  academic_year_id: string;
+  semester: number;
+  courses: Course[];
+  total_available: number;
+}
+
+export interface CourseEnrollmentMatrixCourse {
+  id: string;
+  code: string;
+  name: string;
+  credits: number;
+  semester: number;
+  course_unit_id: string;
+  course_unit_code: string | null;
+  course_unit_name: string | null;
+}
+
+export interface CourseEnrollmentMatrixEnrollment {
+  id: string;
+  student_id: string;
+  student_number: string | null;
+  student_name: string | null;
+  status: string;
+}
+
+export interface CourseEnrollmentMatrixCell {
+  enrollment_id: string;
+  course_id: string;
+  course_enrollment_id: string | null;
+  checked: boolean;
+  status: CourseEnrollmentStatus | null;
+  locked: boolean;
+  lock_reason: string | null;
+  has_grades: boolean;
+}
+
+export interface CourseEnrollmentMatrix {
+  program: {
+    id: string;
+    name: string;
+    level: string;
+  };
+  academic_year: {
+    id: string;
+    name: string;
+    status: string | null;
+    is_current: boolean;
+  };
+  semester: number;
+  is_read_only: boolean;
+  read_only_reason: string | null;
+  courses: CourseEnrollmentMatrixCourse[];
+  enrollments: CourseEnrollmentMatrixEnrollment[];
+  cells: CourseEnrollmentMatrixCell[];
+}
+
+export interface CourseEnrollmentMatrixFilters {
+  academic_year_id: string;
+  semester: number;
+  status?: string;
+  search?: string;
+}
+
+export interface SaveCourseEnrollmentMatrixInput {
+  academic_year_id: string;
+  semester: number;
+  enrollment_date?: string;
+  creates: Array<{
+    enrollment_id: string;
+    course_id: string;
+  }>;
+  drops: Array<{
+    course_enrollment_id: string;
+  }>;
+}
+
+export interface SaveCourseEnrollmentMatrixResult {
+  created: number;
+  reactivated: number;
+  dropped: number;
+  skipped: number;
+  errors: Array<{
+    index: number;
+    action: "create" | "drop";
+    message: string;
+  }>;
+}
+
 // =====================
 // FORM TYPES
 // =====================

@@ -9,6 +9,9 @@ import type {
   CreateCourseEnrollmentInput,
   UpdateCourseEnrollmentInput,
   Course,
+  ProgramAvailableCoursesInput,
+  CourseEnrollmentMatrixFilters,
+  SaveCourseEnrollmentMatrixInput,
 } from "@/types/course-enrollment";
 
 // Query keys
@@ -19,6 +22,10 @@ export const courseEnrollmentKeys = {
   details: () => [...courseEnrollmentKeys.all, "detail"] as const,
   detail: (id: string) => [...courseEnrollmentKeys.details(), id] as const,
   courses: ["courses"] as const,
+  availableCourses: (programId: string, input?: ProgramAvailableCoursesInput) =>
+    [...courseEnrollmentKeys.all, "availableCourses", programId, input] as const,
+  matrix: (programId: string, filters?: CourseEnrollmentMatrixFilters) =>
+    [...courseEnrollmentKeys.all, "matrix", programId, filters] as const,
   academicYears: ["academicYears"] as const,
   availability: (courseId: string, academicYearId: string, semester: number) =>
     [...courseEnrollmentKeys.all, "availability", courseId, academicYearId, semester] as const,
@@ -59,6 +66,24 @@ export function useCreateCourseEnrollment() {
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: courseEnrollmentKeys.lists() });
+    },
+  });
+}
+
+export function useEnrollCourse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      enrollmentId,
+      input,
+    }: {
+      enrollmentId: string;
+      input: Omit<CreateCourseEnrollmentInput, "enrollment_id" | "academic_year_id" | "status">;
+    }) => courseEnrollmentsApi.enrollCourse(enrollmentId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: courseEnrollmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: courseEnrollmentKeys.all });
     },
   });
 }
@@ -104,6 +129,44 @@ export function useCourses() {
     queryKey: courseEnrollmentKeys.courses,
     queryFn: () => courseEnrollmentsApi.getCourses(),
     staleTime: 300000, // 5 minutes
+  });
+}
+
+export function useAvailableCoursesByProgram(
+  programId: string,
+  input: ProgramAvailableCoursesInput,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: courseEnrollmentKeys.availableCourses(programId, input),
+    queryFn: () => courseEnrollmentsApi.getAvailableCoursesByProgram(programId, input),
+    enabled: enabled && !!programId && !!input.semester,
+    staleTime: 30000,
+  });
+}
+
+export function useCourseEnrollmentMatrix(
+  programId: string,
+  filters: CourseEnrollmentMatrixFilters,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: courseEnrollmentKeys.matrix(programId, filters),
+    queryFn: () => courseEnrollmentsApi.getCourseEnrollmentMatrix(programId, filters),
+    enabled: enabled && !!programId && !!filters.academic_year_id && !!filters.semester,
+    staleTime: 15000,
+  });
+}
+
+export function useSaveCourseEnrollmentMatrix(programId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: SaveCourseEnrollmentMatrixInput) =>
+      courseEnrollmentsApi.saveCourseEnrollmentMatrix(programId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: courseEnrollmentKeys.all });
+    },
   });
 }
 

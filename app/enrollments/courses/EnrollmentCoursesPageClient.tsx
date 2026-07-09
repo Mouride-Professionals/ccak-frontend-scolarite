@@ -15,8 +15,7 @@ import Pagination from "@/components/ui/pagination";
 import {
   useCourseEnrollments,
   useDeleteCourseEnrollment,
-  useCreateCourseEnrollment,
-  useCourses,
+  useEnrollCourse,
 } from "@/hooks/use-course-enrollments";
 import { useEnrollment } from "@/hooks/use-enrollments";
 import { CourseEnrollmentStatus, type CourseEnrollmentFilters } from "@/types/course-enrollment";
@@ -60,10 +59,7 @@ export default function EnrollmentCoursesPageClient() {
   const { data: enrollment } = useEnrollment(enrollmentId);
   const clearBasket = useCourseBasketStore((state) => state.clear);
   const deleteMutation = useDeleteCourseEnrollment();
-  const createMutation = useCreateCourseEnrollment();
-
-  // Load form data
-  const { data: courses, isLoading: loadingCourses } = useCourses();
+  const enrollCourseMutation = useEnrollCourse();
 
   const handleViewClick = (id: string) => {
     // Vous pouvez créer une page de détail si nécessaire
@@ -104,13 +100,13 @@ export default function EnrollmentCoursesPageClient() {
     try {
       await Promise.all(
         payload.course_ids.map((courseId) =>
-          createMutation.mutateAsync({
-            enrollment_id: payload.enrollment_id,
-            course_id: courseId,
-            academic_year_id: payload.academic_year_id,
-            semester: payload.semester,
-            enrollment_date: payload.enrollment_date,
-            status: payload.status,
+          enrollCourseMutation.mutateAsync({
+            enrollmentId: payload.enrollment_id,
+            input: {
+              course_id: courseId,
+              semester: payload.semester,
+              enrollment_date: payload.enrollment_date,
+            },
           })
         )
       );
@@ -241,35 +237,25 @@ export default function EnrollmentCoursesPageClient() {
           subtitle="Formulaire d'ajout de cours"
           size="lg"
         >
-          {loadingCourses ? (
-            <div className="flex min-h-[400px] items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-[#008D36]"></div>
-                <p className="mt-3 text-sm text-zinc-500">Chargement des données...</p>
-              </div>
-            </div>
-          ) : (
-            <CourseEnrollmentForm
-              onSubmit={handleCreateSubmit}
-              onCancel={() => {
-                clearBasket();
-                setIsCreateModalOpen(false);
-              }}
-              enrollments={enrollment ? [enrollment] : []}
-              courses={courses ?? []}
-              alreadyEnrolledCourseIds={(data?.data ?? [])
-                .filter((item) => item.status !== CourseEnrollmentStatus.DROPPED)
-                .map((item) => item.course_id)}
-              isLoading={createMutation.isPending}
-              initialData={{
-                enrollment_id: enrollmentId,
-                course_id: "",
-                academic_year_id: enrollment?.academic_year_id || "",
-                semester: enrollment?.current_semester || 1,
-                enrollment_date: new Date().toISOString().split("T")[0],
-              }}
-            />
-          )}
+          <CourseEnrollmentForm
+            onSubmit={handleCreateSubmit}
+            onCancel={() => {
+              clearBasket();
+              setIsCreateModalOpen(false);
+            }}
+            enrollments={enrollment ? [enrollment] : []}
+            alreadyEnrolledCourseIds={(data?.data ?? [])
+              .filter((item) => item.status !== CourseEnrollmentStatus.DROPPED)
+              .map((item) => item.course_id)}
+            isLoading={enrollCourseMutation.isPending}
+            initialData={{
+              enrollment_id: enrollmentId,
+              course_id: "",
+              academic_year_id: enrollment?.academic_year_id || "",
+              semester: enrollment?.current_semester || 1,
+              enrollment_date: new Date().toISOString().split("T")[0],
+            }}
+          />
         </Modal>
 
         {/* Delete Confirmation Dialog */}
