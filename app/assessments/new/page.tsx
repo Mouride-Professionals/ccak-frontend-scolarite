@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
-import AssessmentForm, { defaultFormState, buildAssessmentPayload } from "@/components/assessments/assessment-form";
+import AssessmentForm, {
+  defaultFormState,
+  buildAssessmentPayload,
+} from "@/components/assessments/assessment-form";
 import { useCreateAssessment } from "@/hooks/use-assessments";
 import type { CreateAssessmentInput } from "@/types/assessment";
 

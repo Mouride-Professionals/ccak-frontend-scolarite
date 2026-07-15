@@ -7,7 +7,10 @@ import type { Course, CreateCourseEnrollmentInput } from "@/types/course-enrollm
 import { CourseEnrollmentStatus } from "@/types/course-enrollment";
 import type { Enrollment } from "@/types/enrollment";
 import { useCurrentAcademicYear } from "@/hooks/use-academic-years";
-import { useCourseAvailabilities } from "@/hooks/use-course-enrollments";
+import {
+  useAvailableCoursesByProgram,
+  useCourseAvailabilities,
+} from "@/hooks/use-course-enrollments";
 import { useCourseBasketStore } from "@/stores/course-basket-store";
 import { zodErrorToFieldErrors, type FieldErrors } from "@/lib/validations/zod-errors";
 
@@ -87,28 +90,54 @@ export default function CourseEnrollmentForm({
     formData.enrollment_date.trim().length > 0 &&
     basketItems.length > 0;
 
-  const availabilityByCourseId = useCourseAvailabilities(
-    courses,
-    formData.academic_year_id,
-    formData.semester,
-    !!formData.academic_year_id
-  );
-
   const selectedEnrollment = useMemo(
     () => enrollments.find((item) => item.id === formData.enrollment_id),
     [enrollments, formData.enrollment_id]
   );
 
+  const scopedCourseInput = useMemo(
+    () => ({
+      academic_year_id: formData.academic_year_id,
+      semester: formData.semester,
+      student_id: selectedEnrollment?.student_id,
+      search,
+    }),
+    [formData.academic_year_id, formData.semester, search, selectedEnrollment?.student_id]
+  );
+
+  const shouldUseScopedCourses = Boolean(
+    selectedEnrollment?.academic_program_id && formData.academic_year_id && formData.semester
+  );
+  const scopedCoursesQuery = useAvailableCoursesByProgram(
+    selectedEnrollment?.academic_program_id ?? "",
+    scopedCourseInput,
+    shouldUseScopedCourses
+  );
+  const courseCatalog = useMemo(
+    () => (shouldUseScopedCourses ? (scopedCoursesQuery.data?.courses ?? []) : courses),
+    [courses, scopedCoursesQuery.data?.courses, shouldUseScopedCourses]
+  );
+  const loadingCourseCatalog = shouldUseScopedCourses && scopedCoursesQuery.isLoading;
+
+  const availabilityByCourseId = useCourseAvailabilities(
+    courseCatalog,
+    formData.academic_year_id,
+    formData.semester,
+    !!formData.academic_year_id
+  );
+
   const filteredCourses = useMemo(() => {
+    if (shouldUseScopedCourses) return courseCatalog;
+
     const q = search.trim().toLowerCase();
-    if (!q) return courses;
-    return courses.filter(
+    if (!q) return courseCatalog;
+    return courseCatalog.filter(
       (course) =>
         course.name.toLowerCase().includes(q) ||
         course.code.toLowerCase().includes(q) ||
         (course.description || "").toLowerCase().includes(q)
     );
-  }, [courses, search]);
+  }, [courseCatalog, search, shouldUseScopedCourses]);
 
   const takenOrSelectedCourseIds = useMemo(() => {
     return new Set([...alreadyEnrolledCourseIds, ...basketItems.map((item) => item.id)]);
@@ -330,66 +359,78 @@ export default function CourseEnrollmentForm({
           </div>
 
           <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
-            {filteredCourses.map((course) => {
-              const availability = availabilityByCourseId[course.id];
-              const missingPrereqs = getMissingPrerequisites(course);
-              const selected = hasCourse(course.id);
+            {loadingCourseCatalog ? (
+              <div className="rounded-lg border border-zinc-200 p-6 text-center text-sm text-zinc-500">
+                Chargement des cours du programme...
+              </div>
+            ) : filteredCourses.length === 0 ? (
+              <div className="rounded-lg border border-zinc-200 p-6 text-center text-sm text-zinc-500">
+                Aucun cours trouvé pour ce programme et ce semestre.
+              </div>
+            ) : (
+              filteredCourses.map((course) => {
+                const availability = availabilityByCourseId[course.id];
+                const missingPrereqs = getMissingPrerequisites(course);
+                const selected = hasCourse(course.id);
+                const alreadyEnrolled = alreadyEnrolledCourseIds.includes(course.id);
 
-              return (
-                <div key={course.id} className="rounded-lg border border-zinc-200 p-3">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-[#00365F]">
-                        {course.code} - {course.name}
-                      </p>
-                      <div className="mt-1 flex flex-wrap gap-2 text-xs">
-                        <span className="rounded-full bg-[#00365F]/10 px-2 py-0.5 text-[#00365F]">
-                          {course.credits} crédits
-                        </span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 ${
-                            missingPrereqs.length > 0
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {missingPrereqs.length > 0
-                            ? `${missingPrereqs.length} prérequis manquant(s)`
-                            : "Prérequis validés"}
-                        </span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 ${
-                            availability && !availability.is_available
-                              ? "bg-red-100 text-red-700"
-                              : "bg-blue-100 text-blue-700"
-                          }`}
-                        >
-                          {availability?.remaining_seats != null
-                            ? `${availability.remaining_seats} place(s) restante(s)`
-                            : availability?.is_available === false
-                              ? "Complet"
-                              : "Disponibilité à vérifier"}
-                        </span>
+                return (
+                  <div key={course.id} className="rounded-lg border border-zinc-200 p-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-[#00365F]">
+                          {course.code} - {course.name}
+                        </p>
+                        <div className="mt-1 flex flex-wrap gap-2 text-xs">
+                          <span className="rounded-full bg-[#00365F]/10 px-2 py-0.5 text-[#00365F]">
+                            {course.credits} crédits
+                          </span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 ${
+                              missingPrereqs.length > 0
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-green-100 text-green-700"
+                            }`}
+                          >
+                            {missingPrereqs.length > 0
+                              ? `${missingPrereqs.length} prérequis manquant(s)`
+                              : "Prérequis validés"}
+                          </span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 ${
+                              availability && !availability.is_available
+                                ? "bg-red-100 text-red-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {availability?.remaining_seats != null
+                              ? `${availability.remaining_seats} place(s) restante(s)`
+                              : availability?.is_available === false
+                                ? "Complet"
+                                : "Disponibilité à vérifier"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      type="button"
-                      disabled={
-                        isLoading ||
-                        selected ||
-                        missingPrereqs.length > 0 ||
-                        (availability ? !availability.is_available : false)
-                      }
-                      onClick={() => handleAddCourse(course)}
-                      className="rounded-lg bg-[#008D36] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#0A8F3D] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {selected ? "Ajouté" : "Ajouter"}
-                    </button>
+                      <button
+                        type="button"
+                        disabled={
+                          isLoading ||
+                          selected ||
+                          alreadyEnrolled ||
+                          missingPrereqs.length > 0 ||
+                          (availability ? !availability.is_available : false)
+                        }
+                        onClick={() => handleAddCourse(course)}
+                        className="rounded-lg bg-[#008D36] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#0A8F3D] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {alreadyEnrolled ? "Déjà inscrit" : selected ? "Ajouté" : "Ajouter"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 

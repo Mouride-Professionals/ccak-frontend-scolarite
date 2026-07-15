@@ -19,8 +19,7 @@ import * as examsApi from "@/lib/api/exams";
 export const examKeys = {
   all: ["exam-sessions"] as const,
   lists: () => [...examKeys.all, "list"] as const,
-  schedulesList: (filters?: ExamScheduleFilters) =>
-    ["exam-schedules", "list", filters] as const,
+  schedulesList: (filters?: ExamScheduleFilters) => ["exam-schedules", "list", filters] as const,
   list: (filters?: ExamSessionFilters) => [...examKeys.lists(), filters] as const,
   details: () => [...examKeys.all, "detail"] as const,
   detail: (id: string) => [...examKeys.details(), id] as const,

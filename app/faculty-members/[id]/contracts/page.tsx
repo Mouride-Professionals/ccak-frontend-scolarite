@@ -173,7 +173,9 @@ export default function FacultyContractsPage() {
                   >
                     {Object.values(FacultyContractType).map((type) => (
                       <option key={type} value={type}>
-                        {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[type] ?? type}
+                        {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[
+                          type
+                        ] ?? type}
                       </option>
                     ))}
                   </select>
@@ -205,7 +207,9 @@ export default function FacultyContractsPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-zinc-700">Salaire (FCFA)</label>
+                  <label className="mb-2 block text-sm font-medium text-zinc-700">
+                    Salaire (FCFA)
+                  </label>
                   <input
                     type="number"
                     value={form.salary}

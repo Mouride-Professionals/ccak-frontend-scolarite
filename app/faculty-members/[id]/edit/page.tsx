@@ -113,7 +113,10 @@ export default function FacultyMemberEditPage() {
                     setFormData((prev) => ({ ...prev, phone: event.target.value }))
                   }
                   onBlur={(e) =>
-                    setFormData((prev) => ({ ...prev, phone: formatPhoneInput(e.target.value) || "+221 " }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      phone: formatPhoneInput(e.target.value) || "+221 ",
+                    }))
                   }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 />
@@ -188,7 +191,9 @@ export default function FacultyMemberEditPage() {
                 >
                   {Object.values(FacultyContractType).map((type) => (
                     <option key={type} value={type}>
-                      {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[type] ?? type}
+                      {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[
+                        type
+                      ] ?? type}
                     </option>
                   ))}
                 </select>

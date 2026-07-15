@@ -67,7 +67,9 @@ export default function StudentTable({ students, onEdit, onDelete }: StudentTabl
                 </td>
                 <td className="px-4 py-4 sm:px-6 sm:py-5">
                   <div className="text-sm text-zinc-700">{student.full_name}</div>
-                  <div className="mt-1 text-xs text-zinc-500 lg:hidden">{formatPhone(student.phone)}</div>
+                  <div className="mt-1 text-xs text-zinc-500 lg:hidden">
+                    {formatPhone(student.phone)}
+                  </div>
                 </td>
                 <td className="hidden px-4 py-4 sm:px-6 sm:py-5 md:table-cell">
                   <span className="inline-flex items-center rounded-md bg-[#00365F]/10 px-2.5 py-1 text-xs font-medium text-[#00365F]">

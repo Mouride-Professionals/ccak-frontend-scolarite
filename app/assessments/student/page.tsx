@@ -11,14 +11,14 @@ import { ASSESSMENT_TYPE_LABELS } from "@/types/assessment";
 import type { AssessmentType } from "@/types/assessment";
 
 const STATUS_LABELS: Record<string, string> = {
-  DRAFT:     "Brouillon",
+  DRAFT: "Brouillon",
   SUBMITTED: "Soumise",
   VALIDATED: "Validée",
   PUBLISHED: "Publiée",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT:     "bg-zinc-100 text-zinc-500",
+  DRAFT: "bg-zinc-100 text-zinc-500",
   SUBMITTED: "bg-blue-100 text-blue-600",
   VALIDATED: "bg-yellow-100 text-yellow-700",
   PUBLISHED: "bg-green-100 text-green-700",
@@ -148,9 +148,7 @@ export default function AssessmentStudentPage() {
                           : "—"}
                       </td>
                       <td className="px-4 py-3 text-sm font-semibold text-[#00365F]">
-                        {grade.score != null
-                          ? `${grade.score} / ${grade.max_score}`
-                          : "—"}
+                        {grade.score != null ? `${grade.score} / ${grade.max_score}` : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <span

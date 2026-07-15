@@ -74,7 +74,9 @@ export default function SyncLogTable({ logs }: SyncLogTableProps) {
                 const cfg = statusConfig[log.status];
                 return (
                   <tr key={log.id} className="bg-white transition-colors hover:bg-zinc-50/50">
-                    <td className="px-4 py-4 font-medium text-zinc-900 sm:px-6">{log.entity_type}</td>
+                    <td className="px-4 py-4 font-medium text-zinc-900 sm:px-6">
+                      {log.entity_type}
+                    </td>
                     <td className="px-4 py-4 sm:px-6">
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${cfg.bgColor} ${cfg.textColor}`}
@@ -147,9 +149,7 @@ export default function SyncLogTable({ logs }: SyncLogTableProps) {
             <div className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
               {selectedLog.error_details.map((err, i) => (
                 <div key={i} className="flex gap-4 px-4 py-3">
-                  <span className="mt-0.5 shrink-0 font-mono text-xs text-zinc-400">
-                    #{i + 1}
-                  </span>
+                  <span className="mt-0.5 shrink-0 font-mono text-xs text-zinc-400">#{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     {err.id && (
                       <p className="mb-0.5 font-mono text-xs text-zinc-500">ID: {err.id}</p>

@@ -1,16 +1,16 @@
 export enum AssessmentType {
-  WRITTEN      = "WRITTEN",
-  ORAL         = "ORAL",
-  LAB          = "LAB",
-  QCM          = "QCM",
+  WRITTEN = "WRITTEN",
+  ORAL = "ORAL",
+  LAB = "LAB",
+  QCM = "QCM",
   PRESENTATION = "PRESENTATION",
 }
 
 export const ASSESSMENT_TYPE_LABELS: Record<AssessmentType, string> = {
-  [AssessmentType.WRITTEN]:      "Écrit",
-  [AssessmentType.ORAL]:         "Oral",
-  [AssessmentType.LAB]:          "Travaux Pratiques",
-  [AssessmentType.QCM]:          "QCM",
+  [AssessmentType.WRITTEN]: "Écrit",
+  [AssessmentType.ORAL]: "Oral",
+  [AssessmentType.LAB]: "Travaux Pratiques",
+  [AssessmentType.QCM]: "QCM",
   [AssessmentType.PRESENTATION]: "Exposé / Soutenance",
 };
 

@@ -30,10 +30,7 @@ export default function ExamGradesPage() {
   );
   const sessions: ExamSession[] = sessionsData?.data ?? [];
 
-  const sessionMap = useMemo(
-    () => new Map(sessions.map((s) => [s.id, s])),
-    [sessions]
-  );
+  const sessionMap = useMemo(() => new Map(sessions.map((s) => [s.id, s])), [sessions]);
 
   const { data: schedulesData, isLoading } = useExamSchedulesList({
     academic_year_id: filters.academicYearId || undefined,
@@ -147,13 +144,9 @@ export default function ExamGradesPage() {
                           "—"
                         )}
                       </td>
+                      <td className="px-4 py-3 text-sm text-zinc-600">{session?.name ?? "—"}</td>
                       <td className="px-4 py-3 text-sm text-zinc-600">
-                        {session?.name ?? "—"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-zinc-600">
-                        {schedule.date
-                          ? new Date(schedule.date).toLocaleDateString("fr-FR")
-                          : "—"}
+                        {schedule.date ? new Date(schedule.date).toLocaleDateString("fr-FR") : "—"}
                       </td>
                       <td className="px-4 py-3 text-sm text-zinc-600">
                         {schedule.start_time} – {schedule.end_time}

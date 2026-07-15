@@ -188,7 +188,7 @@ function SyncPageContent() {
     entity_type: entityFilter || undefined,
   });
   const { data: stats, isLoading: statsLoading } = useSyncStats(
-    pendingEntities.size > 0 ? 3000 : false,
+    pendingEntities.size > 0 ? 3000 : false
   );
   const triggerSync = useTriggerSync();
 

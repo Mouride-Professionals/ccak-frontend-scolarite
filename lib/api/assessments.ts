@@ -37,10 +37,7 @@ export async function updateAssessment(
   id: string,
   input: UpdateAssessmentInput
 ): Promise<Assessment> {
-  const response = await api.put(
-    `/assessments/${id}`,
-    input as unknown as Record<string, unknown>
-  );
+  const response = await api.put(`/assessments/${id}`, input as unknown as Record<string, unknown>);
   return unwrapData<Assessment>(response);
 }
 

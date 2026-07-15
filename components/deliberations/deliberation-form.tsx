@@ -72,7 +72,10 @@ export default function DeliberationForm({
     jury_members: initialData?.jury_members ?? [],
   });
 
-  const { data: displayYear } = useAcademicYear(formData.academic_year_id, !!formData.academic_year_id);
+  const { data: displayYear } = useAcademicYear(
+    formData.academic_year_id,
+    !!formData.academic_year_id
+  );
 
   useEffect(() => {
     if (currentYear && !initialData?.academic_year_id) {

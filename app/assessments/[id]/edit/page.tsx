@@ -56,7 +56,9 @@ export default function AssessmentEditPage() {
             type: (assessment?.type as AssessmentType) ?? undefined,
             date: assessment?.date ?? "",
             startTime: assessment?.start_time ?? "",
-            durationMinutes: assessment?.duration_minutes ? String(assessment.duration_minutes) : "",
+            durationMinutes: assessment?.duration_minutes
+              ? String(assessment.duration_minutes)
+              : "",
             room: assessment?.room ?? "",
             coefficient: assessment?.coefficient ? String(assessment.coefficient) : "",
             notes: assessment?.notes ?? "",
