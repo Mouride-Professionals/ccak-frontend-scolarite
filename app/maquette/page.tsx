@@ -11,7 +11,6 @@ import type {
   MaquetteCourse,
 } from "@/types/maquette";
 import { getAcademicPrograms } from "@/lib/api/course-units";
-import { getDepartments } from "@/lib/api/departments";
 import { downloadTemplate } from "@/lib/api/maquette";
 import type { ImportMaquetteResult } from "@/lib/api/maquette";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -33,11 +32,7 @@ export default function MaquettePage() {
   // Import dialog state
   const [importOpen, setImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
-  const [importDeptId, setImportDeptId] = useState("");
-  const [importProgramName, setImportProgramName] = useState("");
-  const [importLevel, setImportLevel] = useState<
-    "LICENCE" | "MASTER" | "DOCTORAT" | "CLASSE_PREPARATOIRE"
-  >("LICENCE");
+  const [importProgramId, setImportProgramId] = useState("");
   const [importDryRun, setImportDryRun] = useState(true);
   const [importResult, setImportResult] = useState<ImportMaquetteResult | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -45,12 +40,6 @@ export default function MaquettePage() {
 
   const importMutation = useImportMaquette();
   const queryClient = useQueryClient();
-
-  const { data: departments } = useQuery({
-    queryKey: ["departments-all"],
-    queryFn: () => getDepartments({ limit: 200 }),
-    staleTime: 60_000,
-  });
 
   const { data: programs } = useQuery({
     queryKey: ["academic-programs-all"],
@@ -68,25 +57,21 @@ export default function MaquettePage() {
 
   function resetImportDialog() {
     setImportFile(null);
-    setImportDeptId("");
-    setImportProgramName("");
-    setImportLevel("LICENCE");
+    setImportProgramId("");
     setImportDryRun(true);
     setImportResult(null);
     setImportError(null);
   }
 
   async function handleImport() {
-    if (!importFile || !importDeptId) return;
+    if (!importFile || !importProgramId) return;
     setImportError(null);
     setImportResult(null);
     try {
       const result = await importMutation.mutateAsync({
         file: importFile,
         params: {
-          department_id: importDeptId,
-          program_name: importProgramName || undefined,
-          program_level: importLevel,
+          program_id: importProgramId,
           dry_run: importDryRun,
         },
       });
@@ -311,65 +296,30 @@ export default function MaquettePage() {
                   <FileDropZone file={importFile} onChange={setImportFile} />
                 </div>
 
-                {/* Department */}
+                {/* Program */}
                 <div>
                   <label className="mb-1 block text-sm font-medium text-zinc-700">
-                    Département *
+                    Programme *
+                    <span className="ml-1 text-xs font-normal text-zinc-400">
+                      (le fichier sera rattaché à ce programme existant)
+                    </span>
                   </label>
                   <select
-                    value={importDeptId}
-                    onChange={(e) => setImportDeptId(e.target.value)}
+                    value={importProgramId}
+                    onChange={(e) => setImportProgramId(e.target.value)}
                     className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                   >
-                    <option value="">Sélectionner un département</option>
-                    {(departments?.data ?? []).map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
+                    <option value="">Sélectionner un programme</option>
+                    {(programs ?? []).map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Program name */}
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
-                    Nom du programme
-                    <span className="ml-1 text-xs font-normal text-zinc-400">
-                      (requis si absent du fichier)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    value={importProgramName}
-                    onChange={(e) => setImportProgramName(e.target.value)}
-                    placeholder="Ex: Licence en Agronomie-Productions Végétales"
-                    className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-                  />
-                </div>
-
-                {/* Level + dry run */}
+                {/* Dry run */}
                 <div className="flex items-end gap-4">
-                  <div className="flex-1">
-                    <label className="mb-1 block text-sm font-medium text-zinc-700">Niveau</label>
-                    <select
-                      value={importLevel}
-                      onChange={(e) =>
-                        setImportLevel(
-                          e.target.value as
-                            | "LICENCE"
-                            | "MASTER"
-                            | "DOCTORAT"
-                            | "CLASSE_PREPARATOIRE"
-                        )
-                      }
-                      className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
-                    >
-                      <option value="LICENCE">Licence</option>
-                      <option value="MASTER">Master</option>
-                      <option value="DOCTORAT">Doctorat</option>
-                      <option value="CLASSE_PREPARATOIRE">Cycle Préparatoire</option>
-                    </select>
-                  </div>
                   <label className="flex cursor-pointer items-center gap-2 pb-2">
                     <input
                       type="checkbox"
@@ -412,7 +362,7 @@ export default function MaquettePage() {
                 </button>
                 <button
                   onClick={handleImport}
-                  disabled={!importFile || !importDeptId || importMutation.isPending}
+                  disabled={!importFile || !importProgramId || importMutation.isPending}
                   className="rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white hover:bg-[#008D36]/90 disabled:opacity-50"
                 >
                   {importMutation.isPending ? "En cours..." : importDryRun ? "Simuler" : "Importer"}
@@ -527,7 +477,6 @@ function ImportResultCard({
       : "border-green-200 bg-green-50";
 
   const stats = [
-    { label: "Programmes créés", value: result.programs_created },
     { label: "Programmes trouvés", value: result.programs_found },
     { label: "UE créées", value: result.units_created },
     { label: "UE mises à jour / ignorées", value: result.units_skipped },
