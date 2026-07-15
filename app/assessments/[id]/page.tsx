@@ -14,21 +14,22 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import {
-  useAssessmentGradeSheet,
-  usePublishAssessmentGrades,
-} from "@/hooks/use-assessments";
+import { useAssessmentGradeSheet, usePublishAssessmentGrades } from "@/hooks/use-assessments";
 import { useCreateGrade, useUpdateGrade } from "@/hooks/use-grades";
-import { useDownloadGradeSheetPdf, useDownloadGradeSheetExcel, useImportGradeSheet } from "@/hooks/use-fiche-de-note";
+import {
+  useDownloadGradeSheetPdf,
+  useDownloadGradeSheetExcel,
+  useImportGradeSheet,
+} from "@/hooks/use-fiche-de-note";
 import { ASSESSMENT_TYPE_LABELS } from "@/types/assessment";
 import type { AssessmentType, AssessmentGradeSheetRow } from "@/types/assessment";
 import type { ImportGradesResult } from "@/types/fiche-de-note";
 
 const TYPE_COLORS: Record<string, string> = {
-  WRITTEN:      "bg-blue-100 text-blue-700",
-  ORAL:         "bg-purple-100 text-purple-700",
-  LAB:          "bg-yellow-100 text-yellow-700",
-  QCM:          "bg-orange-100 text-orange-700",
+  WRITTEN: "bg-blue-100 text-blue-700",
+  ORAL: "bg-purple-100 text-purple-700",
+  LAB: "bg-yellow-100 text-yellow-700",
+  QCM: "bg-orange-100 text-orange-700",
   PRESENTATION: "bg-pink-100 text-pink-700",
 };
 
@@ -53,9 +54,9 @@ export default function AssessmentDetailPage() {
   const updateGrade = useUpdateGrade();
 
   const ctx = { type: "assessment" as const, id };
-  const downloadPdf   = useDownloadGradeSheetPdf(ctx);
+  const downloadPdf = useDownloadGradeSheetPdf(ctx);
   const downloadExcel = useDownloadGradeSheetExcel(ctx);
-  const importGrades  = useImportGradeSheet(ctx);
+  const importGrades = useImportGradeSheet(ctx);
 
   const [scores, setScores] = useState<Record<string, string>>({});
   const [savingRow, setSavingRow] = useState<string | null>(null);
@@ -73,8 +74,8 @@ export default function AssessmentDetailPage() {
     scores[row.student_id] !== undefined
       ? scores[row.student_id]
       : row.score !== null && row.score !== undefined
-      ? String(row.score)
-      : "";
+        ? String(row.score)
+        : "";
 
   const handleScoreChange = (studentId: string, value: string) => {
     setScores((prev) => ({ ...prev, [studentId]: value }));
@@ -115,7 +116,11 @@ export default function AssessmentDetailPage() {
           return next;
         });
       } catch {
-        setToast({ isOpen: true, message: "Erreur lors de l'enregistrement de la note.", type: "error" });
+        setToast({
+          isOpen: true,
+          message: "Erreur lors de l'enregistrement de la note.",
+          type: "error",
+        });
       } finally {
         setSavingRow(null);
       }
@@ -140,7 +145,11 @@ export default function AssessmentDetailPage() {
       const result = await importGrades.mutateAsync(file);
       setImportResult(result);
       await refetch();
-      setToast({ isOpen: true, message: `${result.imported} note(s) importée(s).`, type: "success" });
+      setToast({
+        isOpen: true,
+        message: `${result.imported} note(s) importée(s).`,
+        type: "success",
+      });
     } catch {
       setToast({ isOpen: true, message: "Échec de l'import.", type: "error" });
     } finally {
@@ -179,8 +188,11 @@ export default function AssessmentDetailPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <h2 className="text-lg font-semibold text-[#00365F]">{assessment.title}</h2>
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[assessment.type] ?? "bg-zinc-100 text-zinc-600"}`}>
-                        {ASSESSMENT_TYPE_LABELS[assessment.type as AssessmentType] ?? assessment.type_label}
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[assessment.type] ?? "bg-zinc-100 text-zinc-600"}`}
+                      >
+                        {ASSESSMENT_TYPE_LABELS[assessment.type as AssessmentType] ??
+                          assessment.type_label}
                       </span>
                       {assessment.is_grades_published && (
                         <span className="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
@@ -192,7 +204,9 @@ export default function AssessmentDetailPage() {
                       <div>
                         <dt className="text-zinc-400">Matière</dt>
                         <dd className="font-medium text-zinc-700">
-                          {assessment.course ? `${assessment.course.code} — ${assessment.course.name}` : "—"}
+                          {assessment.course
+                            ? `${assessment.course.code} — ${assessment.course.name}`
+                            : "—"}
                         </dd>
                       </div>
                       <div>
@@ -216,7 +230,9 @@ export default function AssessmentDetailPage() {
                       {assessment.duration_minutes && (
                         <div>
                           <dt className="text-zinc-400">Durée</dt>
-                          <dd className="font-medium text-zinc-700">{assessment.duration_minutes} min</dd>
+                          <dd className="font-medium text-zinc-700">
+                            {assessment.duration_minutes} min
+                          </dd>
                         </div>
                       )}
                       {assessment.room && (
@@ -307,11 +323,14 @@ export default function AssessmentDetailPage() {
                 {importResult && (
                   <div className="mx-6 mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm">
                     <p className="font-medium text-zinc-700">
-                      Import terminé — {importResult.imported} importée(s), {importResult.skipped} ignorée(s)
+                      Import terminé — {importResult.imported} importée(s), {importResult.skipped}{" "}
+                      ignorée(s)
                     </p>
                     {importResult.errors.length > 0 && (
                       <ul className="mt-1 list-inside list-disc text-xs text-red-600">
-                        {importResult.errors.map((e, i) => <li key={i}>{e}</li>)}
+                        {importResult.errors.map((e, i) => (
+                          <li key={i}>{e}</li>
+                        ))}
                       </ul>
                     )}
                   </div>
@@ -337,13 +356,17 @@ export default function AssessmentDetailPage() {
                       {students.map((row, idx) => {
                         const isSaving = savingRow === row.student_id;
                         const scoreVal = getScore(row);
-                        const isDirty  = scores[row.student_id] !== undefined;
+                        const isDirty = scores[row.student_id] !== undefined;
 
                         return (
                           <TableRow key={row.student_id}>
                             <TableCell className="text-zinc-400">{idx + 1}</TableCell>
-                            <TableCell className="font-medium text-zinc-800">{row.full_name}</TableCell>
-                            <TableCell className="font-mono text-zinc-500">{row.student_number ?? "—"}</TableCell>
+                            <TableCell className="font-medium text-zinc-800">
+                              {row.full_name}
+                            </TableCell>
+                            <TableCell className="font-mono text-zinc-500">
+                              {row.student_number ?? "—"}
+                            </TableCell>
                             <TableCell>
                               <input
                                 type="number"

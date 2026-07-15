@@ -15,7 +15,11 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useExamGradeSheet, useCreateExamGrade, useUpdateExamGrade } from "@/hooks/use-exam-grades";
-import { useDownloadGradeSheetPdf, useDownloadGradeSheetExcel, useImportGradeSheet } from "@/hooks/use-fiche-de-note";
+import {
+  useDownloadGradeSheetPdf,
+  useDownloadGradeSheetExcel,
+  useImportGradeSheet,
+} from "@/hooks/use-fiche-de-note";
 import type { GradeSheetStudentRow } from "@/types/fiche-de-note";
 import type { ImportGradesResult } from "@/types/fiche-de-note";
 
@@ -30,9 +34,9 @@ export default function ExamGradeSheetPage() {
   const updateGrade = useUpdateExamGrade(examScheduleId);
 
   const ctx = { type: "exam_schedule" as const, id: examScheduleId };
-  const downloadPdf   = useDownloadGradeSheetPdf(ctx);
+  const downloadPdf = useDownloadGradeSheetPdf(ctx);
   const downloadExcel = useDownloadGradeSheetExcel(ctx);
-  const importGrades  = useImportGradeSheet(ctx);
+  const importGrades = useImportGradeSheet(ctx);
 
   const [scores, setScores] = useState<Record<string, string>>({});
   const [savingRow, setSavingRow] = useState<string | null>(null);
@@ -43,8 +47,8 @@ export default function ExamGradeSheetPage() {
     type: "success" as "success" | "error",
   });
 
-  const schedule   = data?.exam_schedule;
-  const students   = data?.students ?? [];
+  const schedule = data?.exam_schedule;
+  const students = data?.students ?? [];
   const useAnonyma = schedule?.use_exam_number ?? false;
 
   // scores keyed by student_id always (even in anonyma mode)
@@ -52,8 +56,8 @@ export default function ExamGradeSheetPage() {
     scores[row.student_id] !== undefined
       ? scores[row.student_id]
       : row.score !== null && row.score !== undefined
-      ? String(row.score)
-      : "";
+        ? String(row.score)
+        : "";
 
   const handleScoreChange = (studentId: string, value: string) => {
     setScores((prev) => ({ ...prev, [studentId]: value }));
@@ -103,7 +107,11 @@ export default function ExamGradeSheetPage() {
       const result = await importGrades.mutateAsync(file);
       setImportResult(result);
       await refetch();
-      setToast({ isOpen: true, message: `${result.imported} note(s) importée(s).`, type: "success" });
+      setToast({
+        isOpen: true,
+        message: `${result.imported} note(s) importée(s).`,
+        type: "success",
+      });
     } catch {
       setToast({ isOpen: true, message: "Échec de l'import.", type: "error" });
     } finally {
@@ -232,11 +240,14 @@ export default function ExamGradeSheetPage() {
                 {importResult && (
                   <div className="mx-6 mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm">
                     <p className="font-medium text-zinc-700">
-                      Import terminé — {importResult.imported} importée(s), {importResult.skipped} ignorée(s)
+                      Import terminé — {importResult.imported} importée(s), {importResult.skipped}{" "}
+                      ignorée(s)
                     </p>
                     {importResult.errors.length > 0 && (
                       <ul className="mt-1 list-inside list-disc text-xs text-red-600">
-                        {importResult.errors.map((e, i) => <li key={i}>{e}</li>)}
+                        {importResult.errors.map((e, i) => (
+                          <li key={i}>{e}</li>
+                        ))}
                       </ul>
                     )}
                   </div>
@@ -268,7 +279,7 @@ export default function ExamGradeSheetPage() {
                       {students.map((row, idx) => {
                         const isSaving = savingRow === row.student_id;
                         const scoreVal = getScore(row);
-                        const isDirty  = scores[row.student_id] !== undefined;
+                        const isDirty = scores[row.student_id] !== undefined;
 
                         return (
                           <TableRow key={row.student_id}>

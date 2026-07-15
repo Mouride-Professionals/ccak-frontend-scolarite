@@ -35,63 +35,60 @@ const toOptionalTrimmedString = (value: unknown) => {
 };
 
 const FacultyRegistrationBaseSchema = z.object({
-    full_name: z
-      .string()
-      .trim()
-      .min(3, "Le nom complet doit contenir au moins 3 caractères")
-      .max(120, "Le nom complet ne peut pas dépasser 120 caractères"),
-    email: z
-      .string()
-      .trim()
-      .min(1, "L'email est requis")
-      .email("Veuillez saisir une adresse email valide"),
-    phone: z
-      .string()
-      .trim()
-      .min(1, "Le téléphone est requis")
-      .regex(PHONE_REGEX, "Veuillez saisir un numéro de téléphone valide"),
-    address: z.preprocess(
-      toOptionalTrimmedString,
-      z.string().max(200, "L'adresse ne peut pas dépasser 200 caractères").optional()
-    ),
-    department_id: z.string().min(1, "Le département est requis"),
-    rank: z.nativeEnum(FacultyRank),
-    hire_date: z
-      .string()
-      .min(1, "La date d'embauche est requise")
-      .regex(ISO_DATE_REGEX, "La date d'embauche doit être au format YYYY-MM-DD"),
-    contract_type: z.nativeEnum(FacultyContractType),
-    contract_start: z
-      .string()
-      .min(1, "La date de début de contrat est requise")
-      .regex(ISO_DATE_REGEX, "La date de début doit être au format YYYY-MM-DD"),
-    contract_end: z.preprocess(
-      toOptionalTrimmedString,
-      z.string().regex(ISO_DATE_REGEX, "La date de fin doit être au format YYYY-MM-DD").optional()
-    ),
-    salary: z.preprocess(
-      (value) => {
-        if (typeof value === "string") {
-          const trimmed = value.trim();
-          if (!trimmed) return undefined;
-          const parsed = Number(trimmed);
-          return Number.isNaN(parsed) ? trimmed : parsed;
-        }
-        return value;
-      },
-      z
-        .number({ error: "Le salaire doit être un nombre" })
-        .min(0, "Le salaire ne peut pas être négatif")
-        .max(100_000_000, "Le salaire ne peut pas dépasser 100000000")
-        .optional()
-    ),
-    contract_terms: z.preprocess(
-      toOptionalTrimmedString,
-      z
-        .string()
-        .max(2000, "Les termes du contrat ne peuvent pas dépasser 2000 caractères")
-        .optional()
-    ),
+  full_name: z
+    .string()
+    .trim()
+    .min(3, "Le nom complet doit contenir au moins 3 caractères")
+    .max(120, "Le nom complet ne peut pas dépasser 120 caractères"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "L'email est requis")
+    .email("Veuillez saisir une adresse email valide"),
+  phone: z
+    .string()
+    .trim()
+    .min(1, "Le téléphone est requis")
+    .regex(PHONE_REGEX, "Veuillez saisir un numéro de téléphone valide"),
+  address: z.preprocess(
+    toOptionalTrimmedString,
+    z.string().max(200, "L'adresse ne peut pas dépasser 200 caractères").optional()
+  ),
+  department_id: z.string().min(1, "Le département est requis"),
+  rank: z.nativeEnum(FacultyRank),
+  hire_date: z
+    .string()
+    .min(1, "La date d'embauche est requise")
+    .regex(ISO_DATE_REGEX, "La date d'embauche doit être au format YYYY-MM-DD"),
+  contract_type: z.nativeEnum(FacultyContractType),
+  contract_start: z
+    .string()
+    .min(1, "La date de début de contrat est requise")
+    .regex(ISO_DATE_REGEX, "La date de début doit être au format YYYY-MM-DD"),
+  contract_end: z.preprocess(
+    toOptionalTrimmedString,
+    z.string().regex(ISO_DATE_REGEX, "La date de fin doit être au format YYYY-MM-DD").optional()
+  ),
+  salary: z.preprocess(
+    (value) => {
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return undefined;
+        const parsed = Number(trimmed);
+        return Number.isNaN(parsed) ? trimmed : parsed;
+      }
+      return value;
+    },
+    z
+      .number({ error: "Le salaire doit être un nombre" })
+      .min(0, "Le salaire ne peut pas être négatif")
+      .max(100_000_000, "Le salaire ne peut pas dépasser 100000000")
+      .optional()
+  ),
+  contract_terms: z.preprocess(
+    toOptionalTrimmedString,
+    z.string().max(2000, "Les termes du contrat ne peuvent pas dépasser 2000 caractères").optional()
+  ),
 });
 
 const FacultyRegistrationSchema = FacultyRegistrationBaseSchema.superRefine((data, ctx) => {
@@ -501,7 +498,9 @@ export default function FacultyRegistrationPage() {
                     id="phone"
                     value={formData.phone}
                     onChange={(event) => setFieldValue("phone", event.target.value)}
-                    onBlur={(e) => setFieldValue("phone", formatPhoneInput(e.target.value) || "+221 ")}
+                    onBlur={(e) =>
+                      setFieldValue("phone", formatPhoneInput(e.target.value) || "+221 ")
+                    }
                     placeholder="+221 XX XXX XX XX"
                     className={`block w-full rounded-lg border px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36] ${
                       fieldErrors.phone ? "border-red-300" : "border-zinc-300"
@@ -658,7 +657,9 @@ export default function FacultyRegistrationPage() {
                   >
                     {Object.values(FacultyContractType).map((type) => (
                       <option key={type} value={type}>
-                        {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[type] ?? type}
+                        {{ PERMANENT: "Permanent", TEMPORARY: "Temporaire", HOURLY: "Vacataire" }[
+                          type
+                        ] ?? type}
                       </option>
                     ))}
                   </select>

@@ -89,12 +89,19 @@ export default function AssessmentForm({
     }
   }, [selectedYear?.id, initialValues?.academicYearId]);
 
-  const field = (key: keyof AssessmentFormState) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => setForm((prev) => ({ ...prev, [key]: event.target.value }));
+  const field =
+    (key: keyof AssessmentFormState) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setForm((prev) => ({ ...prev, [key]: event.target.value }));
 
   const handleSubmit = async () => {
-    if (!form.courseId || !form.facultyMemberId || !form.academicYearId || !form.title || !form.date) {
+    if (
+      !form.courseId ||
+      !form.facultyMemberId ||
+      !form.academicYearId ||
+      !form.title ||
+      !form.date
+    ) {
       return;
     }
     await onSubmit(buildAssessmentPayload(form));
@@ -104,14 +111,11 @@ export default function AssessmentForm({
     <>
       <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
           {/* Enseignant */}
           <div className="sm:col-span-2">
             <label className="mb-2 block text-sm font-medium text-zinc-700">Enseignant *</label>
             <FacultySearch
-              onSelect={(faculty) =>
-                setForm((prev) => ({ ...prev, facultyMemberId: faculty.id }))
-              }
+              onSelect={(faculty) => setForm((prev) => ({ ...prev, facultyMemberId: faculty.id }))}
             />
           </div>
 
@@ -257,7 +261,14 @@ export default function AssessmentForm({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isPending || !form.courseId || !form.facultyMemberId || !form.academicYearId || !form.title || !form.date}
+            disabled={
+              isPending ||
+              !form.courseId ||
+              !form.facultyMemberId ||
+              !form.academicYearId ||
+              !form.title ||
+              !form.date
+            }
             className="rounded-lg bg-[#008D36] px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#007A2E] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? "Enregistrement..." : submitLabel}

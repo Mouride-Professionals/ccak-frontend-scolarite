@@ -50,7 +50,9 @@ export default function StudentForm({
       type_of_id: initialData?.type_of_id ?? undefined,
       id_details: initialData?.id_details ?? "",
       emergency_contact_name: initialData?.emergency_contact_name ?? "",
-      emergency_contact_phone: initialData?.emergency_contact_phone ? formatPhone(initialData.emergency_contact_phone) : "+221 ",
+      emergency_contact_phone: initialData?.emergency_contact_phone
+        ? formatPhone(initialData.emergency_contact_phone)
+        : "+221 ",
       address: initialData?.address ?? "",
       documents: [],
     },
@@ -337,7 +339,9 @@ export default function StudentForm({
               id="phone"
               {...phoneReg}
               onBlur={(e) => {
-                setValue("phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                setValue("phone", formatPhoneInput(e.target.value) || "+221 ", {
+                  shouldValidate: true,
+                });
                 phoneReg.onBlur(e);
               }}
               placeholder="+221 XX XXX XX XX"
@@ -357,7 +361,9 @@ export default function StudentForm({
               id="phone_2"
               {...phone2Reg}
               onBlur={(e) => {
-                setValue("phone_2", formatPhoneInput(e.target.value) || "", { shouldValidate: true });
+                setValue("phone_2", formatPhoneInput(e.target.value) || "", {
+                  shouldValidate: true,
+                });
                 phone2Reg.onBlur(e);
               }}
               placeholder="+221 XX XXX XX XX"
@@ -439,7 +445,9 @@ export default function StudentForm({
               id="emergency_contact_phone"
               {...emergencyPhoneReg}
               onBlur={(e) => {
-                setValue("emergency_contact_phone", formatPhoneInput(e.target.value) || "+221 ", { shouldValidate: true });
+                setValue("emergency_contact_phone", formatPhoneInput(e.target.value) || "+221 ", {
+                  shouldValidate: true,
+                });
                 emergencyPhoneReg.onBlur(e);
               }}
               placeholder="+221 XX XXX XX XX"

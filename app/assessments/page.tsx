@@ -15,10 +15,10 @@ import type { AssessmentType } from "@/types/assessment";
 import { useEffect } from "react";
 
 const TYPE_COLORS: Record<string, string> = {
-  WRITTEN:      "bg-blue-100 text-blue-700",
-  ORAL:         "bg-purple-100 text-purple-700",
-  LAB:          "bg-yellow-100 text-yellow-700",
-  QCM:          "bg-orange-100 text-orange-700",
+  WRITTEN: "bg-blue-100 text-blue-700",
+  ORAL: "bg-purple-100 text-purple-700",
+  LAB: "bg-yellow-100 text-yellow-700",
+  QCM: "bg-orange-100 text-orange-700",
   PRESENTATION: "bg-pink-100 text-pink-700",
 };
 
@@ -53,8 +53,7 @@ export default function AssessmentsPage() {
   const handleDelete = (id: string) => {
     if (!confirm("Supprimer ce contrôle continu ?")) return;
     deleteMutation.mutate(id, {
-      onSuccess: () =>
-        setToast({ isOpen: true, message: "Contrôle supprimé.", type: "success" }),
+      onSuccess: () => setToast({ isOpen: true, message: "Contrôle supprimé.", type: "success" }),
       onError: () =>
         setToast({ isOpen: true, message: "Erreur lors de la suppression.", type: "error" }),
     });
@@ -79,7 +78,12 @@ export default function AssessmentsPage() {
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#008D36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#007A2E] sm:w-auto"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Nouveau contrôle
             </button>
@@ -105,10 +109,14 @@ export default function AssessmentsPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">Année académique</label>
+                <label className="mb-2 block text-sm font-medium text-zinc-700">
+                  Année académique
+                </label>
                 <select
                   value={filters.academicYearId}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, academicYearId: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((prev) => ({ ...prev, academicYearId: e.target.value }))
+                  }
                   className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-[#008D36] focus:outline-none focus:ring-1 focus:ring-[#008D36]"
                 >
                   <option value="">Toutes</option>
@@ -157,10 +165,14 @@ export default function AssessmentsPage() {
                           <span className="font-mono text-xs text-zinc-400">{a.course.code}</span>{" "}
                           {a.course.name}
                         </span>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[a.type] ?? "bg-zinc-100 text-zinc-600"}`}>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_COLORS[a.type] ?? "bg-zinc-100 text-zinc-600"}`}
+                      >
                         {ASSESSMENT_TYPE_LABELS[a.type as AssessmentType] ?? a.type_label}
                       </span>
                     </td>

@@ -7,11 +7,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import EnrollmentForm from "@/components/enrollments/enrollment-form";
 import Toast from "@/components/ui/toast";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
-import {
-  useCreateEnrollment,
-  useAcademicPrograms,
-  useStudents,
-} from "@/hooks/use-enrollments";
+import { useCreateEnrollment, useAcademicPrograms, useStudents } from "@/hooks/use-enrollments";
 import type { CreateEnrollmentInput } from "@/types/enrollment";
 
 export default function NewEnrollmentPage() {

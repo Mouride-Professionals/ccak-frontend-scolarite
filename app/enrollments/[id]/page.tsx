@@ -277,7 +277,9 @@ export default function EnrollmentDetailPage() {
               {enrollment.student?.phone && (
                 <div>
                   <p className="text-sm font-medium text-zinc-500">Téléphone</p>
-                  <p className="mt-1 text-sm text-zinc-900">{formatPhone(enrollment.student.phone)}</p>
+                  <p className="mt-1 text-sm text-zinc-900">
+                    {formatPhone(enrollment.student.phone)}
+                  </p>
                 </div>
               )}
               {enrollment.student?.address && (

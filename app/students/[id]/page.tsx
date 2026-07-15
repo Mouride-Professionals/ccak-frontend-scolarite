@@ -533,7 +533,8 @@ export default function StudentDetailPage() {
                           </p>
                           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-zinc-500">Téléphone:</span> {formatPhone(guardian.phone)}
+                              <span className="text-zinc-500">Téléphone:</span>{" "}
+                              {formatPhone(guardian.phone)}
                             </div>
                             <div>
                               <span className="text-zinc-500">Email:</span> {guardian.email}

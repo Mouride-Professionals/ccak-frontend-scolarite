@@ -233,10 +233,7 @@ export default function EvaluationResultsPage() {
                     <XAxis dataKey="key" />
                     <YAxis domain={[0, ratingCeiling]} />
                     <Tooltip
-                      formatter={(value) => [
-                        `${Number(value ?? 0).toFixed(2)} / 5`,
-                        "Moyenne",
-                      ]}
+                      formatter={(value) => [`${Number(value ?? 0).toFixed(2)} / 5`, "Moyenne"]}
                       labelFormatter={(_, payload) => payload?.[0]?.payload?.question || "Question"}
                     />
                     <ReferenceLine
@@ -272,9 +269,7 @@ export default function EvaluationResultsPage() {
                         <Cell key={item.key} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      formatter={(value) => Number(value ?? 0).toFixed(2)}
-                    />
+                    <Tooltip formatter={(value) => Number(value ?? 0).toFixed(2)} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

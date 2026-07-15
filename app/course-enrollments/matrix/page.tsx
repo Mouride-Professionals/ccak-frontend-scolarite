@@ -5,7 +5,14 @@ import ProtectedRoute from "@/components/auth/protected-route";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import Toast from "@/components/ui/toast";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAcademicPrograms, useAcademicYears } from "@/hooks/use-enrollments";
 import {
   useCourseEnrollmentMatrix,
@@ -398,7 +405,10 @@ export default function CourseEnrollmentMatrixPage() {
                         );
 
                       return (
-                        <TableRow key={enrollment.id} className="border-0 odd:bg-white even:bg-zinc-50">
+                        <TableRow
+                          key={enrollment.id}
+                          className="border-0 odd:bg-white even:bg-zinc-50"
+                        >
                           <TableHead className="sticky left-0 z-10 h-auto min-w-64 border-r border-t border-zinc-200 bg-inherit px-3 py-3 text-left font-normal">
                             <label className="flex items-start gap-3">
                               <input
