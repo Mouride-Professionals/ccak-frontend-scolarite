@@ -340,9 +340,18 @@ export default function CourseEnrollmentMatrixPage() {
               </div>
             ) : !matrix ? (
               <div className="p-10 text-center text-sm text-zinc-500">Aucun périmètre chargé.</div>
-            ) : matrix.courses.length === 0 || matrix.enrollments.length === 0 ? (
+            ) : matrix.courses.length === 0 && matrix.enrollments.length === 0 ? (
               <div className="p-10 text-center text-sm text-zinc-500">
                 Aucun étudiant ou cours trouvé pour ce programme et ce semestre.
+              </div>
+            ) : matrix.courses.length === 0 ? (
+              <div className="p-10 text-center text-sm text-zinc-500">
+                Aucun cours trouvé pour ce programme et ce semestre. La maquette n&apos;a peut-être
+                pas encore été importée.
+              </div>
+            ) : matrix.enrollments.length === 0 ? (
+              <div className="p-10 text-center text-sm text-zinc-500">
+                Aucun étudiant inscrit trouvé pour ce programme et ce semestre.
               </div>
             ) : (
               <div className="max-h-[70vh] overflow-auto">

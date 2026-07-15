@@ -10,16 +10,13 @@ export async function getMaquette(filters?: MaquetteFilters): Promise<MaquetteRe
 }
 
 export interface ImportMaquetteParams {
-  department_id: string;
-  program_name?: string;
-  program_level?: "LICENCE" | "MASTER" | "DOCTORAT" | "CLASSE_PREPARATOIRE";
+  program_id: string;
   dry_run?: boolean;
 }
 
 export interface ImportMaquetteResult {
   dry_run: boolean;
   program_id: string | null;
-  programs_created: number;
   programs_found: number;
   units_created: number;
   units_skipped: number;
@@ -35,9 +32,7 @@ export async function importMaquette(
 ): Promise<ImportMaquetteResult> {
   const form = new FormData();
   form.append("file", file);
-  form.append("department_id", params.department_id);
-  if (params.program_name) form.append("program_name", params.program_name);
-  if (params.program_level) form.append("program_level", params.program_level);
+  form.append("program_id", params.program_id);
   if (params.dry_run != null) form.append("dry_run", params.dry_run ? "1" : "0");
 
   const response = await api.post("/maquette/import", form as unknown as Record<string, unknown>);
